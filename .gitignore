@@ -1,0 +1,10 @@
+node_modules
+log
+package-lock.json
+.env
+yarn.lock
+.git
+.DS_Store
+.env.*
+imgs/*
+.vscode
