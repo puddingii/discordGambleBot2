@@ -7,22 +7,22 @@ interface SwordConstructor extends ToolConstructor {
 }
 
 export default class Sword extends ToolAbstract {
-	#hitRatio: number;
-	#missRatio: number;
+	private _hitRatio: number;
+	private _missRatio: number;
 	bonusPower: number;
 
 	constructor(weaponInfo: SwordConstructor) {
 		super({ ...weaponInfo, type: 'sword' });
 		this.bonusPower = weaponInfo?.bonusPower ?? 0;
-		this.#hitRatio = weaponInfo?.hitRatio ?? 1;
-		this.#missRatio = weaponInfo?.missRatio ?? 0;
+		this._hitRatio = weaponInfo?.hitRatio ?? 1;
+		this._missRatio = weaponInfo?.missRatio ?? 0;
 	}
 
-	getHitRatio(): number {
-		return this.#hitRatio;
+	get hitRatio(): number {
+		return this._hitRatio;
 	}
 
-	getMissRatio(): number {
-		return this.#missRatio;
+	get missRatio(): number {
+		return this._missRatio;
 	}
 }
