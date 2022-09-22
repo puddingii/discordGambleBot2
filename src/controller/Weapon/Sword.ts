@@ -11,7 +11,7 @@ export default class Sword extends ToolAbstract {
 	private _missRatio: number;
 	bonusPower: number;
 
-	constructor(weaponInfo: SwordConstructor) {
+	constructor(weaponInfo?: SwordConstructor) {
 		super({ ...weaponInfo, type: 'sword' });
 		this.bonusPower = weaponInfo?.bonusPower ?? 0;
 		this._hitRatio = weaponInfo?.hitRatio ?? 1;

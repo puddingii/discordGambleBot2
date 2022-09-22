@@ -1,4 +1,4 @@
-export default new (class {
+export const numberUtil = new (class Util {
 	/** miin <= x < min + len */
 	getRandomNumber(len: number, min = 0): number {
 		return Math.floor(Math.random() * len) + min;
@@ -13,3 +13,5 @@ export default new (class {
 		return num.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 	}
 })();
+
+export default { numberUtil };

@@ -10,7 +10,7 @@ export interface StockAbstractConstructor {
 	comment: string;
 }
 
-export default abstract class {
+export default abstract class StockAbstract {
 	private _ratio: StockAbstractConstructor['ratio'];
 	beforeHistoryRatio: number;
 	comment: StockAbstractConstructor['comment'];
