@@ -7,10 +7,10 @@ export interface ToolConstructor {
 }
 
 export default abstract class ToolAbstract {
-	curPower: ToolConstructor['curPower'];
-	destroyCnt: ToolConstructor['destroyCnt'];
-	failCnt: ToolConstructor['failCnt'];
-	successCnt: ToolConstructor['successCnt'];
+	curPower: number;
+	destroyCnt: number;
+	failCnt: number;
+	successCnt: number;
 	type: ToolConstructor['type'];
 
 	constructor({ destroyCnt, failCnt, successCnt, curPower, type }: ToolConstructor) {

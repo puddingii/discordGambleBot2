@@ -1,6 +1,15 @@
+import Game from '../Game';
 import Sword from './Sword';
 import dependency from '../../config/dependencyInjection';
-// FIXME 아직 미완성
+
+const {
+	cradle: {
+		util: {
+			numberUtil: { getRandomNumber },
+		},
+	},
+} = dependency;
+
 interface DefaultResult {
 	code: number;
 	message?: string;
@@ -10,14 +19,6 @@ interface EnhanceWeaponType extends DefaultResult {
 	myWeapon?: Sword;
 	money?: number;
 }
-
-const {
-	cradle: {
-		util: {
-			numberUtil: { getRandomNumber },
-		},
-	},
-} = dependency;
 
 export default class Weapon {
 	swordInfo: {
@@ -54,6 +55,7 @@ export default class Weapon {
 		};
 	}
 
+	/** 무기강화 */
 	enhanceWeapon(
 		userId: string,
 		type: 'sword',
@@ -71,6 +73,7 @@ export default class Weapon {
 					myWeapon = new Sword();
 					break;
 				default:
+					myWeapon = new Sword();
 			}
 			userInfo.weaponList.push(myWeapon);
 		}

@@ -6,9 +6,9 @@ import Weapon from './Weapon/Sword';
 interface UserConstructor {
 	id: string;
 	nickname: string;
-	money: number;
-	stockList: { stock: Stock; cnt: number; value: number }[];
-	weaponList: Weapon[];
+	money?: number;
+	stockList?: { stock: Stock; cnt: number; value: number }[];
+	weaponList?: Weapon[];
 }
 
 /** 유저가 가지고 있는 주식정보 타입 */
@@ -32,16 +32,16 @@ interface UpdateStockReturnType extends DefaultResult {
 }
 
 export default class User {
-	private _id: UserConstructor['id'];
-	money: UserConstructor['money'];
-	nickname: UserConstructor['nickname'];
-	stockList: UserConstructor['stockList'];
-	weaponList: UserConstructor['weaponList'];
+	private _id: string;
+	money: number;
+	nickname: string;
+	stockList: { stock: Stock; cnt: number; value: number }[];
+	weaponList: Weapon[];
 
 	constructor({ id, nickname, money, stockList, weaponList }: UserConstructor) {
 		this._id = id;
 		this.nickname = nickname;
-		this.money = money;
+		this.money = money ?? 1000000;
 		this.stockList = stockList ?? [];
 		this.weaponList = weaponList ?? [];
 	}
