@@ -90,7 +90,7 @@ export default class User {
 	}
 
 	/** 가지고 있는 주식 업데이트 하기(사고 팔때 사용) 살때는 cnt가 양수 아니면 음수 */
-	updateStock(stock: Stock, cnt: number, isFull: boolean): UpdateStockReturnType {
+	updateStock(stock: Stock | Coin, cnt: number, isFull: boolean): UpdateStockReturnType {
 		const myStock = this.getStock(stock.name);
 		if (isFull) {
 			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : (myStock?.cnt ?? 0) * -1;
@@ -126,7 +126,7 @@ export default class User {
 		} else {
 			// 처음 살 때
 			averageValue = stock.value;
-			this.stockList.push({ stock, cnt, value: averageValue });
+			this.stockList.push({ stock: <Stock>stock, cnt, value: averageValue });
 		}
 
 		return { code: 1, cnt: totalCnt, value: averageValue, money: this.money };
