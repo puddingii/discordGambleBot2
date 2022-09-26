@@ -62,6 +62,7 @@
 		/**********************/
 		/* Global Code Rules */
 		/**********************/
+		"no-use-before-define": "warn",
 		"global-require": "warn",
 		"no-restricted-globals": ["error", "event"],
 		"no-empty-function": "off",

@@ -1,9 +1,9 @@
 /** Dependency Injection File Bot */
 declare namespace DIFB {
 	interface Config {
-		logger: typeof import('../config/logger');
+		logger: typeof import('../config/logger').default;
 		util: typeof import('../config/util');
-		secretKey: typeof import('../config/secretKey');
+		secretKey: typeof import('../config/secretKey').default;
 	}
 
 	interface Models {
