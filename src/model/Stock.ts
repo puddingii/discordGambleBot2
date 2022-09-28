@@ -33,13 +33,13 @@ interface IStock {
 	dividend: number;
 }
 
-interface StockModel extends Model<IStock> {
+interface IStockStatics extends Model<IStock> {
 	findAllList(
 		type: 'stock' | 'coin' | 'all',
-	): Promise<HydratedDocument<IStock, StockModel>[]>;
+	): Promise<HydratedDocument<IStock, IStockStatics>[]>;
 	findByName(
 		type: 'stock' | 'coin' | 'all',
-	): Promise<HydratedDocument<IStock, StockModel>>;
+	): Promise<HydratedDocument<IStock, IStockStatics>>;
 	addStock(
 		stockInfo: CoinClass | StockClass,
 	): Promise<{ code: number; message?: string }>;
@@ -49,7 +49,7 @@ interface StockModel extends Model<IStock> {
 	): Promise<{ code: number; message?: string }>;
 }
 
-const Stock = new Schema<IStock, StockModel>({
+const Stock = new Schema<IStock, IStockStatics>({
 	/** 이름 */
 	name: {
 		type: String,
@@ -182,4 +182,4 @@ Stock.statics.updateStock = async function (updatedStockInfo: UpdatedStockInfo) 
 	return { code: 1 };
 };
 
-export default model<IStock, StockModel>('Stock', Stock);
+export default model<IStock, IStockStatics>('Stock', Stock);

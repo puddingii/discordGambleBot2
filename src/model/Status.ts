@@ -1,7 +1,7 @@
 import { Schema, Model, model, Types, HydratedDocument } from 'mongoose';
 import Game from '../controller/Game';
 
-interface Status {
+interface IStatus {
 	user: {
 		grantMoney: number;
 	};
@@ -13,12 +13,12 @@ interface Status {
 	};
 }
 
-interface StatusModel extends Model<Status> {
-	getStatus(): Promise<HydratedDocument<Status, StatusModel>>;
+interface IStatusStatics extends Model<IStatus> {
+	getStatus(): Promise<HydratedDocument<IStatus, IStatusStatics>>;
 	updateStatus(statusInfo: Game): Promise<{ code: number }>;
 }
 
-const Status = new Schema<Status, StatusModel>({
+const Status = new Schema<IStatus, IStatusStatics>({
 	user: {
 		grantMoney: {
 			type: Number,
@@ -71,4 +71,4 @@ Status.statics.updateStatus = async function (statusInfo: Game) {
 	return { code: 1 };
 };
 
-export default model<Status, StatusModel>('Status', Status);
+export default model<IStatus, IStatusStatics>('Status', Status);
