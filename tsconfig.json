@@ -2,7 +2,7 @@
 	"include": ["**/*.js", "**/*.ts", "./src/interface", "./src/types"],
 	"compilerOptions": {
 		"outDir": "build", // js로 컴파일이 될 장소
-		"target": "ES6", // 어떤 버전으로 js를 컴파일 할건지?
+		"target": "ES5", // 어떤 버전으로 js를 컴파일 할건지?
 		"lib": ["ES6", "ESNext"], // 합쳐진 라이브러리의 정의 파일(d.ts)을 특정해주는 역할. js코드가 어떤 환경에서 실행되는지 등. DOM을 주면 클라이언트에서 쓸수있는 dom객체 등을 자동완성시켜줌.
 		"strict": true,
 		"allowJs": true, // js 파일도 가져올수 있게끔.(ts에서 js함수 등을 사용할 경우)

@@ -1,3 +1,4 @@
+// require('regenerator-runtime');
 import { createContainer, asValue } from 'awilix';
 import logger from './logger';
 import util from './util';

@@ -1,9 +1,11 @@
+import discord from 'discord.js';
+import dependency from './dependencyInjection';
+
 const {
 	cradle: { UserModel, logger },
-} = require('./dependencyInjection');
+} = dependency;
 
-/** @param {import('discord.js').CommandInteraction} interaction */
-const isEnrolledUser = async function (interaction) {
+export const isEnrolledUser = async function (interaction: discord.CommandInteraction) {
 	const discordId = interaction.user.id.toString();
 	const userInfo = await UserModel.findByDiscordId(discordId);
 	if (!userInfo) {
@@ -14,6 +16,4 @@ const isEnrolledUser = async function (interaction) {
 	return true;
 };
 
-module.exports = {
-	isEnrolledUser,
-};
+export default { isEnrolledUser };
