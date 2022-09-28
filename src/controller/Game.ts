@@ -37,7 +37,7 @@ export default class Game {
 	weapon: Weapon;
 
 	/** 싱글톤으로 관리 */
-	private constructor({ gamble, weapon, grantMoney, userList }: GameConstructor) {
+	constructor({ gamble, weapon, grantMoney, userList }: GameConstructor) {
 		this.gamble = gamble;
 		this.weapon = weapon;
 		this.grantMoney = grantMoney ?? 0;
