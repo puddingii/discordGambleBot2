@@ -73,10 +73,7 @@ export default class User {
 	}
 
 	/** 유저가 가지고 있는 돈 업데이트 */
-	updateMoney(
-		money: number,
-		type: 'stock' | 'coin' | 'weapon' | undefined,
-	): DefaultResult {
+	updateMoney(money: number, type?: 'stock' | 'coin' | 'weapon'): DefaultResult {
 		if (this.money + money < 0) {
 			return { code: 0, message: '돈이 부족함' };
 		}

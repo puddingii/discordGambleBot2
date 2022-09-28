@@ -63,24 +63,16 @@ export default class Gamble {
 		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
-	addStock(stock: Stock | Coin): DefaultResult {
-		// let isExistStock;
-		// switch (stock.type) {
-		// 	case 'coin':
-		// 		isExistStock = this.coinList.find(stockInfo => stockInfo.name === stock.name);
-		// 		break;
-		// 	case 'stock':
-		// 		isExistStock = this.stockList.find(stockInfo => stockInfo.name === stock.name);
-		// 		break;
-		// 	default:
-		// }
-		const isExistStock = this[`${stock.type}List`].find(
-			stockInfo => stockInfo.name === stock.name,
-		);
+	addStock(stock: (Stock | Coin)[]): DefaultResult {
+		if (!(stock instanceof Coin || stock instanceof Stock)) {
+			return { code: 0, message: 'Class Type 에러' };
+		}
+		const list = <(Stock | Coin)[]>this[`${stock.type}List`];
+		const isExistStock = list.find(stockInfo => stockInfo.name === stock.name);
 		if (isExistStock) {
 			return { code: 0, message: '이미 있는 주식입니다.' };
 		}
-		this[`${stock.type}List`].push(stock);
+		list.push(stock);
 		return { code: 1 };
 	}
 
@@ -122,11 +114,7 @@ export default class Gamble {
 		}
 	}
 
-	/**
-	 * 내가 가지고 있는 주식리스트
-	 * @param {string} myDiscordId
-	 * @return {}
-	 */
+	/** 내가 가지고 있는 주식리스트 */
 	getMyStock(myDiscordId: string): DefaultResult | MyStockInfo {
 		const user = Game.getUser({ discordId: myDiscordId });
 		if (!user) {
@@ -134,7 +122,7 @@ export default class Gamble {
 		}
 
 		const stockInfo = user.stockList.reduce(
-			(acc, myStock) => {
+			(acc: MyStockInfo, myStock) => {
 				if (myStock.cnt > 0) {
 					const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
 					acc.stockList.push({
@@ -157,19 +145,14 @@ export default class Gamble {
 		return stockInfo;
 	}
 
-	/**
-	 * 주식/코인 리스트에서 name에 해당하는 정보 가져오기
-	 * @param {'stock' | 'coin' | ''} type
-	 * @param {string} name
-	 * @returns {Stock | Coin | undefined}
-	 */
-	getStock(type, name) {
+	/** 주식/코인 리스트에서 name에 해당하는 정보 가져오기 */
+	getStock(type: 'stock' | 'coin' | '', name: string): Stock | Coin | undefined {
 		if (!type) {
-			return this.stockList.concat(this.coinList).find(stock => {
+			return [...this.stockList, ...this.coinList].find(stock => {
 				return stock.name === name;
 			});
 		}
-		return this[`${type}List`].find(stock => {
+		return (<(Stock | Coin)[]>this[`${type}List`]).find(stock => {
 			return stock.name === name;
 		});
 	}
@@ -187,9 +170,9 @@ export default class Gamble {
 	}
 
 	/** 주식정보 갱신하기 */
-	update() {
-		const updStockList = [];
-		let updUserList = [];
+	update(): { stockList: (Stock | Coin)[]; userList: User[] } {
+		const updStockList: (Stock | Coin)[] = [];
+		let updUserList: User[] = [];
 		this.stockList.forEach(stock => {
 			const myStock = new Condition(stock);
 			const ratio = myStock.getRandomRatio();
@@ -226,13 +209,8 @@ export default class Gamble {
 		});
 	}
 
-	/**
-	 * 돈 갱신
-	 * @param {string} userId 유저아이디
-	 * @param {number} value 업데이트 할 금액
-	 * @returns {DefaultResult & { userInfo?: Stock }}
-	 */
-	updateMoney(userId, value) {
+	/** 돈 갱신 */
+	updateMoney(userId: string, value: number): DefaultResult & { userInfo?: User } {
 		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };

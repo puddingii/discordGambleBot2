@@ -4,9 +4,7 @@ import dependency from '../../config/dependencyInjection';
 
 const {
 	cradle: {
-		util: {
-			numberUtil: { getRandomNumber },
-		},
+		util: { getRandomNumber },
 	},
 } = dependency;
 
