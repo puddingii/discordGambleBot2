@@ -1,4 +1,4 @@
-import { Schema, Model, model, Types, HydratedDocument } from 'mongoose';
+import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 import dayjs from 'dayjs';
 
 import secretKey from '../config/secretKey';
@@ -19,7 +19,11 @@ interface UpdatedStockInfo {
 	dividend: number;
 }
 
-interface IStock {
+interface DoucmentResult<T> {
+	_doc: T;
+}
+
+export interface IStock extends Document, DoucmentResult<IStock> {
 	name: string;
 	type: string;
 	value: number;
@@ -33,7 +37,7 @@ interface IStock {
 	dividend: number;
 }
 
-interface IStockStatics extends Model<IStock> {
+export interface IStockStatics extends Model<IStock> {
 	findAllList(
 		type: 'stock' | 'coin' | 'all',
 	): Promise<HydratedDocument<IStock, IStockStatics>[]>;
@@ -119,13 +123,13 @@ const Stock = new Schema<IStock, IStockStatics>({
 });
 
 /** Type에 맞는 주식정보 다 가져오기 */
-Stock.statics.findAllList = async function (type) {
+Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
 	const condition = type === 'all' ? {} : { type };
 	const stockList = await this.find(condition);
 	return stockList ?? [];
 };
 
-Stock.statics.addStock = async function (stockInfo) {
+Stock.statics.addStock = async function (stockInfo: CoinClass | StockClass) {
 	const isExist = await this.exists({ name: stockInfo.name });
 	if (isExist) {
 		return { code: 0, message: '같은 이름이 있습니다.' };
@@ -134,12 +138,8 @@ Stock.statics.addStock = async function (stockInfo) {
 	return { code: 1 };
 };
 
-/**
- * 아이디로 유저정보 탐색
- * @this import('mongoose').Model
- * @param {string} name
- */
-Stock.statics.findByName = async function (name) {
+/** 아이디로 유저정보 탐색 */
+Stock.statics.findByName = async function (name: string) {
 	const stockInfo = await this.findOne({ name });
 	return stockInfo;
 };

@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import Gamble from '../controller/Gamble/Gamble';
 import Stock from '../controller/Gamble/Stock';
 import Coin from '../controller/Gamble/Coin';
@@ -12,19 +13,31 @@ const {
 } = dependencyInjection;
 
 export default async () => {
-	const stockAllList = await StockModel.find({});
+	const stockAllList = await StockModel.findAllList('all');
 	const { stockList, coinList } = stockAllList.reduce(
 		(acc: { stockList: Stock[]; coinList: Coin[] }, cur) => {
 			if (cur.type === 'stock') {
 				const stock = new Stock({
 					ratio: { min: cur.minRatio, max: cur.maxRatio },
-					...cur._doc,
+					name: cur._doc.name,
+					comment: cur._doc.comment,
+					type: 'stock',
+					updateTime: cur._doc.updateTime,
+					conditionList: cur._doc.conditionList,
+					correctionCnt: cur._doc.correctionCnt,
+					dividend: cur._doc.dividend,
+					value: cur._doc.value,
 				});
 				acc.stockList.push(stock);
 			} else {
 				const coin = new Coin({
 					ratio: { min: cur.minRatio, max: cur.maxRatio },
-					...cur._doc,
+					name: cur._doc.name,
+					comment: cur._doc.comment,
+					type: 'coin',
+					updateTime: cur._doc.updateTime,
+					correctionCnt: cur._doc.correctionCnt,
+					value: cur._doc.value,
 				});
 				acc.coinList.push(coin);
 			}
@@ -33,22 +46,26 @@ export default async () => {
 		{ stockList: [], coinList: [] },
 	);
 
-	const userDBList = await UserModel.find({}).populate('stockList.stock').orFail();
+	const userDBList = await UserModel.find({})
+		.populate<{ 'stockList.stock': typeof StockModel }>('stockList.stock')
+		.orFail();
 	const userList = userDBList.map(user => {
 		/** stock정보에 해당하는 class 불러와서 init */
-		const myStockList = user.stockList.reduce((acc, stockInfo) => {
-			const {
-				stock: { type, name },
-				cnt,
-				value,
-			} = stockInfo;
-			const list = type === 'stock' ? stockList : coinList;
-			const stock = list.find(stock => stock.name === name);
-			if (stock) {
-				acc.push({ stock, cnt, value });
-			}
-			return acc;
-		}, []);
+		const myStockList = user.stockList.reduce(
+			(acc: { stock: Stock | Coin; cnt: number; value: number }[], stockInfo) => {
+				if (stockInfo.stock instanceof Types.ObjectId) {
+					return acc;
+				}
+				const { stock, cnt, value } = stockInfo;
+				const list = stock.type === 'stock' ? stockList : coinList;
+				const myStock = list.find(controllerStock => controllerStock.name === stock.name);
+				if (myStock) {
+					acc.push({ stock: myStock, cnt, value });
+				}
+				return acc;
+			},
+			[],
+		);
 
 		const weaponList = user.weaponList.map(weapon => {
 			return new Sword(weapon._doc);

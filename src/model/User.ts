@@ -1,5 +1,5 @@
-import { Schema, Model, model, Types, HydratedDocument } from 'mongoose';
-import StockModel from './Stock';
+import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
+import StockModel, { IStockStatics } from './Stock';
 import logger from '../config/logger';
 import UserContorller from '../controller/User';
 import SwordController from '../controller/Weapon/Sword';
@@ -15,12 +15,16 @@ interface WeaponInfo {
 	missRatio: number;
 }
 
-interface IUser {
+interface DoucmentResult<T> {
+	_doc: T;
+}
+
+interface IUser extends Document, DoucmentResult<IUser> {
 	discordId: string;
 	nickname: string;
 	money: number;
 	stockList: Types.Array<{
-		stock: Types.ObjectId | typeof StockModel;
+		stock: Types.ObjectId;
 		cnt: number;
 		value: number;
 	}>;
@@ -47,6 +51,10 @@ interface IUserStatics extends Model<IUser> {
 		code: number;
 		message?: string;
 	}>;
+}
+
+interface PopulatedParent {
+	'stockList.stock': IStockStatics | null;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -145,9 +153,7 @@ User.statics.updateStock = async function (
 	},
 ) {
 	const userInfo = await this.findOne({ discordId })
-		.populate<{
-			'stockList.stock': typeof StockModel;
-		}>('stockList.stock')
+		.populate<Pick<PopulatedParent, 'stockList.stock'>>('stockList.stock')
 		.orFail();
 	if (!userInfo) {
 		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };

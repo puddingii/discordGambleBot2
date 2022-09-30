@@ -7,8 +7,8 @@ interface UserConstructor {
 	id: string;
 	nickname: string;
 	money?: number;
-	stockList?: { stock: Stock; cnt: number; value: number }[];
-	weaponList?: Weapon[];
+	stockList: { stock: Stock; cnt: number; value: number }[];
+	weaponList: Weapon[];
 }
 
 /** 유저가 가지고 있는 주식정보 타입 */

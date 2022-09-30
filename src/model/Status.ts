@@ -1,7 +1,11 @@
-import { Schema, Model, model, Types, HydratedDocument } from 'mongoose';
+import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 import Game from '../controller/Game';
 
-interface IStatus {
+interface DoucmentResult<T> {
+	_doc: T;
+}
+
+interface IStatus extends Document, DoucmentResult<IStatus> {
 	user: {
 		grantMoney: number;
 	};
