@@ -57,7 +57,7 @@ export default async () => {
 					return acc;
 				}
 				const { stock, cnt, value } = stockInfo;
-				const list = stock.type === 'stock' ? stockList : coinList;
+				const list: Array<Stock | Coin> = stock.type === 'stock' ? stockList : coinList;
 				const myStock = list.find(controllerStock => controllerStock.name === stock.name);
 				if (myStock) {
 					acc.push({ stock: myStock, cnt, value });
@@ -68,7 +68,16 @@ export default async () => {
 		);
 
 		const weaponList = user.weaponList.map(weapon => {
-			return new Sword(weapon._doc);
+			return new Sword({
+				bonusPower: weapon.bonusPower,
+				hitRatio: weapon.hitRatio,
+				missRatio: weapon.missRatio,
+				type: weapon.type,
+				curPower: weapon.curPower,
+				destroyCnt: weapon.destroyCnt,
+				failCnt: weapon.failCnt,
+				successCnt: weapon.successCnt,
+			});
 		});
 
 		return new User({

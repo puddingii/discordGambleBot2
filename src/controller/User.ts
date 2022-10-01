@@ -7,8 +7,8 @@ interface UserConstructor {
 	id: string;
 	nickname: string;
 	money?: number;
-	stockList: { stock: Stock; cnt: number; value: number }[];
-	weaponList: Weapon[];
+	stockList: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
+	weaponList: Array<Weapon>;
 }
 
 /** 유저가 가지고 있는 주식정보 타입 */
@@ -35,8 +35,8 @@ export default class User {
 	private _id: string;
 	money: number;
 	nickname: string;
-	stockList: { stock: Stock; cnt: number; value: number }[];
-	weaponList: Weapon[];
+	stockList: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
+	weaponList: Array<Weapon>;
 
 	constructor({ id, nickname, money, stockList, weaponList }: UserConstructor) {
 		this._id = id;
@@ -63,7 +63,7 @@ export default class User {
 	/** 가지고 있는 주식들 배당금 지급 */
 	giveDividend(): { code: number } {
 		const totalMoney = this.stockList.reduce((acc, cur) => {
-			if (cur.cnt > 0 && cur.stock.type === 'stock') {
+			if (cur.cnt > 0 && cur.stock instanceof Stock && cur.stock.type === 'stock') {
 				acc += cur.stock.dividend * cur.stock.value * cur.cnt;
 			}
 			return acc;
@@ -123,7 +123,7 @@ export default class User {
 		} else {
 			// 처음 살 때
 			averageValue = stock.value;
-			this.stockList.push({ stock: <Stock>stock, cnt, value: averageValue });
+			this.stockList.push({ stock: stock, cnt, value: averageValue });
 		}
 
 		return { code: 1, cnt: totalCnt, value: averageValue, money: this.money };

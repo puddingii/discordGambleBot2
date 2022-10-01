@@ -17,7 +17,7 @@ interface BuySellStockResult extends DefaultResult {
 }
 
 interface MyStockInfo {
-	stockList: {
+	stockList: Array<{
 		name: string;
 		cnt: number;
 		myRatio: number;
@@ -25,14 +25,14 @@ interface MyStockInfo {
 		stockValue: number;
 		stockType: 'stock' | 'coin';
 		stockBeforeRatio: number;
-	}[];
+	}>;
 	totalMyValue: number;
 	totalStockValue: number;
 }
 
 interface GambleConstructor {
-	coinList?: Coin[];
-	stockList?: Stock[];
+	coinList?: Array<Coin>;
+	stockList?: Array<Stock>;
 	curCondition?: number;
 	curTime?: number;
 	conditionPeriod?: number;
@@ -40,12 +40,12 @@ interface GambleConstructor {
 }
 
 export default class Gamble {
-	coinList: Coin[];
+	coinList: Array<Coin>;
 	conditionPeriod: number;
 	conditionRatioPerList: number[];
 	curCondition: number;
 	curTime: number;
-	stockList: Stock[];
+	stockList: Array<Stock>;
 
 	constructor({
 		coinList,
@@ -63,11 +63,11 @@ export default class Gamble {
 		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
-	addStock(stock: (Stock | Coin)[]): DefaultResult {
+	addStock(stock: Array<Stock | Coin>): DefaultResult {
 		if (!(stock instanceof Coin || stock instanceof Stock)) {
 			return { code: 0, message: 'Class Type 에러' };
 		}
-		const list = <(Stock | Coin)[]>this[`${stock.type}List`];
+		const list = <Array<Stock | Coin>>this[`${stock.type}List`];
 		const isExistStock = list.find(stockInfo => stockInfo.name === stock.name);
 		if (isExistStock) {
 			return { code: 0, message: '이미 있는 주식입니다.' };
@@ -103,7 +103,7 @@ export default class Gamble {
 	}
 
 	/** 주식/코인 리스트에서 name에 해당하는 정보 가져오기 */
-	getAllStock(type: 'stock' | 'coin' | 'all'): (Coin | Stock)[] {
+	getAllStock(type: 'stock' | 'coin' | 'all'): Array<Coin | Stock> {
 		switch (type) {
 			case 'coin':
 				return this.coinList;
@@ -152,7 +152,7 @@ export default class Gamble {
 				return stock.name === name;
 			});
 		}
-		return (<(Stock | Coin)[]>this[`${type}List`]).find(stock => {
+		return (<Array<Stock | Coin>>this[`${type}List`]).find(stock => {
 			return stock.name === name;
 		});
 	}
@@ -170,8 +170,8 @@ export default class Gamble {
 	}
 
 	/** 주식정보 갱신하기 */
-	update(): { stockList: (Stock | Coin)[]; userList: User[] } {
-		const updStockList: (Stock | Coin)[] = [];
+	update(): { stockList: Array<Stock | Coin>; userList: User[] } {
+		const updStockList: Array<Stock | Coin> = [];
 		let updUserList: User[] = [];
 		this.stockList.forEach(stock => {
 			const myStock = new Condition(stock);

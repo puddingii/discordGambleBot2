@@ -1,5 +1,5 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
-import StockModel, { IStockStatics } from './Stock';
+import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
 import UserContorller from '../controller/User';
 import SwordController from '../controller/Weapon/Sword';
@@ -24,7 +24,7 @@ interface IUser extends Document, DoucmentResult<IUser> {
 	nickname: string;
 	money: number;
 	stockList: Types.Array<{
-		stock: Types.ObjectId;
+		stock: Types.ObjectId | IStock;
 		cnt: number;
 		value: number;
 	}>;
