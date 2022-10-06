@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.185",
+    "@types/mocha": "^10.0.0",
     "@types/node": "^18.7.18",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
@@ -39,6 +40,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-sort-class-members": "^1.15.2",
+    "mocha": "^10.0.0",
     "nodemon": "^2.0.20",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
