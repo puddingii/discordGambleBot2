@@ -41,9 +41,7 @@ export interface IStockStatics extends Model<IStock> {
 	findAllList(
 		type: 'stock' | 'coin' | 'all',
 	): Promise<HydratedDocument<IStock, IStockStatics>[]>;
-	findByName(
-		type: 'stock' | 'coin' | 'all',
-	): Promise<HydratedDocument<IStock, IStockStatics>>;
+	findByName(name: string): Promise<HydratedDocument<IStock, IStockStatics>>;
 	addStock(
 		stockInfo: CoinClass | StockClass,
 	): Promise<{ code: number; message?: string }>;

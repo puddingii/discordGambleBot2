@@ -36,13 +36,13 @@ interface IUserStatics extends Model<IUser> {
 	updateStock(
 		discordId: string,
 		updStockInfo: {
-			name: 'stock' | 'coin' | 'all';
+			name: string;
 			cnt: number;
 			value: number;
 			money: number;
 		},
 	): Promise<{ code: number; message?: string }>;
-	updateMoney(userList: UserContorller[]): Promise<{ code: number; message?: string }>;
+	updateMoney(userList: UserContorller[]): Promise<{ code: number }>;
 	updateWeapon(
 		discordId: string,
 		updWeaponInfo: SwordController,
@@ -146,15 +146,15 @@ User.statics.findByDiscordId = async function (discordId: string) {
 User.statics.updateStock = async function (
 	discordId: string,
 	updStockInfo: {
-		name: 'stock' | 'coin' | 'all';
+		name: string;
 		cnt: number;
 		value: number;
 		money: number;
 	},
 ) {
-	const userInfo = await this.findOne({ discordId })
-		.populate<Pick<PopulatedParent, 'stockList.stock'>>('stockList.stock')
-		.orFail();
+	const userInfo = await this.findOne({ discordId }).populate<
+		Pick<PopulatedParent, 'stockList.stock'>
+	>('stockList.stock');
 	if (!userInfo) {
 		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
 	}
@@ -169,6 +169,7 @@ User.statics.updateStock = async function (
 		myStock.value = updStockInfo.value;
 		myStock.cnt = updStockInfo.cnt;
 	} else {
+		// 아예 처음사는 경우
 		const stock = await StockModel.findByName(updStockInfo.name);
 		if (!stock) {
 			return { code: 0, message: '[DB]주식정보를 찾을 수 없습니다.' };

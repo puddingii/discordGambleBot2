@@ -46,9 +46,9 @@ export default async () => {
 		{ stockList: [], coinList: [] },
 	);
 
-	const userDBList = await UserModel.find({})
-		.populate<{ 'stockList.stock': typeof StockModel }>('stockList.stock')
-		.orFail();
+	const userDBList = await UserModel.find({}).populate<{
+		'stockList.stock': typeof StockModel;
+	}>('stockList.stock');
 	const userList = userDBList.map(user => {
 		/** stock정보에 해당하는 class 불러와서 init */
 		const myStockList = user.stockList.reduce(
