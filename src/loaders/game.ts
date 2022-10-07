@@ -72,7 +72,6 @@ export default async () => {
 				bonusPower: weapon.bonusPower,
 				hitRatio: weapon.hitRatio,
 				missRatio: weapon.missRatio,
-				type: weapon.type,
 				curPower: weapon.curPower,
 				destroyCnt: weapon.destroyCnt,
 				failCnt: weapon.failCnt,

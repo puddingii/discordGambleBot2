@@ -1,6 +1,6 @@
 import ToolAbstract, { ToolConstructor } from './ToolAbstract';
 
-interface SwordConstructor extends ToolConstructor {
+interface SwordConstructor extends Omit<ToolConstructor, 'type'> {
 	bonusPower: number;
 	hitRatio: number;
 	missRatio: number;
@@ -11,7 +11,7 @@ export default class Sword extends ToolAbstract {
 	private _missRatio: number;
 	bonusPower: number;
 
-	constructor(weaponInfo?: SwordConstructor) {
+	constructor(weaponInfo?: Partial<SwordConstructor>) {
 		super({ ...weaponInfo, type: 'sword' });
 		this.bonusPower = weaponInfo?.bonusPower ?? 0;
 		this._hitRatio = weaponInfo?.hitRatio ?? 1;
