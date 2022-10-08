@@ -17,7 +17,7 @@ interface StockInfo {
 	dividend: number;
 }
 
-type StockConstructor = StockAbstractConstructor & Partial<StockInfo>;
+export type StockConstructor = StockAbstractConstructor & Partial<StockInfo>;
 
 export default class Stock extends StockAbstract {
 	/** 주식 값 유효성 검사 */

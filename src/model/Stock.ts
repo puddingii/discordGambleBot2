@@ -7,7 +7,7 @@ import logger from '../config/logger';
 import CoinClass from '../controller/Gamble/Coin';
 import StockClass from '../controller/Gamble/Stock';
 
-interface UpdatedStockInfo {
+export interface UpdatedStockInfo {
 	name: string;
 	type: string;
 	value: number;
@@ -67,7 +67,7 @@ export interface IStockStatics extends Model<IStock> {
 
 	/** 주식 단일 업데이트(주식 히스토리 미누적) */
 	updateStock(
-		updatedStockInfo: CoinClass | StockClass,
+		updatedStockInfo: UpdatedStockInfo,
 	): Promise<{ code: number; message?: string }>;
 }
 
@@ -157,7 +157,10 @@ Stock.statics.updateStockList = async function (updateList: (CoinClass | StockCl
 			stock.updHistory.push({ value: updStock.value, date: dayjs().toDate().toString() });
 			return stock.save();
 		}
-		return { status: 'rejected', reason: 'Class에 들어있는 주식정보가 DB에 없습니다.' };
+		const errorPromise = new Promise((_, reject) => {
+			reject(new Error('Class에 들어있는 주식정보가 DB에 없습니다.'));
+		});
+		return errorPromise;
 	});
 
 	const resultList = await Promise.allSettled(updPromiseList);
