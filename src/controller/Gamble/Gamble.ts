@@ -10,11 +10,8 @@ interface DefaultResult {
 	message?: string;
 }
 
-interface BuySellStockResult extends DefaultResult {
-	cnt?: number;
-	value?: number;
-	money?: number;
-}
+type BuySellStockResult = Partial<{ cnt: number; value: number; money: number }> &
+	DefaultResult;
 
 interface MyStockInfo {
 	stockList: Array<{
@@ -30,7 +27,7 @@ interface MyStockInfo {
 	totalStockValue: number;
 }
 
-interface GambleConstructor {
+interface GambleInfo {
 	coinList: Array<Coin>;
 	stockList: Array<Stock>;
 	curCondition: number;
@@ -39,13 +36,15 @@ interface GambleConstructor {
 	conditionRatioPerList: number[];
 }
 
+type GambleConstructor = Partial<GambleInfo>;
+
 export default class Gamble {
-	coinList: Array<Coin>;
-	conditionPeriod: number;
-	conditionRatioPerList: number[];
-	curCondition: number;
-	curTime: number;
-	stockList: Array<Stock>;
+	coinList: GambleInfo['coinList'];
+	conditionPeriod: GambleInfo['conditionPeriod'];
+	conditionRatioPerList: GambleInfo['conditionRatioPerList'];
+	curCondition: GambleInfo['curCondition'];
+	curTime: GambleInfo['curTime'];
+	stockList: GambleInfo['stockList'];
 
 	constructor({
 		coinList,
@@ -54,7 +53,7 @@ export default class Gamble {
 		curTime,
 		conditionPeriod,
 		conditionRatioPerList,
-	}: Partial<GambleConstructor>) {
+	}: GambleConstructor) {
 		this.coinList = coinList ?? [];
 		this.stockList = stockList ?? [];
 		this.conditionRatioPerList = conditionRatioPerList ?? [4, 16, 16, 4];
@@ -118,7 +117,7 @@ export default class Gamble {
 	getMyStock(myDiscordId: string): DefaultResult | MyStockInfo {
 		const user = Game.getUser({ discordId: myDiscordId });
 		if (!user) {
-			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
+			return { code: 0, message: '유저정보를 찾을 수 없습니다.' };
 		}
 
 		const stockInfo = user.stockList.reduce(

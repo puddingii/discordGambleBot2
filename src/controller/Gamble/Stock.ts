@@ -12,10 +12,12 @@ interface CheckStockValidationParam {
 	dividend: number;
 }
 
-interface StockConstructor extends StockAbstractConstructor {
+interface StockInfo {
 	conditionList: number[];
 	dividend: number;
 }
+
+type StockConstructor = StockAbstractConstructor & Partial<StockInfo>;
 
 export default class Stock extends StockAbstract {
 	/** 주식 값 유효성 검사 */
@@ -47,8 +49,8 @@ export default class Stock extends StockAbstract {
 
 		return { code: 1 };
 	}
-	conditionList: StockConstructor['conditionList'];
-	dividend: StockConstructor['dividend'];
+	conditionList: StockInfo['conditionList'];
+	dividend: StockInfo['dividend'];
 	readonly MAX_RATIO = 0.2;
 
 	constructor(info: StockConstructor) {

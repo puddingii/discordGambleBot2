@@ -22,10 +22,10 @@ export default class Game {
 	static getUser({
 		discordId,
 		nickname,
-	}: {
-		discordId?: string;
-		nickname?: string;
-	}): User | undefined {
+	}: Partial<{
+		discordId: string;
+		nickname: string;
+	}>): User | undefined {
 		if (discordId) {
 			return this.userList.find(userInfo => userInfo.getId() === discordId);
 		}
@@ -65,10 +65,10 @@ export default class Game {
 	getUser({
 		discordId,
 		nickname,
-	}: {
-		discordId?: string;
-		nickname?: string;
-	}): User | undefined {
+	}: Partial<{
+		discordId: string;
+		nickname: string;
+	}>): User | undefined {
 		if (discordId) {
 			return Game.userList.find(userInfo => userInfo.getId() === discordId);
 		}

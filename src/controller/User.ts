@@ -3,13 +3,16 @@ import Coin from './Gamble/Coin';
 import Weapon from './Weapon/Sword';
 
 /** Class Constructor Param Type */
-interface UserConstructor {
+interface UserInfo {
 	id: string;
 	nickname: string;
-	money?: number;
-	stockList?: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
-	weaponList?: Array<Weapon>;
+	money: number;
+	stockList: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
+	weaponList: Array<Weapon>;
 }
+
+type UserConstructor = Pick<UserInfo, 'id' | 'nickname'> &
+	Omit<Partial<UserInfo>, 'id' | 'nickname'>;
 
 /** 유저가 가지고 있는 주식정보 타입 */
 interface UserStockInfo {
@@ -25,18 +28,15 @@ interface DefaultResult {
 }
 
 /** 유저가 가지고 있는 Stock 업데이트 할 때 사용하는 함수리턴 타입 */
-interface UpdateStockReturnType extends DefaultResult {
-	cnt?: number;
-	value?: number;
-	money?: number;
-}
+type UpdateStockReturnType = Partial<{ cnt: number; value: number; money: number }> &
+	DefaultResult;
 
 export default class User {
-	private _id: string;
-	money: number;
-	nickname: string;
-	stockList: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
-	weaponList: Array<Weapon>;
+	private _id: UserInfo['id'];
+	money: UserInfo['money'];
+	nickname: UserInfo['nickname'];
+	stockList: UserInfo['stockList'];
+	weaponList: UserInfo['weaponList'];
 
 	constructor({ id, nickname, money, stockList, weaponList }: UserConstructor) {
 		this._id = id;

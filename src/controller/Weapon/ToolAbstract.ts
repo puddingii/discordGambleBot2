@@ -1,17 +1,19 @@
-export interface ToolConstructor {
-	destroyCnt?: number;
-	failCnt?: number;
-	successCnt?: number;
-	curPower?: number;
-	type: string;
-}
-
-export default abstract class ToolAbstract {
-	curPower: number;
+type ToolInfo = {
 	destroyCnt: number;
 	failCnt: number;
 	successCnt: number;
-	type: ToolConstructor['type'];
+	curPower: number;
+	type: string;
+};
+
+export type ToolConstructor = Omit<Partial<ToolInfo>, 'type'> & Pick<ToolInfo, 'type'>;
+
+export default abstract class ToolAbstract {
+	curPower: ToolInfo['curPower'];
+	destroyCnt: ToolInfo['destroyCnt'];
+	failCnt: ToolInfo['failCnt'];
+	successCnt: ToolInfo['successCnt'];
+	type: ToolInfo['type'];
 
 	constructor({ destroyCnt, failCnt, successCnt, curPower, type }: ToolConstructor) {
 		this.type = type;

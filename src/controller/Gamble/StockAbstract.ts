@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export interface StockAbstractConstructor {
+interface StockAbstractInfo {
 	ratio: { min: number; max: number };
 	name: string;
 	value: number;
@@ -10,16 +10,22 @@ export interface StockAbstractConstructor {
 	comment: string;
 }
 
+export type StockAbstractConstructor = Omit<
+	StockAbstractInfo,
+	'correctionCnt' | 'comment'
+> &
+	Pick<Partial<StockAbstractInfo>, 'correctionCnt' | 'comment'>;
+
 export default abstract class StockAbstract {
-	private _ratio: StockAbstractConstructor['ratio'];
+	private _ratio: StockAbstractInfo['ratio'];
 	beforeHistoryRatio: number;
-	comment: StockAbstractConstructor['comment'];
-	correctionCnt: StockAbstractConstructor['correctionCnt'];
+	comment: StockAbstractInfo['comment'];
+	correctionCnt: StockAbstractInfo['correctionCnt'];
 	correctionHistory: { value: number; ratio: number }[];
-	name: StockAbstractConstructor['name'];
-	type: StockAbstractConstructor['type'];
-	updateTime: StockAbstractConstructor['updateTime'];
-	value: StockAbstractConstructor['value'];
+	name: StockAbstractInfo['name'];
+	type: StockAbstractInfo['type'];
+	updateTime: StockAbstractInfo['updateTime'];
+	value: StockAbstractInfo['value'];
 
 	constructor({
 		ratio,
@@ -36,8 +42,8 @@ export default abstract class StockAbstract {
 		this.type = type;
 		this.updateTime = updateTime;
 		this.correctionCnt = correctionCnt ?? 4;
+		this.comment = comment ?? '';
 		this.correctionHistory = [];
-		this.comment = comment;
 		this.beforeHistoryRatio = 0;
 	}
 

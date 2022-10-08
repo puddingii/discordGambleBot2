@@ -13,10 +13,7 @@ interface DefaultResult {
 	message?: string;
 }
 
-interface EnhanceWeaponType extends DefaultResult {
-	myWeapon?: Sword;
-	money?: number;
-}
+type EnhanceWeaponType = Partial<{ myWeapon: Sword; money: number }> & DefaultResult;
 
 export default class Weapon {
 	swordInfo: {
