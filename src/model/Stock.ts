@@ -24,76 +24,87 @@ interface DoucmentResult<T> {
 }
 
 export interface IStock extends Document, DoucmentResult<IStock> {
+	/** 이름 */
 	name: string;
+	/** 타입 (코인 or 주식) */
 	type: string;
+	/** 1개당 가격 */
 	value: number;
+	/** 설명 */
 	comment: string;
+	/** 변동률 최소치 */
 	minRatio: number;
+	/** 변동률 최대치 */
 	maxRatio: number;
+	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
 	updateTime: number;
+	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
 	correctionCnt: number;
+	/** 주식 히스토리 */
 	updHistory: Types.Array<{ value: number; date?: string }>;
+	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
 	conditionList: Types.Array<number>;
+	/** 배당 주식에만 해당함 */
 	dividend: number;
 }
 
 export interface IStockStatics extends Model<IStock> {
+	/** Type에 맞는 주식정보 다 가져오기 */
 	findAllList(
 		type: 'stock' | 'coin' | 'all',
 	): Promise<HydratedDocument<IStock, IStockStatics>[]>;
+
+	/** 주식이름으로 주식정보 찾아오기 */
 	findByName(name: string): Promise<HydratedDocument<IStock, IStockStatics>>;
+
+	/** 주식추가 */
 	addStock(
 		stockInfo: CoinClass | StockClass,
 	): Promise<{ code: number; message?: string }>;
+
+	/** 주식 List 업데이트(주식 히스토리 누적) */
 	updateStockList(updateList: (CoinClass | StockClass)[]): Promise<void>;
+
+	/** 주식 단일 업데이트(주식 히스토리 미누적) */
 	updateStock(
 		updatedStockInfo: CoinClass | StockClass,
 	): Promise<{ code: number; message?: string }>;
 }
 
 const Stock = new Schema<IStock, IStockStatics>({
-	/** 이름 */
 	name: {
 		type: String,
 		unique: true,
 		required: true,
 	},
-	/** 타입 (코인 or 주식) */
 	type: {
 		type: String,
 		default: 'stock',
 	},
-	/** 1개당 가격 */
 	value: {
 		type: Number,
 		default: 1000000,
 	},
-	/** 설명 */
 	comment: {
 		type: String,
 		default: '',
 	},
-	/** 변동률 최소치 */
 	minRatio: {
 		type: Number,
 		default: -0.05,
 	},
-	/** 변동률 최대치 */
 	maxRatio: {
 		type: Number,
 		default: 0.05,
 	},
-	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
 	updateTime: {
 		type: Number,
 		default: secretKey.stockUpdateTime,
 	},
-	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
 	correctionCnt: {
 		type: Number,
 		default: 4,
 	},
-	/** 주식 히스토리 */
 	updHistory: [
 		{
 			value: {
@@ -108,19 +119,16 @@ const Stock = new Schema<IStock, IStockStatics>({
 			},
 		},
 	],
-	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
 	conditionList: {
 		type: [Number],
 		default: [0, -0.06, -0.04, 0.04, 0.06],
 	},
-	/** 배당 주식에만 해당함 */
 	dividend: {
 		type: Number,
 		default: 0.005,
 	},
 });
 
-/** Type에 맞는 주식정보 다 가져오기 */
 Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
 	const condition = type === 'all' ? {} : { type };
 	const stockList = await this.find(condition);
@@ -136,13 +144,11 @@ Stock.statics.addStock = async function (stockInfo: CoinClass | StockClass) {
 	return { code: 1 };
 };
 
-/** 아이디로 유저정보 탐색 */
 Stock.statics.findByName = async function (name: string) {
 	const stockInfo = await this.findOne({ name });
 	return stockInfo;
 };
 
-/** 주식정보 리스트째로 업데이트(주식 히스토리 추가 전용) */
 Stock.statics.updateStockList = async function (updateList: (CoinClass | StockClass)[]) {
 	const updPromiseList = updateList.map(async updStock => {
 		const stock = await this.findOne({ name: updStock.name });
@@ -163,7 +169,6 @@ Stock.statics.updateStockList = async function (updateList: (CoinClass | StockCl
 	});
 };
 
-/** 주식정보 업데이트 (히스토리 추가하지 않음. 어드민 전용) */
 Stock.statics.updateStock = async function (updatedStockInfo: UpdatedStockInfo) {
 	const stock = await this.findOne({ name: updatedStockInfo.name });
 	if (!stock) {

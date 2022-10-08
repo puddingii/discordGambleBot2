@@ -31,12 +31,12 @@ interface MyStockInfo {
 }
 
 interface GambleConstructor {
-	coinList?: Array<Coin>;
-	stockList?: Array<Stock>;
-	curCondition?: number;
-	curTime?: number;
-	conditionPeriod?: number;
-	conditionRatioPerList?: number[];
+	coinList: Array<Coin>;
+	stockList: Array<Stock>;
+	curCondition: number;
+	curTime: number;
+	conditionPeriod: number;
+	conditionRatioPerList: number[];
 }
 
 export default class Gamble {
@@ -54,7 +54,7 @@ export default class Gamble {
 		curTime,
 		conditionPeriod,
 		conditionRatioPerList,
-	}: GambleConstructor) {
+	}: Partial<GambleConstructor>) {
 		this.coinList = coinList ?? [];
 		this.stockList = stockList ?? [];
 		this.conditionRatioPerList = conditionRatioPerList ?? [4, 16, 16, 4];

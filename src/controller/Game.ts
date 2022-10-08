@@ -6,7 +6,7 @@ interface GameConstructor {
 	userList: User[];
 	gamble: Gamble;
 	weapon: Weapon;
-	grantMoney: number;
+	grantMoney?: number;
 }
 
 interface DefaultResult {
