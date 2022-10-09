@@ -1,22 +1,21 @@
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
-const _ = require('lodash');
+import {
+	ChatInputCommandInteraction,
+	EmbedBuilder,
+	SlashCommandBuilder,
+} from 'discord.js';
+import _ from 'lodash';
+import dependency from '../../config/dependencyInjection';
+import { setComma } from '../../config/util';
+import Game from '../../controller/Game';
+
 const {
-	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
-const { setComma } = require('../../config/util');
+	cradle: { logger },
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder().setName('무기확률').setDescription('무기확률표'),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
-			/** Discord Info */
-			const discordId = interaction.user.id.toString();
-
-			const userWeapon = game.getUser({ discordId }).getWeapon('sword');
 			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
@@ -27,7 +26,7 @@ module.exports = {
 
 			const { ratioList: list, value } = game.weapon.swordInfo;
 			let money = value;
-			for (let i = 0; i < parseInt(list.length / 5, 10); i++) {
+			for (let i = 0; i < Math.floor(list.length / 5); i++) {
 				let value = '';
 				// eslint-disable-next-line no-loop-func
 				list.slice(i * 5, (i + 1) * 5).forEach((weaponInfo, idx) => {

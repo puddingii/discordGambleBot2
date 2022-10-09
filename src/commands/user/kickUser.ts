@@ -1,9 +1,16 @@
-const { SlashCommandBuilder, ChannelType } = require('discord.js');
-const {
-	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
+import {
+	SlashCommandBuilder,
+	ChannelType,
+	ChatInputCommandInteraction,
+} from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
 
-module.exports = {
+const {
+	cradle: { logger },
+} = dependency;
+
+export default {
 	data: new SlashCommandBuilder()
 		.setName('유저킥')
 		.setDescription('음성채팅방에서 킥할 유저를 고르셈')
@@ -14,17 +21,15 @@ module.exports = {
 				.setDescription('무야호')
 				.addChannelTypes(ChannelType.GuildVoice),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 			const user = interaction.options.getUser('유저');
 			const selectedChannel = interaction.options.getChannel('채널');
-			const kickedUser = interaction.channel.members.get(user.id);
+			if (user && interaction.channel?.isVoiceBased()) {
+				const kickedUser = interaction.channel?.members.get(user.id);
+			}
 			// kickedUser.voice.disconnect('ㅋㅋ');
 
 			await interaction.reply({ content: '테스트' });

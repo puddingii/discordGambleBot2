@@ -1,18 +1,21 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+import {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ChatInputCommandInteraction,
+} from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import { setComma } from '../../config/util';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { logger },
-} = require('../../config/dependencyInjection');
-const { setComma } = require('../../config/util');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('랭킹')
 		.setDescription('가지고 있는 돈과 주식 등을 합한 랭킹, 무기강화 수치 등등..'),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const rankingList = game.getUserList().map(user => {

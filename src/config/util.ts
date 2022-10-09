@@ -3,7 +3,7 @@ export const getRandomNumber = (len: number, min = 0): number => {
 	return Math.floor(Math.random() * len) + min;
 };
 
-export const setComma = (num: string | number, isRemoveDecimal: boolean): string => {
+export const setComma = (num: string | number, isRemoveDecimal?: boolean): string => {
 	if (!num) {
 		return '0';
 	}

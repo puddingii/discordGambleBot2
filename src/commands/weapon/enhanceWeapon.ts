@@ -1,10 +1,13 @@
-const { SlashCommandBuilder } = require('discord.js');
-const _ = require('lodash');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import _ from 'lodash';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('무기강화')
 		.setDescription('무기를 강화함')
@@ -14,18 +17,14 @@ module.exports = {
 	// .addBooleanOption(option =>
 	// 	option.setName('파괴방지').setDescription('강화비용이 3배가 든다'),
 	// ),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 			const isPreventFail = interaction.options.getBoolean('하락방지') ?? false;
 			const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const beforePower = game.getUser({ discordId }).getWeapon('sword')?.curPower ?? 0;
+			const beforePower = game.getUser({ discordId })?.getWeapon('sword')?.curPower ?? 0;
 			const ratioInfo = game.weapon.swordInfo.ratioList[beforePower];
 			const successRatio = (1 - (ratioInfo.destroyRatio + ratioInfo.failRatio)) * 100;
 			const { code, message, myWeapon, money } = game.weapon.enhanceWeapon(
@@ -35,7 +34,7 @@ module.exports = {
 				isPreventFail,
 			);
 
-			if (!code) {
+			if (!code || !myWeapon || money === undefined) {
 				await interaction.reply({ content: message });
 				return;
 			}

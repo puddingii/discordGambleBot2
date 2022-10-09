@@ -1,24 +1,23 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import dependency from '../config/dependencyInjection';
+import Game from '../controller/Game';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('유저등록')
 		.setDescription('봇 게임에 참여하기 위해 유저등록. 등록하기전에는 참여하지 못함')
 		.addStringOption(option =>
 			option.setName('유저닉네임').setDescription('닉네임').setRequired(true),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const nickname = interaction.options.getString('유저닉네임');
+			const nickname = interaction.options.getString('유저닉네임') ?? '';
 
 			/** DB Info */
 			const userInfo = await UserModel.findByDiscordId(discordId);

@@ -1,9 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('돈기부')
 		.setDescription('다른 유저에게 돈 주기')
@@ -13,16 +16,12 @@ module.exports = {
 		.addNumberOption(option =>
 			option.setName('액수').setDescription('얼마나 줄건지').setRequired(true),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const ptrNickname = interaction.options.getString('상대방');
-			const cnt = Math.floor(interaction.options.getNumber('액수'));
+			const ptrNickname = interaction.options.getString('상대방') ?? '';
+			const cnt = Math.floor(interaction.options.getNumber('액수') ?? 0);
 
 			if (cnt < 1) {
 				await interaction.reply({ content: '마이너스 값은 입력이 안됩니다.' });

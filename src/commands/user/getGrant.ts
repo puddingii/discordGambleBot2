@@ -1,30 +1,32 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import { setComma } from '../../config/util';
+import Game from '../../controller/Game';
+import User from '../../controller/User';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
-const { setComma } = require('../../config/util');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('보조금받기')
 		.setDescription('아끼다 다른 사람한테 넘어간다ㅋㅋ'),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
 			const rankingList = game.getUserList();
-			const nowMinUser = rankingList.reduce((minUser, user) => {
-				const getTotalMoney = info =>
-					info.stockList.reduce((acc, cur) => {
-						acc += cur.cnt * cur.stock.value;
-						return acc;
-					}, 0) + info.money;
 
+			// User가 가지고 있는 주식과 현금을 합친 돈
+			const getTotalMoney = (info: User) =>
+				info.stockList.reduce((acc, cur) => {
+					acc += cur.cnt * cur.stock.value;
+					return acc;
+				}, 0) + info.money;
+
+			const nowMinUser = rankingList.reduce((minUser, user) => {
 				const afterMoney = getTotalMoney(user);
 				const beforeMoney = getTotalMoney(minUser);
 

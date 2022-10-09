@@ -1,21 +1,24 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const dayjs = require('dayjs');
+import {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ChatInputCommandInteraction,
+} from 'discord.js';
+import dayjs from 'dayjs';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder().setName('무기내역').setDescription('무기강화 내역'),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const myWeapon = game.getUser({ discordId }).getWeapon('sword');
+			const myWeapon = game.getUser({ discordId })?.getWeapon('sword');
 			if (!myWeapon) {
 				await interaction.reply({ content: '내역 없음' });
 				return;
