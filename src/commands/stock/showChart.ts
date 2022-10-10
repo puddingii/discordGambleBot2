@@ -1,12 +1,23 @@
-const { SlashCommandBuilder } = require('discord.js');
-const echarts = require('echarts');
-const sharp = require('sharp');
-const dayjs = require('dayjs');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import echarts from 'echarts';
+import sharp from 'sharp';
+import dayjs from 'dayjs';
+import dependency from '../../config/dependencyInjection';
+
 const {
 	cradle: { StockModel, logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+type ChartOption = {
+	xAxis: {
+		data: Array<string>;
+	};
+	yAxis: object;
+	series: Array<{ type: string; data: Array<number | Array<number>> }>;
+	backgroundColor: string;
+};
+
+export default {
 	data: new SlashCommandBuilder()
 		.setName('차트보기')
 		.setDescription('주식 or 코인 차트보기')
@@ -45,14 +56,10 @@ module.exports = {
 				},
 			),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
-			const name = interaction.options.getString('이름');
+			const name = interaction.options.getString('이름') ?? '';
 			const stickTime = interaction.options.getNumber('시간봉') ?? 8;
 			const chartType = interaction.options.getString('차트종류') ?? 'stick';
 
@@ -62,14 +69,14 @@ module.exports = {
 				return;
 			}
 
-			const chart = echarts.init(null, null, {
+			const chart = echarts.init(null, undefined, {
 				renderer: 'svg',
 				ssr: true,
 				width: 1600,
 				height: 800,
 			});
 
-			const chartOptions = {
+			const chartOptions: ChartOption = {
 				xAxis: {
 					data: [],
 				},
@@ -81,7 +88,7 @@ module.exports = {
 			const type = 'stock';
 			const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
 			let historyStartIdx = stockInfo.updHistory.length - stickPerCnt * 30;
-			let beforeHistory = '';
+			let beforeHistory = 0;
 			historyStartIdx = historyStartIdx < 0 ? 0 : historyStartIdx;
 			for (
 				historyStartIdx;
@@ -92,18 +99,22 @@ module.exports = {
 					historyStartIdx,
 					historyStartIdx + stickPerCnt,
 				);
+				const stickLastIdx = stickData.length - 1;
+				if (stickData.length === -1) {
+					break;
+				}
 				const valueList = stickData.map(data => data.value);
 				beforeHistory && valueList.unshift(beforeHistory);
 				const stickValue =
 					chartType === 'stick'
 						? [
 								valueList[0],
-								valueList.at(-1),
+								valueList[stickLastIdx],
 								Math.min(...valueList),
 								Math.max(...valueList),
 						  ]
-						: valueList.at(-1);
-				beforeHistory = valueList.at(-1);
+						: valueList[stickLastIdx];
+				beforeHistory = valueList[stickLastIdx];
 				chartOptions.xAxis.data.push(dayjs(stickData[0].date).format('MM.DD'));
 				chartOptions.series[0].data.push(stickValue);
 			}

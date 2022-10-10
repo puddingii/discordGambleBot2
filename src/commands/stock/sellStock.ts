@@ -1,36 +1,40 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
-		.setName('주식매수')
+		.setName('주식매도')
 		.setDescription('주식 or 코인 사기')
 		.addStringOption(option =>
 			option.setName('이름').setDescription('주식이름').setRequired(true),
 		)
 		.addNumberOption(option =>
-			option.setName('수량').setDescription('몇개나 살건지').setRequired(true),
+			option.setName('수량').setDescription('몇개나 팔건지').setRequired(true),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const name = interaction.options.getString('이름');
-			const cnt = Math.floor(interaction.options.getNumber('수량'));
+			const name = interaction.options.getString('이름') ?? '';
+			const cnt = Math.floor(interaction.options.getNumber('수량') ?? 0);
 
 			if (cnt < 1) {
 				await interaction.reply({ content: '갯수를 입력해주세요' });
 				return;
 			}
 
-			const gambleResult = game.gamble.buySellStock(discordId, name, cnt, false);
-			if (!gambleResult.code) {
+			const gambleResult = game.gamble.buySellStock(discordId, name, cnt * -1, false);
+			if (
+				!gambleResult.code ||
+				!gambleResult.cnt ||
+				!gambleResult.value ||
+				!gambleResult.money
+			) {
 				await interaction.reply({ content: gambleResult.message });
 				return;
 			}
@@ -45,7 +49,7 @@ module.exports = {
 				return;
 			}
 
-			await interaction.reply({ content: '매수완료!' });
+			await interaction.reply({ content: '매도완료!' });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });

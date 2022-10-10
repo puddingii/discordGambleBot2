@@ -1,17 +1,21 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const dayjs = require('dayjs');
-const _ = require('lodash');
+import {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ChatInputCommandInteraction,
+} from 'discord.js';
+import dayjs from 'dayjs';
+import _ from 'lodash';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+import { MyStockInfo } from '../../controller/Gamble/Gamble';
+
 const {
 	cradle: { logger, util },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder().setName('내주식').setDescription('내 주식임'),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
@@ -24,13 +28,14 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
-			const { stockList, totalMyValue, totalStockValue } =
-				game.gamble.getMyStock(discordId);
-			const totalCalc = stockList.reduce((acc, stock) => {
-				const upDownEmoji = num => {
-					return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
-				};
+			const myStock = game.gamble.getMyStock(discordId);
 
+			// FIXME
+			const { stockList, totalMyValue, totalStockValue } = <MyStockInfo>myStock;
+			const upDownEmoji = (num: number) => {
+				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
+			};
+			const totalCalc = stockList.reduce((acc, stock) => {
 				const calcPrice = stock.cnt * (stock.stockValue - stock.myValue);
 				acc += calcPrice;
 				embedBox.addFields({

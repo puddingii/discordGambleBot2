@@ -13,7 +13,7 @@ interface DefaultResult {
 type BuySellStockResult = Partial<{ cnt: number; value: number; money: number }> &
 	DefaultResult;
 
-interface MyStockInfo {
+export interface MyStockInfo {
 	stockList: Array<{
 		name: string;
 		cnt: number;

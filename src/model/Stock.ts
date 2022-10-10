@@ -41,7 +41,7 @@ export interface IStock extends Document, DoucmentResult<IStock> {
 	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
 	correctionCnt: number;
 	/** 주식 히스토리 */
-	updHistory: Types.Array<{ value: number; date?: string }>;
+	updHistory: Types.Array<{ value: number; date: string }>;
 	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
 	conditionList: Types.Array<number>;
 	/** 배당 주식에만 해당함 */

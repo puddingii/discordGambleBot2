@@ -1,19 +1,18 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { UserModel, logger },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('주식흐름')
 		.setDescription(
 			'주식 흐름임. 주식 종류에 따라 이 영향을 많이 받을수도 아닐수도 있음. [비용: 1만원]',
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
@@ -37,13 +36,13 @@ module.exports = {
 			}
 
 			const result = game.gamble.updateMoney(discordId, -10000);
-			if (!result.code) {
+			if (!result.code || !result.userInfo) {
 				await interaction.reply({ content: result.message, ephemeral: true });
 				return;
 			}
 			const dbResult = await UserModel.updateMoney([result.userInfo]);
 			if (!dbResult.code) {
-				await interaction.reply({ content: dbResult.message, ephemeral: true });
+				await interaction.reply({ content: 'DB Error', ephemeral: true });
 				return;
 			}
 

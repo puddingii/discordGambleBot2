@@ -33,6 +33,7 @@
 		"@types/lodash": "^4.14.185",
 		"@types/mocha": "^10.0.0",
 		"@types/node": "^18.7.18",
+		"@types/sharp": "^0.31.0",
 		"@typescript-eslint/eslint-plugin": "^5.37.0",
 		"@typescript-eslint/parser": "^5.37.0",
 		"cross-env": "^7.0.3",

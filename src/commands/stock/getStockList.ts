@@ -1,10 +1,17 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const dayjs = require('dayjs');
+import {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ChatInputCommandInteraction,
+} from 'discord.js';
+import dayjs from 'dayjs';
+import dependency from '../../config/dependencyInjection';
+import Game from '../../controller/Game';
+
 const {
 	cradle: { logger, util },
-} = require('../../config/dependencyInjection');
+} = dependency;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('주식리스트')
 		.setDescription('주식리스트임. 옵션이 없으면 기본으로 전체가 뜸.')
@@ -24,11 +31,7 @@ module.exports = {
 				},
 			),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const stockType = interaction.options.getString('종류') || 'all';
@@ -48,7 +51,12 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
-			const stockList = game.gamble.getAllStock(stockType);
+			const stockTypeList = ['coin', 'stock', 'all'];
+			if (!stockTypeList.includes(stockType)) {
+				await interaction.reply({ content: 'Builder Error' });
+				return;
+			}
+			const stockList = game.gamble.getAllStock(<'coin' | 'stock' | 'all'>stockType);
 			stockList.forEach(stock => {
 				embedBox.addFields({
 					name: `${stock.name} ${
