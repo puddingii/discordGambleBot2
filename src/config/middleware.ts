@@ -1,11 +1,17 @@
-import discord from 'discord.js';
+import {
+	CommandInteraction,
+	ModalSubmitInteraction,
+	SelectMenuInteraction,
+} from 'discord.js';
 import dependency from './dependencyInjection';
 
 const {
 	cradle: { UserModel, logger },
 } = dependency;
 
-export const isEnrolledUser = async function (interaction: discord.CommandInteraction) {
+export const isEnrolledUser = async function (
+	interaction: CommandInteraction | ModalSubmitInteraction | SelectMenuInteraction,
+) {
 	const discordId = interaction.user.id.toString();
 	const userInfo = await UserModel.findByDiscordId(discordId);
 	if (!userInfo) {

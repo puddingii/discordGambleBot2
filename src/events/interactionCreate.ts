@@ -1,16 +1,15 @@
-const { InteractionType } = require('discord.js');
+import { BaseInteraction } from 'discord.js';
+import dependency from '../config/dependencyInjection';
+import { isEnrolledUser } from '../config/middleware';
+import Game from '../controller/Game';
+
 const {
 	cradle: { logger },
-} = require('../config/dependencyInjection');
-const { isEnrolledUser } = require('../config/middleware');
+} = dependency;
 
-module.exports = {
+export default {
 	name: 'interactionCreate',
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: BaseInteraction, game: Game) {
 		const {
 			user: { username },
 		} = interaction;
@@ -22,9 +21,10 @@ module.exports = {
 			return;
 		}
 
-		const commandName = interaction.customId
-			? interaction.customId.split('-')[0]
-			: interaction.commandName;
+		const commandName =
+			(interaction.customId
+				? interaction.customId.split('-')[0]
+				: interaction.commandName) ?? '';
 		const command = interaction.client.commands.get(commandName);
 
 		if (!command) {

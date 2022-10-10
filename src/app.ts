@@ -1,7 +1,9 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 
-const loaders = require('./loaders/index');
-const { botToken } = require('./config/secretKey');
+import loaders from './loaders/index';
+import key from './config/secretKey';
+
+const { botToken } = key;
 
 const startServer = async () => {
 	const client = new Client({

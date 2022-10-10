@@ -10,9 +10,8 @@ export default (client: Client, game: Game) => {
 	const commandFolder = fs.readdirSync(path.resolve(__dirname, '../commands'));
 	const commonCommandFiles = commandFolder.filter(file => file.endsWith('.js'));
 	/** Common Folder Init */
-	commonCommandFiles.forEach(file => {
-		// eslint-disable-next-line global-require
-		const command = require(`../commands/${file}`); // FIXME
+	commonCommandFiles.forEach(async file => {
+		const { default: command } = await import(`../commands/${file}`);
 		if (command.data) {
 			client.commands.set(command.data.name, command);
 		}
@@ -23,9 +22,8 @@ export default (client: Client, game: Game) => {
 	detailFolders.forEach(folder => {
 		const detailFiles = fs.readdirSync(path.resolve(__dirname, `../commands/${folder}`));
 		const commandFiles = detailFiles.filter(file => file.endsWith('.js'));
-		commandFiles.forEach(file => {
-			// eslint-disable-next-line global-require
-			const command = require(`../commands/${folder}/${file}`); // FIXME
+		commandFiles.forEach(async file => {
+			const { default: command } = await import(`../commands/${folder}/${file}`);
 			if (command.data) {
 				client.commands.set(command.data.name, command);
 			}
@@ -35,9 +33,8 @@ export default (client: Client, game: Game) => {
 	const eventFiles = fs
 		.readdirSync(path.resolve(__dirname, '../events'))
 		.filter(file => file.endsWith('.js'));
-	eventFiles.forEach(file => {
-		// eslint-disable-next-line global-require
-		const event = require(`../events/${file}`); // FIXME
+	eventFiles.forEach(async file => {
+		const { default: event } = await import(`../events/${file}`);
 		if (event.once) {
 			client.once(event.name, (...args) => event.execute(...args, game));
 		} else {
