@@ -7,10 +7,11 @@
 		"start:commandBuild": "cross-env NODE_ENV=production node build/deploy-command.js",
 		"build": "tsc",
 		"test": "cross-env NODE_ENV=production env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' mocha",
-		"dev:app": "cross-env NODE_ENV=development ts-node src/deploy-command.ts && cross-env NODE_ENV=development ts-node src/app.ts",
+		"dev:app": "cross-env NODE_ENV=development ts-node --esm src/deploy-command.ts && cross-env NODE_ENV=development ts-node src/app.ts",
 		"dev:deploy": "cross-env NODE_ENV=development ts-node src/deploy-command.ts",
 		"dev:server": "cross-env NODE_ENV=development ts-node src/app.ts",
-		"dev:classTest": "ts-node src/controller/Game.ts",
+		"dev:tscheck": "tsc-watch",
+		"dev:jsapp": "tsc && cross-env NODE_ENV=development node build/app.js",
 		"dev:test": "cross-env NODE_ENV=development env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' mocha"
 	},
 	"author": "",
@@ -47,6 +48,7 @@
 		"nodemon": "^2.0.20",
 		"prettier": "^2.7.1",
 		"ts-node": "^10.9.1",
+		"tsc-watch": "^5.0.3",
 		"typescript": "^4.8.3",
 		"typescript-eslint": "^0.0.1-alpha.0"
 	}

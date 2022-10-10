@@ -1,5 +1,6 @@
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord.js';
+import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
+
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
@@ -11,35 +12,44 @@ const {
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-(function () {
+(async function () {
 	if (!secretKey.botToken || !secretKey.clientId || !secretKey.guildId) {
 		logger.error('Required Env variables is not defined.');
 		return;
 	}
 
 	/** Commands defined */
-	const commands: Array<string> = [];
+	const commands: Array<RESTPostAPIApplicationCommandsJSONBody> = [];
 	const commandFolder = fs.readdirSync(path.resolve(__dirname, './commands'));
-	const commonCommandFiles = commandFolder.filter(file => file.endsWith('.js'));
-	commonCommandFiles.forEach(async file => {
+	const commonCommandFiles = commandFolder.filter(
+		file => file.endsWith('.js') || file.endsWith('.ts'),
+	);
+
+	// eslint-disable-next-line no-restricted-syntax
+	for await (const file of commonCommandFiles) {
 		const { default: command } = await import(`./commands/${file}`);
 		if (command.data) {
 			commands.push(command.data.toJSON());
 		}
-	});
+	}
 
 	/** Service Folder Init */
 	const detailFolders = commandFolder.filter(file => !file.includes('.'));
-	detailFolders.forEach(folder => {
+	// eslint-disable-next-line no-restricted-syntax
+	for await (const folder of detailFolders) {
 		const detailFiles = fs.readdirSync(path.resolve(__dirname, `./commands/${folder}`));
-		const commandFiles = detailFiles.filter(file => file.endsWith('.js'));
-		commandFiles.forEach(async file => {
+		const commandFiles = detailFiles.filter(
+			file => file.endsWith('.js') || file.endsWith('.ts'),
+		);
+
+		// eslint-disable-next-line no-restricted-syntax
+		for await (const file of commandFiles) {
 			const { default: command } = await import(`./commands/${folder}/${file}`);
 			if (command.data) {
 				commands.push(command.data.toJSON());
 			}
-		});
-	});
+		}
+	}
 
 	/** Apply commands */
 	const rest = new REST({ version: '10' }).setToken(secretKey.botToken);

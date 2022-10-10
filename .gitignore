@@ -8,3 +8,4 @@ yarn.lock
 .env.*
 imgs/*
 .vscode
+build

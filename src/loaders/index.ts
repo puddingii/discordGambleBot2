@@ -9,5 +9,5 @@ export default async ({ client }: { client: Client }): Promise<void> => {
 		return;
 	}
 	const game = await gameLoader();
-	botLoader(client, game);
+	await botLoader(client, game);
 };
