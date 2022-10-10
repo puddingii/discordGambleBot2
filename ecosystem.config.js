@@ -2,8 +2,8 @@ module.exports = {
 	apps: [
 		{
 			name: 'Discord Gamble Bot',
-			script: './src/app.js',
-			watch: ['src'],
+			script: './build/app.js',
+			watch: ['build'],
 			watch_delay: 1000,
 			env: {
 				NODE_ENV: 'production',
