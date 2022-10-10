@@ -1,11 +1,13 @@
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord.js');
-const dotenv = require('dotenv');
-const path = require('path');
-const fs = require('fs');
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord.js';
+import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import dependency from './config/dependencyInjection';
+
 const {
 	cradle: { logger, secretKey },
-} = require('./config/dependencyInjection');
+} = dependency;
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -16,12 +18,11 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 	}
 
 	/** Commands defined */
-	const commands = [];
+	const commands: Array<string> = [];
 	const commandFolder = fs.readdirSync(path.resolve(__dirname, './commands'));
 	const commonCommandFiles = commandFolder.filter(file => file.endsWith('.js'));
-	commonCommandFiles.forEach(file => {
-		// eslint-disable-next-line global-require
-		const command = require(`./commands/${file}`);
+	commonCommandFiles.forEach(async file => {
+		const { default: command } = await import(`./commands/${file}`);
 		if (command.data) {
 			commands.push(command.data.toJSON());
 		}
@@ -32,9 +33,8 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 	detailFolders.forEach(folder => {
 		const detailFiles = fs.readdirSync(path.resolve(__dirname, `./commands/${folder}`));
 		const commandFiles = detailFiles.filter(file => file.endsWith('.js'));
-		commandFiles.forEach(file => {
-			// eslint-disable-next-line global-require
-			const command = require(`./commands/${folder}/${file}`);
+		commandFiles.forEach(async file => {
+			const { default: command } = await import(`./commands/${folder}/${file}`);
 			if (command.data) {
 				commands.push(command.data.toJSON());
 			}
