@@ -1,26 +1,38 @@
-const {
+import {
 	ActionRowBuilder,
+	ChatInputCommandInteraction,
+	ModalSubmitInteraction,
 	SelectMenuBuilder,
+	SelectMenuInteraction,
 	SlashCommandBuilder,
-} = require('discord.js');
+} from 'discord.js';
+import dependency from '../config/dependencyInjection';
+import stockManager from './admin/stockManager';
+import userManager from './admin/userManager';
+import statusManager from './admin/gameStatusManager';
+import { getNewSelectMenu } from './admin/common';
+import Game from '../controller/Game';
+
 const {
 	cradle: { logger, secretKey },
-} = require('../config/dependencyInjection');
+} = dependency;
+
 const {
 	modalSubmit: { updateStock },
 	select: { showStockModal },
-} = require('./admin/stockManager');
+} = stockManager;
+
 const {
 	modalSubmit: { giveMoney },
 	select: { showGiveMoneyModal },
-} = require('./admin/userManager');
+} = userManager;
+
 const {
 	modalSubmit: { updateStatus },
 	select: { showGameStatusModal },
-} = require('./admin/gameStatusManager');
-const { getNewSelectMenu } = require('./admin/common');
+} = statusManager;
 
-module.exports = {
+export default {
 	data: new SlashCommandBuilder()
 		.setName('어드민')
 		.setDescription('관리자만 접속할 수 있다.')
@@ -30,11 +42,7 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('비밀번호').setDescription('비밀번호').setRequired(true),
 		),
-	/**
-	 * @param {import('discord.js').CommandInteraction} interaction
-	 * @param {import('../controller/Game')} game
-	 */
-	async execute(interaction, game) {
+	async execute(interaction: ChatInputCommandInteraction, game: Game) {
 		try {
 			/** Discord Info */
 			const adminId = interaction.options.getString('아이디');
@@ -58,12 +66,11 @@ module.exports = {
 			await interaction.reply({ content: `${err}`, ephemeral: true });
 		}
 	},
-	/**
-	 * @param {import('discord.js').SelectMenuInteraction} interaction
-	 * @param {import('../controller/Game')} game
-	 * @param {{ selectedList: string[] }} selectOptions
-	 */
-	async select(interaction, game, { selectedList }) {
+	async select(
+		interaction: SelectMenuInteraction,
+		game: Game,
+		{ selectedList }: { selectedList: string[] },
+	) {
 		try {
 			const command = selectedList[0].split('-');
 			const stockList = game.gamble.getAllStock().map(stock => ({
@@ -82,7 +89,7 @@ module.exports = {
 					await interaction.reply({
 						content: '어드민전용-업데이트할 주식',
 						components: [
-							new ActionRowBuilder().addComponents(
+							new ActionRowBuilder<SelectMenuBuilder>().addComponents(
 								new SelectMenuBuilder()
 									.setCustomId('어드민')
 									.setPlaceholder('주식 리스트')
@@ -106,12 +113,11 @@ module.exports = {
 			await interaction.reply({ content: `${err}`, ephemeral: true });
 		}
 	},
-	/**
-	 * @param {import('discord.js').ModalSubmitInteraction} interaction
-	 * @param {import('../controller/Game')} game
-	 * @param {{ callFuncName: string }} options
-	 */
-	async modalSubmit(interaction, game, { callFuncName }) {
+	async modalSubmit(
+		interaction: ModalSubmitInteraction,
+		game: Game,
+		{ callFuncName }: { callFuncName: string },
+	) {
 		try {
 			switch (callFuncName) {
 				case 'addStock':

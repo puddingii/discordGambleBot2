@@ -2,7 +2,7 @@ import StockAbstract, { StockAbstractConstructor } from './StockAbstract';
 
 interface CheckStockValidationParam {
 	name: string;
-	type: 'stock' | 'coin';
+	type: 'stock';
 	value: number;
 	comment: string;
 	minRatio: number;

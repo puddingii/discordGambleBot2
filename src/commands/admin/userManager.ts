@@ -1,15 +1,16 @@
+import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
+import dependency from '../../config/dependencyInjection';
+import { setComma } from '../../config/util';
+import Game from '../../controller/Game';
+import { getNewSelectMenu, getModal } from './common';
+
 const {
 	cradle: { UserModel },
-} = require('../../config/dependencyInjection');
-const { setComma } = require('../../config/util');
-const { getNewSelectMenu, getModal } = require('./common');
+} = dependency;
 
-module.exports = {
+export default {
 	select: {
-		/**
-		 * @param {import('discord.js').SelectMenuInteraction} interaction
-		 */
-		async showGiveMoneyModal(interaction) {
+		async showGiveMoneyModal(interaction: SelectMenuInteraction) {
 			const modalInfo = {
 				id: '어드민-giveMoney',
 				title: '유저에게 돈주기',
@@ -24,11 +25,7 @@ module.exports = {
 		},
 	},
 	modalSubmit: {
-		/**
-		 * @param {import('discord.js').ModalSubmitInteraction} interaction
-		 * @param {import('../../controller/Game')} game
-		 */
-		async giveMoney(interaction, game) {
+		async giveMoney(interaction: ModalSubmitInteraction, game: Game) {
 			const nickname = interaction.fields.getTextInputValue('userNick');
 			const cnt = Number(interaction.fields.getTextInputValue('cnt'));
 

@@ -62,7 +62,7 @@ export default class Gamble {
 		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
-	addStock(stock: Array<Stock | Coin>): DefaultResult {
+	addStock(stock: Stock | Coin): DefaultResult {
 		if (!(stock instanceof Coin || stock instanceof Stock)) {
 			return { code: 0, message: 'Class Type 에러' };
 		}
@@ -102,7 +102,7 @@ export default class Gamble {
 	}
 
 	/** 주식/코인 리스트에서 name에 해당하는 정보 가져오기 */
-	getAllStock(type: 'stock' | 'coin' | 'all'): Array<Coin | Stock> {
+	getAllStock(type?: 'stock' | 'coin' | string): Array<Coin | Stock> {
 		switch (type) {
 			case 'coin':
 				return this.coinList;
