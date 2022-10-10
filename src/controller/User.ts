@@ -117,6 +117,8 @@ export default class User {
 				);
 				averageValue = myStock.cnt + cnt !== 0 ? averageValue : 0;
 				myStock.value = averageValue;
+			} else {
+				averageValue = myStock.value;
 			}
 			totalCnt += myStock.cnt;
 			myStock.cnt += cnt;

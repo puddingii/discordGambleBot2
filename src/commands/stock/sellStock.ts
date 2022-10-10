@@ -31,11 +31,11 @@ export default {
 			const gambleResult = game.gamble.buySellStock(discordId, name, cnt * -1, false);
 			if (
 				!gambleResult.code ||
-				!gambleResult.cnt ||
+				(!gambleResult.cnt && gambleResult.cnt !== 0) ||
 				!gambleResult.value ||
 				!gambleResult.money
 			) {
-				await interaction.reply({ content: gambleResult.message });
+				await interaction.reply({ content: gambleResult.message ?? 'Error' });
 				return;
 			}
 			const dbResult = await UserModel.updateStock(discordId, {
