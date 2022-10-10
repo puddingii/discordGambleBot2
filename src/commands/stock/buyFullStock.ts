@@ -20,15 +20,6 @@ export default {
 			const name = interaction.options.getString('이름') ?? '';
 
 			const gambleResult = game.gamble.buySellStock(discordId, name, 1, true);
-			if (
-				!gambleResult.code ||
-				!gambleResult.cnt ||
-				!gambleResult.value ||
-				!gambleResult.money
-			) {
-				await interaction.reply({ content: gambleResult.message });
-				return;
-			}
 
 			const dbResult = await UserModel.updateStock(discordId, {
 				name,
@@ -43,8 +34,12 @@ export default {
 
 			await interaction.reply({ content: '풀매수완료!' });
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}` });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({ content: `${errorMessage}` });
 		}
 	},
 };

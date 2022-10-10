@@ -36,10 +36,6 @@ export default {
 			}
 
 			const result = game.gamble.updateMoney(discordId, -10000);
-			if (!result.code || !result.userInfo) {
-				await interaction.reply({ content: result.message, ephemeral: true });
-				return;
-			}
 			const dbResult = await UserModel.updateMoney([result.userInfo]);
 			if (!dbResult.code) {
 				await interaction.reply({ content: 'DB Error', ephemeral: true });
@@ -48,8 +44,12 @@ export default {
 
 			await interaction.reply({ content: conditionText, ephemeral: true });
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}` });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({ content: `${errorMessage}`, ephemeral: true });
 		}
 	},
 };

@@ -42,7 +42,7 @@ export default {
 		.addStringOption(option =>
 			option.setName('비밀번호').setDescription('비밀번호').setRequired(true),
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const adminId = interaction.options.getString('아이디');
@@ -62,8 +62,16 @@ export default {
 				ephemeral: true,
 			});
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}`, ephemeral: true });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({
+				content: `${errorMessage}`,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
 		}
 	},
 	async select(
@@ -109,8 +117,16 @@ export default {
 					break;
 			}
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}`, ephemeral: true });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({
+				content: `${errorMessage}`,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
 		}
 	},
 	async modalSubmit(
@@ -135,8 +151,16 @@ export default {
 				default:
 			}
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}`, ephemeral: true });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({
+				content: `${errorMessage}`,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
 		}
 	},
 };

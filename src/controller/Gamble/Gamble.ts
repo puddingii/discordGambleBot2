@@ -10,9 +10,6 @@ interface DefaultResult {
 	message?: string;
 }
 
-type BuySellStockResult = Partial<{ cnt: number; value: number; money: number }> &
-	DefaultResult;
-
 export interface MyStockInfo {
 	stockList: Array<{
 		name: string;
@@ -86,16 +83,16 @@ export default class Gamble {
 		stockName: string,
 		cnt: number,
 		isFull: boolean,
-	): BuySellStockResult {
+	): { cnt: number; value: number; money: number } {
 		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
-			return { code: 0, message: '유저정보가 없습니다' };
+			throw Error('유저정보가 없습니다');
 		}
 		const stockInfo = [...this.stockList, ...this.coinList].find(
 			stock => stock.name === stockName,
 		);
 		if (!stockInfo) {
-			return { code: 0, message: '주식/코인정보가 없습니다' };
+			throw Error('주식/코인정보가 없습니다');
 		}
 		const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
 		return stockResult;
@@ -209,12 +206,12 @@ export default class Gamble {
 	}
 
 	/** 돈 갱신 */
-	updateMoney(userId: string, value: number): DefaultResult & { userInfo?: User } {
+	updateMoney(userId: string, value: number): { userInfo: User } {
 		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
-			return { code: 0, message: '유저정보가 없습니다' };
+			throw Error('유저정보가 없습니다');
 		}
-		const result = userInfo.updateMoney(value);
-		return { ...result, userInfo };
+		userInfo.updateMoney(value);
+		return { userInfo };
 	}
 }

@@ -48,15 +48,7 @@ export default {
 				return;
 			}
 
-			const gameResult = userInfo.updateMoney(cnt);
-			if (!gameResult.code) {
-				await interaction.reply({
-					content: gameResult.message,
-					components: [getNewSelectMenu()],
-					ephemeral: true,
-				});
-				return;
-			}
+			userInfo.updateMoney(cnt);
 
 			await UserModel.updateMoney([userInfo]);
 

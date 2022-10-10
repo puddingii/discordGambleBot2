@@ -21,15 +21,8 @@ interface UserStockInfo {
 	value: number;
 }
 
-/** Class Default Result Type */
-interface DefaultResult {
-	code: number;
-	message?: string;
-}
-
 /** 유저가 가지고 있는 Stock 업데이트 할 때 사용하는 함수리턴 타입 */
-type UpdateStockReturnType = Partial<{ cnt: number; value: number; money: number }> &
-	DefaultResult;
+type UpdateStockReturnType = { cnt: number; value: number; money: number };
 
 export default class User {
 	private _id: UserInfo['id'];
@@ -73,9 +66,9 @@ export default class User {
 	}
 
 	/** 유저가 가지고 있는 돈 업데이트 */
-	updateMoney(money: number, type?: 'stock' | 'coin' | 'weapon'): DefaultResult {
+	updateMoney(money: number, type?: 'stock' | 'coin' | 'weapon') {
 		if (this.money + money < 0) {
-			return { code: 0, message: '돈이 부족함' };
+			throw Error('돈이 부족함');
 		}
 		let extraCommission = 1;
 		// 주식이고 파는 경우 수수료 2%를 땐다.
@@ -83,7 +76,6 @@ export default class User {
 			extraCommission = 0.98;
 		}
 		this.money += money * extraCommission;
-		return { code: 1 };
 	}
 
 	/** 가지고 있는 주식 업데이트 하기(사고 팔때 사용) 살때는 cnt가 양수 아니면 음수 */
@@ -93,18 +85,15 @@ export default class User {
 			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : (myStock?.cnt ?? 0) * -1;
 		}
 		if (!cnt) {
-			return { code: 0, message: '돈이 부족하거나 갯수 입력값이 잘못됨.' };
+			throw Error('돈이 부족하거나 갯수 입력값이 잘못됨.');
 		}
 		// 파는데 숫자가 잘못될 경우
 		if ((myStock && myStock.cnt + cnt < 0) || (!myStock && cnt < 0)) {
-			return { code: 0, message: '가지고있는 갯수보다 많이 입력함.' };
+			throw Error('가지고있는 갯수보다 많이 입력함.');
 		}
 
 		const totalMoney = cnt * stock.value;
-		const updateResult = this.updateMoney(totalMoney * -1, stock.type);
-		if (!updateResult.code) {
-			return updateResult;
-		}
+		this.updateMoney(totalMoney * -1, stock.type);
 
 		let averageValue = 0;
 		let totalCnt = cnt;
@@ -128,6 +117,6 @@ export default class User {
 			this.stockList.push({ stock: stock, cnt, value: averageValue });
 		}
 
-		return { code: 1, cnt: totalCnt, value: averageValue, money: this.money };
+		return { cnt: totalCnt, value: averageValue, money: this.money };
 	}
 }

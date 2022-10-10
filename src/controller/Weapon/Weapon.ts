@@ -81,10 +81,7 @@ export default class Weapon {
 			}, this[`${type}Info`].value);
 		cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost : 0);
 
-		const moneyResult = userInfo.updateMoney(-1 * cost, 'weapon');
-		if (!moneyResult.code) {
-			return moneyResult;
-		}
+		userInfo.updateMoney(-1 * cost, 'weapon');
 
 		const MAX_NUMBER = 1000;
 		const money = userInfo.money;

@@ -35,19 +35,19 @@ export default {
 				return;
 			}
 
-			const { code, message } = myInfo.updateMoney(cnt * -1);
-			if (!code) {
-				await interaction.reply({ content: message });
-				return;
-			}
+			myInfo.updateMoney(cnt * -1);
 			ptrInfo.updateMoney(cnt);
 
 			await UserModel.updateMoney([myInfo, ptrInfo]);
 
 			await interaction.reply({ content: '기부완료!' });
 		} catch (err) {
-			logger.error(err);
-			await interaction.reply({ content: `${err}` });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage);
+			await interaction.reply({ content: `${errorMessage}` });
 		}
 	},
 };
