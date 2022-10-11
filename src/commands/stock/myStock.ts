@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
 import Game from '../../controller/Game';
-import { MyStockInfo } from '../../controller/Gamble/Gamble';
 
 const {
 	cradle: { logger, util },
@@ -30,8 +29,7 @@ export default {
 			/** DB Info */
 			const myStock = game.gamble.getMyStock(discordId);
 
-			// FIXME
-			const { stockList, totalMyValue, totalStockValue } = <MyStockInfo>myStock;
+			const { stockList, totalMyValue, totalStockValue } = myStock;
 			const upDownEmoji = (num: number) => {
 				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
 			};

@@ -5,11 +5,6 @@ import Coin from './Coin';
 import Stock from './Stock';
 import User from '../User';
 
-interface DefaultResult {
-	code: number;
-	message?: string;
-}
-
 export interface MyStockInfo {
 	stockList: Array<{
 		name: string;
@@ -59,17 +54,13 @@ export default class Gamble {
 		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
-	addStock(stock: Stock | Coin): DefaultResult {
-		if (!(stock instanceof Coin || stock instanceof Stock)) {
-			return { code: 0, message: 'Class Type 에러' };
-		}
+	addStock(stock: Stock | Coin) {
 		const list = <Array<Stock | Coin>>this[`${stock.type}List`];
 		const isExistStock = list.find(stockInfo => stockInfo.name === stock.name);
 		if (isExistStock) {
-			return { code: 0, message: '이미 있는 주식입니다.' };
+			throw Error('이미 있는 주식입니다.');
 		}
 		list.push(stock);
-		return { code: 1 };
 	}
 
 	/**
@@ -88,12 +79,14 @@ export default class Gamble {
 		if (!userInfo) {
 			throw Error('유저정보가 없습니다');
 		}
+
 		const stockInfo = [...this.stockList, ...this.coinList].find(
 			stock => stock.name === stockName,
 		);
 		if (!stockInfo) {
 			throw Error('주식/코인정보가 없습니다');
 		}
+
 		const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
 		return stockResult;
 	}
@@ -111,10 +104,10 @@ export default class Gamble {
 	}
 
 	/** 내가 가지고 있는 주식리스트 */
-	getMyStock(myDiscordId: string): DefaultResult | MyStockInfo {
+	getMyStock(myDiscordId: string): MyStockInfo {
 		const user = Game.getUser({ discordId: myDiscordId });
 		if (!user) {
-			return { code: 0, message: '유저정보를 찾을 수 없습니다.' };
+			throw Error('유저정보를 찾을 수 없습니다.');
 		}
 
 		const stockInfo = user.stockList.reduce(
@@ -193,8 +186,9 @@ export default class Gamble {
 	/** Gamble의 condition 조정 */
 	updateCondition() {
 		const randIdx = Math.floor(Math.random() * 100) + 1;
-		this.curCondition = 0;
 		let perTotal = 0;
+
+		this.curCondition = 0;
 		this.conditionRatioPerList.some((ratio, idx) => {
 			if (randIdx <= ratio + perTotal) {
 				this.curCondition = idx + 1;
@@ -206,12 +200,12 @@ export default class Gamble {
 	}
 
 	/** 돈 갱신 */
-	updateMoney(userId: string, value: number): { userInfo: User } {
+	updateMoney(userId: string, value: number): User {
 		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			throw Error('유저정보가 없습니다');
 		}
 		userInfo.updateMoney(value);
-		return { userInfo };
+		return userInfo;
 	}
 }

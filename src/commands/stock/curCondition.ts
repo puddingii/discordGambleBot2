@@ -35,8 +35,8 @@ export default {
 					conditionText = '아무일도 없음';
 			}
 
-			const result = game.gamble.updateMoney(discordId, -10000);
-			const dbResult = await UserModel.updateMoney([result.userInfo]);
+			const userInfo = game.gamble.updateMoney(discordId, -10000);
+			const dbResult = await UserModel.updateMoney([userInfo]);
 			if (!dbResult.code) {
 				await interaction.reply({ content: 'DB Error', ephemeral: true });
 				return;

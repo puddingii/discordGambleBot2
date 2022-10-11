@@ -140,20 +140,17 @@ const updateStock = async (
 		...defaultClassParam,
 		type: 'coin',
 	};
+
+	// 새 주식인 경우
 	if (isNew) {
 		const stock = type === 'stock' ? new Stock(stockParam) : new Coin(coinParam);
-		const gambleResult = game.gamble.addStock(stock);
-		if (!gambleResult.code) {
-			await interaction.reply({
-				content: gambleResult.message,
-				components: [getNewSelectMenu()],
-				ephemeral: true,
-			});
-			return;
-		}
+		game.gamble.addStock(stock);
+
 		const dbResult = await StockModel.addStock(stock);
 		content = dbResult.code ? '주식추가 완료' : <string>dbResult.message;
-	} else {
+	}
+	// 기존 주식 업데이트인 경우
+	else {
 		const stock = game.gamble.getStock(<'stock' | 'coin'>type, name);
 		if (!stock) {
 			await interaction.reply({

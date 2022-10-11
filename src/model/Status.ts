@@ -67,9 +67,8 @@ Status.statics.updateStatus = async function (statusInfo: Game) {
 	status.gamble.curTime = statusInfo.gamble.curTime;
 	status.gamble.curCondition = statusInfo.gamble.curCondition;
 	status.gamble.conditionPeriod = statusInfo.gamble.conditionPeriod;
-	status.gamble.conditionRatioPerList = new Types.Array(
-		...statusInfo.gamble.conditionRatioPerList,
-	);
+	status.gamble.conditionRatioPerList.splice(0);
+	status.gamble.conditionRatioPerList.push(...statusInfo.gamble.conditionRatioPerList);
 	await status.save();
 
 	return { code: 1 };
