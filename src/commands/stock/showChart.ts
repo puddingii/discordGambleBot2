@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 import sharp from 'sharp';
 import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
