@@ -8,12 +8,12 @@ const {
 	},
 } = dependency;
 
-interface DefaultResult {
-	code: number;
-	message?: string;
-}
-
-type EnhanceWeaponType = Partial<{ myWeapon: Sword; money: number }> & DefaultResult;
+type EnhanceWeaponType = {
+	/** 1: 성공, 2: 실패, 3: 터짐 */
+	code: 1 | 2 | 3;
+	myWeapon: Sword;
+	money: number;
+};
 
 export default class Weapon {
 	swordInfo: {
@@ -39,12 +39,17 @@ export default class Weapon {
 				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.03 },
 				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.04 },
 				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.05 },
-				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.06 }, // 19 -> 20
-				{ moneyRatio: 1.2, failRatio: 0.75, destroyRatio: 0.07 },
-				{ moneyRatio: 1.2, failRatio: 0.75, destroyRatio: 0.07 },
-				{ moneyRatio: 1.2, failRatio: 0.8, destroyRatio: 0.08 },
-				{ moneyRatio: 1.2, failRatio: 0.85, destroyRatio: 0.09 },
-				{ moneyRatio: 1.2, failRatio: 0.89, destroyRatio: 0.1 }, // 24 -> 25
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.05 }, // 19 -> 20
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.06 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.07 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.08 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.09 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.1 }, // 24 -> 25
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.11 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.12 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.13 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.14 },
+				{ moneyRatio: 1.2, failRatio: 0.7, destroyRatio: 0.15 }, // 29 -> 30
 			],
 			value: 3000,
 		};
@@ -59,7 +64,7 @@ export default class Weapon {
 	): EnhanceWeaponType {
 		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
-			return { code: 0, message: '유저정보가 없습니다' };
+			throw Error('유저정보가 없습니다');
 		}
 		let myWeapon = userInfo.weaponList.find(weapon => weapon.type === type);
 		if (!myWeapon) {
@@ -71,6 +76,10 @@ export default class Weapon {
 					myWeapon = new Sword();
 			}
 			userInfo.weaponList.push(myWeapon);
+		}
+
+		if (myWeapon.curPower >= 30) {
+			throw Error('더이상 강화할 수 없습니다.');
 		}
 
 		// 강화비용 계산
