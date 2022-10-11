@@ -27,16 +27,29 @@ export default {
 			const beforePower = game.getUser({ discordId })?.getWeapon('sword')?.curPower ?? 0;
 			const ratioInfo = game.weapon.swordInfo.ratioList[beforePower];
 			const successRatio = (1 - (ratioInfo.destroyRatio + ratioInfo.failRatio)) * 100;
-			const { code, message, myWeapon, money } = game.weapon.enhanceWeapon(
+			const { code, myWeapon, money } = game.weapon.enhanceWeapon(
 				discordId,
 				'sword',
 				false,
 				isPreventFail,
 			);
 
-			if (!code || !myWeapon || money === undefined) {
-				await interaction.reply({ content: message });
-				return;
+			let content;
+			switch (code) {
+				case 2:
+					content = `실패! ${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
+						successRatio,
+						2,
+					)}%)`;
+					break;
+				case 3:
+					content = `터짐ㅋㅋ ${beforePower}강 ▶︎ ${myWeapon.curPower}강`;
+					break;
+				default:
+					content = `성공! ${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
+						successRatio,
+						2,
+					)}%)`;
 			}
 
 			const dbResult = await UserModel.updateWeapon(discordId, myWeapon, money);
@@ -46,12 +59,7 @@ export default {
 				return;
 			}
 
-			await interaction.reply({
-				content: `${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
-					successRatio,
-					2,
-				)}%)`,
-			});
+			await interaction.reply({ content });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });
