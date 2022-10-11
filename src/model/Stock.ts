@@ -178,7 +178,8 @@ Stock.statics.updateStock = async function (updatedStockInfo: UpdatedStockInfo) 
 		return { code: 0, message: '해당하는 주식이 없습니다.' };
 	}
 	stock.comment = updatedStockInfo.comment;
-	stock.conditionList = new Types.Array(...updatedStockInfo.conditionList);
+	stock.conditionList.splice(0);
+	stock.conditionList.push(...updatedStockInfo.conditionList);
 	stock.correctionCnt = updatedStockInfo.correctionCnt;
 	stock.dividend = updatedStockInfo.dividend;
 	stock.maxRatio = updatedStockInfo.maxRatio;
