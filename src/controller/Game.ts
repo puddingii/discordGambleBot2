@@ -9,11 +9,6 @@ interface GameConstructor {
 	grantMoney?: number;
 }
 
-interface DefaultResult {
-	code: number;
-	message?: string;
-}
-
 export default class Game {
 	private static instance: undefined | Game;
 	static userList: User[];
@@ -51,14 +46,13 @@ export default class Game {
 	}
 
 	/** 유저등록 */
-	addUser(myInfo: { id: string; nickname: string }): DefaultResult {
+	addUser(myInfo: { id: string; nickname: string }) {
 		const isExistUser = this.getUser({ discordId: myInfo.id });
 		if (isExistUser) {
-			return { code: 0, message: '이미 있는 유저입니다.' };
+			throw Error('이미 있는 유저입니다.');
 		}
 		const user = new User(myInfo);
 		Game.userList.push(user);
-		return { code: 1 };
 	}
 
 	/** 유저클래스 찾기 */
