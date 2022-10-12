@@ -3,14 +3,17 @@ import Coin from './Stock/Coin';
 import Sword from './Weapon/Sword';
 
 interface DataInfo {
-	stock: Stock;
-	coin: Coin;
-	weapon: Sword;
+	stock: Array<Stock>;
+	coin: Array<Coin>;
+	weapon: Array<Sword>;
+	status: { code: number };
 }
 
 interface DataConstructor<T extends keyof DataInfo> {
-	dataInfo: Map<T, Array<DataInfo[T]>>;
+	dataInfo: Map<T, DataInfo[T]>;
 }
+
+interface GetDataOptions {}
 
 export default class DataManager {
 	private static instance: DataManager;
@@ -26,8 +29,12 @@ export default class DataManager {
 		this.dataInfo = new Map();
 	}
 
-	addData<T extends keyof DataInfo>(type: T, dataList: Array<DataInfo[T]>) {
+	/** 데이터가 리스트로 담겨있다면 해당 메소드를 사용해서 데이터를 추가할 수 있다. */
+	addData<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
 		const existedList = this.dataInfo.get(type);
+		if (!Array.isArray(dataList) || !Array.isArray(existedList)) {
+			return;
+		}
 
 		if (existedList) {
 			this.dataInfo.set(type, [...existedList, ...dataList]);
@@ -36,11 +43,21 @@ export default class DataManager {
 		}
 	}
 
-	getDataList(type: keyof DataInfo) {
-		return this.dataInfo.get(type);
+	// FIXME
+	getData(type: keyof DataInfo, listOptions?: GetDataOptions) {
+		const data = this.dataInfo.get(type);
+		if (!listOptions) {
+			return data;
+		}
+
+		// if (Array.isArray(data) && listOptions) {
+		// 	data.find(value => {
+		// 		return
+		// 	})
+		// }
 	}
 
-	setData<T extends keyof DataInfo>(type: T, dataList: Array<DataInfo[T]>) {
+	setData<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
 		this.dataInfo.set(type, dataList);
 	}
 }
