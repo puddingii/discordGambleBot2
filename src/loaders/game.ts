@@ -101,7 +101,7 @@ export default async () => {
 		conditionRatioPerList,
 	});
 	const game = new Game({ userList, gamble, weapon, grantMoney });
-	setInterval(() => {
+	setInterval(() => { // FIXME node-scheduler
 		/** 12시간마다 컨디션 조정 */
 		if (game.gamble.curTime % game.gamble.conditionPeriod === 0) {
 			game.gamble.updateCondition();
