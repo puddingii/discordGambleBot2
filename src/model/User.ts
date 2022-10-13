@@ -5,7 +5,7 @@ import UserContorller from '../controller/User';
 import SwordController from '../controller/Weapon/Sword';
 
 interface WeaponInfo {
-	type: 'weapon' | 'pickaxe';
+	type: 'sword' | 'pickaxe';
 	destroyCnt: number;
 	failCnt: number;
 	successCnt: number;
@@ -138,7 +138,7 @@ const User = new Schema<IUser, IUserStatics>({
 
 /** 아이디로 유저정보 탐색 */
 User.statics.findByDiscordId = async function (discordId: string) {
-	const userInfo = await this.findOne({ discordId });
+	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
 	return userInfo;
 };
 

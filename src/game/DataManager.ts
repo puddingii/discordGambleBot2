@@ -1,19 +1,17 @@
-import Stock from './Stock/Stock';
-import Coin from './Stock/Coin';
-import Sword from './Weapon/Sword';
+import StockManager from './Stock/StockManager';
+import UserManager from './User/UserManager';
+import WeaponManager from './Weapon/WeaponManager';
 
 interface DataInfo {
-	stock: Array<Stock>;
-	coin: Array<Coin>;
-	weapon: Array<Sword>;
-	status: { code: number };
+	stock: StockManager;
+	weapon: WeaponManager;
+	user: UserManager;
+	globalStatus: { code: number };
 }
 
 interface DataConstructor<T extends keyof DataInfo> {
 	dataInfo: Map<T, DataInfo[T]>;
 }
-
-interface GetDataOptions {}
 
 export default class DataManager {
 	private static instance: DataManager;
@@ -29,35 +27,16 @@ export default class DataManager {
 		this.dataInfo = new Map();
 	}
 
-	/** 데이터가 리스트로 담겨있다면 해당 메소드를 사용해서 데이터를 추가할 수 있다. */
-	addData<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
-		const existedList = this.dataInfo.get(type);
-		if (!Array.isArray(dataList) || !Array.isArray(existedList)) {
-			return;
+	get<T extends keyof DataInfo>(type: T): DataInfo[T] {
+		const dataList = ['stock', 'weapon', 'user', 'globalStatus'];
+		if (dataList.includes(type)) {
+			throw Error('잘못된 타입값입니다.');
 		}
-
-		if (existedList) {
-			this.dataInfo.set(type, [...existedList, ...dataList]);
-		} else {
-			this.dataInfo.set(type, dataList);
-		}
+		const dataManager = <DataInfo[T]>this.dataInfo.get(type);
+		return dataManager;
 	}
 
-	// FIXME
-	getData(type: keyof DataInfo, listOptions?: GetDataOptions) {
-		const data = this.dataInfo.get(type);
-		if (!listOptions) {
-			return data;
-		}
-
-		// if (Array.isArray(data) && listOptions) {
-		// 	data.find(value => {
-		// 		return
-		// 	})
-		// }
-	}
-
-	setData<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
+	set<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
 		this.dataInfo.set(type, dataList);
 	}
 }
