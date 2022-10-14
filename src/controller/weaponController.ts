@@ -19,19 +19,46 @@ type EnhanceWeaponType = {
 	money: number;
 };
 
+export const getMyWeapon = ({
+	discordId,
+	type,
+}: {
+	discordId: string;
+	type: 'sword';
+}) => {
+	return userManager.getMyWeaponList({ discordId, type });
+};
+
+export const getWeaponInfo = (type: 'sword') => {
+	return weaponManager.getDefaultValue(type);
+};
+
+export const getNextRatio = ({
+	type,
+	discordId,
+}: {
+	type: 'sword';
+	discordId: string;
+}) => {
+	const userWeapon = getMyWeapon({ discordId, type });
+	const curPower = userWeapon?.curPower ?? 0;
+
+	return weaponManager.getNextRatio({ type, curPower });
+};
+
 /** 무기강화 */
 export const enhanceWeapon = ({
-	userId,
+	discordId,
 	type,
 	isPreventDestroy = false,
 	isPreventDown = false,
 }: {
-	userId: string;
+	discordId: string;
 	type: 'sword';
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
 }): EnhanceWeaponType => {
-	const userInfo = userManager.getUser({ discordId: userId });
+	const userInfo = userManager.getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
@@ -90,4 +117,6 @@ export const enhanceWeapon = ({
 
 export default {
 	enhanceWeapon,
+	getNextRatio,
+	getMyWeapon,
 };

@@ -36,7 +36,7 @@ export default class UserManager {
 	}
 
 	/** 내가 가지고 있는 주식리스트 */
-	getMyStock(myDiscordId: string): MyStockInfo {
+	getMyStockList(myDiscordId: string): MyStockInfo {
 		const user = this.getUser({ discordId: myDiscordId });
 		if (!user) {
 			throw Error('유저정보를 찾을 수 없습니다.');
@@ -64,6 +64,16 @@ export default class UserManager {
 		);
 
 		return stockInfo;
+	}
+
+	/** 내가 가지고 있는 무기 반환 */
+	getMyWeaponList({ discordId, type }: { discordId: string; type: 'sword' }) {
+		const user = this.getUser({ discordId });
+		if (!user) {
+			throw Error('유저정보를 찾을 수 없습니다.');
+		}
+
+		return user.getWeapon(type);
 	}
 
 	/** 디스코드 아이디를 가지고 유저클래스 찾기 */

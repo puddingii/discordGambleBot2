@@ -6,6 +6,7 @@ import {
 import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
 import Game from '../../controller/Game';
+import weaponController from '../../controller/weaponController';
 
 const {
 	cradle: { logger },
@@ -18,7 +19,8 @@ export default {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const myWeapon = game.getUser({ discordId })?.getWeapon('sword');
+			const myWeapon = weaponController.getMyWeapon({ discordId, type: 'sword' });
+
 			if (!myWeapon) {
 				await interaction.reply({ content: '내역 없음' });
 				return;

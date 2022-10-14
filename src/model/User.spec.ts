@@ -2,7 +2,7 @@ import { equal, ok, fail } from 'assert';
 import mongoose from 'mongoose';
 import User from './User';
 import UserControlller from '../controller/User';
-import SwordController from '../controller/Weapon/Sword';
+import SwordController from '../game/Weapon/Sword';
 
 // 건빵 id는 계속 db에 남겨둘것.
 const TEST_NICKNAME = '모카테스트';

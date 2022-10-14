@@ -58,6 +58,24 @@ export default class WeaponManager {
 		return this[`${type}Info`].value;
 	}
 
+	getInfo(type: 'sword') {
+		return this[`${type}Info`];
+	}
+
+	/** 다음 강화할 때 확률 */
+	getNextRatio({ type, curPower }: { type: 'sword'; curPower: number }) {
+		const ratioList = this[`${type}Info`].ratioList;
+		if (curPower >= ratioList.length) {
+			throw Error('더이상 강화할 수 없습니다.');
+		}
+		const ratio = ratioList[curPower];
+		return {
+			success: 1 - (ratio.destroyRatio + ratio.failRatio),
+			fail: ratio.failRatio,
+			destroy: ratio.destroyRatio,
+		};
+	}
+
 	getRatioList(type: 'sword') {
 		return this[`${type}Info`].ratioList;
 	}

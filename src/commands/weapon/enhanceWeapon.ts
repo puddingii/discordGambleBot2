@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
 import Game from '../../controller/Game';
+import weaponController from '../../controller/weaponController';
 
 const {
 	cradle: { UserModel, logger },
@@ -24,32 +25,30 @@ export default {
 			const isPreventFail = interaction.options.getBoolean('하락방지') ?? false;
 			const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const beforePower = game.getUser({ discordId })?.getWeapon('sword')?.curPower ?? 0;
-			const ratioInfo = game.weapon.swordInfo.ratioList[beforePower];
-			const successRatio = (1 - (ratioInfo.destroyRatio + ratioInfo.failRatio)) * 100;
-			const { code, myWeapon, money } = game.weapon.enhanceWeapon(
+			const [successRatio] = Object.values(
+				weaponController.getNextRatio({ discordId, type: 'sword' }),
+			).map(ratio => ratio * 100);
+			const { code, myWeapon, money } = weaponController.enhanceWeapon({
 				discordId,
-				'sword',
-				false,
-				isPreventFail,
-			);
+				type: 'sword',
+				isPreventDestroy: false,
+				isPreventDown: isPreventFail,
+			});
 
 			let content;
 			switch (code) {
 				case 2:
-					content = `실패! ${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
-						successRatio,
-						2,
-					)}%)`;
+					content = `실패! ${myWeapon.curPower + 1}강 ▶︎ ${
+						myWeapon.curPower
+					}강 (확률: ${_.round(successRatio, 2)}%)`;
 					break;
 				case 3:
-					content = `터짐ㅋㅋ ${beforePower}강 ▶︎ ${myWeapon.curPower}강`;
+					content = `터짐ㅋㅋ 0강 ▶︎ ${myWeapon.curPower}강`;
 					break;
 				default:
-					content = `성공! ${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
-						successRatio,
-						2,
-					)}%)`;
+					content = `성공! ${myWeapon.curPower - 1}강 ▶︎ ${
+						myWeapon.curPower
+					}강 (확률: ${_.round(successRatio, 2)}%)`;
 			}
 
 			const dbResult = await UserModel.updateWeapon(discordId, myWeapon, money);

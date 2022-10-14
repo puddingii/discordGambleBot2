@@ -2,7 +2,7 @@ import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoos
 import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
 import UserContorller from '../controller/User';
-import SwordController from '../controller/Weapon/Sword';
+import SwordController from '../game/Weapon/Sword';
 
 interface WeaponInfo {
 	type: 'sword' | 'pickaxe';

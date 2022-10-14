@@ -7,6 +7,7 @@ import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
 import { setComma } from '../../config/util';
 import Game from '../../controller/Game';
+import weaponController from '../../controller/weaponController';
 
 const {
 	cradle: { logger },
