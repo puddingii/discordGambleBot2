@@ -21,7 +21,7 @@ export default class DataManager {
 		}
 		return DataManager.instance;
 	}
-	dataInfo: DataConstructor<keyof DataInfo>['dataInfo'];
+	private dataInfo: DataConstructor<keyof DataInfo>['dataInfo'];
 
 	private constructor() {
 		this.dataInfo = new Map();

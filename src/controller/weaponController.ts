@@ -1,10 +1,11 @@
+import _ from 'lodash';
 import DataManager from '../game/DataManager';
 import Sword from '../game/Weapon/Sword';
 import dependency from '../config/dependencyInjection';
 
 const {
 	cradle: {
-		util: { getRandomNumber },
+		util: { getRandomNumber, setComma },
 	},
 } = dependency;
 
@@ -17,7 +18,10 @@ type EnhanceWeaponType = {
 	code: 1 | 2 | 3;
 	myWeapon: Sword;
 	money: number;
+	beforePower: number;
 };
+
+type FormattedRatioList = Array<{ value: string; name: string }>;
 
 export const getMyWeapon = ({
 	discordId,
@@ -29,10 +33,37 @@ export const getMyWeapon = ({
 	return userManager.getMyWeaponList({ discordId, type });
 };
 
+/** 타입에 해당하는 무기정보 class 리턴 */
 export const getWeaponInfo = (type: 'sword') => {
 	return weaponManager.getDefaultValue(type);
 };
 
+/** perCnt를 기준으로 나눠서 Ratio 설명표를 리턴함 */
+export const getFormattedRatioList = (
+	type: 'sword',
+	perCnt: number,
+): FormattedRatioList => {
+	const { ratioList: list, value } = weaponManager.getInfo(type);
+	let money = value;
+	const resultList: FormattedRatioList = [];
+	for (let i = 0; i < Math.floor(list.length / perCnt); i++) {
+		let value = '';
+		for (let j = i * perCnt; j < (i + 1) * perCnt; j++) {
+			const fail = _.round(list[j].failRatio * 100, 2);
+			const destroy = _.round(list[j].destroyRatio * 100, 2);
+			const success = _.round(100 - destroy - fail, 2);
+			money *= list[j].moneyRatio;
+			value = `${value}\n${i * perCnt + j}~${
+				i * perCnt + j + 1
+			}: (${success}%/${fail}%/${destroy}%)-${setComma(money, true)}원`;
+		}
+		resultList.push({ value, name: `${i * perCnt}~${(i + 1) * perCnt}강` });
+	}
+
+	return resultList;
+};
+
+/** 다음 강화확률 반환 */
 export const getNextRatio = ({
 	type,
 	discordId,
@@ -74,6 +105,7 @@ export const enhanceWeapon = ({
 		userInfo.weaponList.push(myWeapon);
 	}
 
+	const beforePower = myWeapon.curPower;
 	if (myWeapon.curPower >= 30) {
 		throw Error('더이상 강화할 수 없습니다.');
 	}
@@ -85,7 +117,7 @@ export const enhanceWeapon = ({
 		.reduce((acc, cur) => {
 			return acc * cur.moneyRatio;
 		}, weaponManager.getDefaultValue(type));
-	cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost : 0);
+	cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
 
 	userInfo.updateMoney(-1 * cost, 'weapon');
 
@@ -99,7 +131,7 @@ export const enhanceWeapon = ({
 		if (!isPreventDown && myWeapon.curPower > 0) {
 			myWeapon.curPower--;
 		}
-		return { code: 2, myWeapon, money };
+		return { code: 2, myWeapon, money, beforePower };
 	}
 	// 터짐
 	if ((failRatio + destroyRatio) * MAX_NUMBER >= randomNum) {
@@ -107,16 +139,18 @@ export const enhanceWeapon = ({
 			myWeapon.curPower = 0;
 			myWeapon.destroyCnt++;
 		}
-		return { code: 3, myWeapon, money };
+		return { code: 3, myWeapon, money, beforePower };
 	}
 
+	// 성공
 	myWeapon.curPower++;
 	myWeapon.successCnt++;
-	return { code: 1, myWeapon, money };
+	return { code: 1, myWeapon, money, beforePower };
 };
 
 export default {
 	enhanceWeapon,
+	getFormattedRatioList,
 	getNextRatio,
 	getMyWeapon,
 };

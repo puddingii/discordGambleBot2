@@ -5,7 +5,6 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
 import weaponController from '../../controller/weaponController';
 
 const {
@@ -14,7 +13,7 @@ const {
 
 export default {
 	data: new SlashCommandBuilder().setName('무기내역').setDescription('무기강화 내역'),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
