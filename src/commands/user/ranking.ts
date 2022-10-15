@@ -4,33 +4,21 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import { setComma } from '../../config/util';
-import Game from '../../controller/Game';
+import userController from '../../controller/userController';
 
 const {
-	cradle: { logger },
+	cradle: {
+		logger,
+		util: { setComma },
+	},
 } = dependency;
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('랭킹')
 		.setDescription('가지고 있는 돈과 주식 등을 합한 랭킹, 무기강화 수치 등등..'),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
-			/** Discord Info */
-			const rankingList = game.getUserList().map(user => {
-				const money =
-					user.stockList.reduce((acc, cur) => {
-						acc += cur.cnt * cur.stock.value;
-						return acc;
-					}, 0) + user.money;
-				return {
-					name: user.nickname,
-					money,
-					sword: user.getWeapon('sword')?.curPower ?? 0,
-				};
-			});
-
 			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
@@ -38,6 +26,8 @@ export default {
 				.setDescription('가지고 있는 돈과 주식 등을 합한 랭킹, 무기강화 수치 등등..')
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
+
+			const rankingList = userController.getRankingList();
 
 			rankingList.forEach(user => {
 				embedBox.addFields({

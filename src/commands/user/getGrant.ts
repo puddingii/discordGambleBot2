@@ -1,50 +1,38 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import { setComma } from '../../config/util';
-import Game from '../../controller/Game';
-import User from '../../controller/User';
+import userController from '../../controller/userController';
+import globalController from '../../controller/globalController';
 
 const {
-	cradle: { UserModel, logger },
+	cradle: {
+		logger,
+		util: { setComma },
+	},
 } = dependency;
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName('보조금받기')
 		.setDescription('아끼다 다른 사람한테 넘어간다ㅋㅋ'),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const rankingList = game.getUserList();
-
-			// User가 가지고 있는 주식과 현금을 합친 돈
-			const getTotalMoney = (info: User) =>
-				info.stockList.reduce((acc, cur) => {
-					acc += cur.cnt * cur.stock.value;
-					return acc;
-				}, 0) + info.money;
-
-			const nowMinUser = rankingList.reduce((minUser, user) => {
-				const afterMoney = getTotalMoney(user);
-				const beforeMoney = getTotalMoney(minUser);
-
-				return afterMoney - beforeMoney > 0 ? minUser : user;
-			}, rankingList[0]);
+			// User가 가지고 있는 주식과 현금을 합친 돈이 젤 적은사람
+			const nowMinUser = userController.getMinUser();
 
 			if (nowMinUser.getId() !== discordId) {
 				await interaction.reply({ content: '꼴찌도 아닌 놈이 받을려해! 갈!!!!!!!!' });
 				return;
 			}
 
-			nowMinUser.updateMoney(game.grantMoney);
-			await UserModel.updateMoney([nowMinUser]);
-
+			const money = globalController.getGrantMoney();
+			nowMinUser.updateMoney(money);
 			await interaction.reply({
-				content: `${setComma(game.grantMoney)}원을 받았습니다.`,
+				content: `${setComma(money)}원을 받았습니다.`,
 			});
-			game.grantMoney = 0;
+			globalController.updateGrantMoney(0);
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });

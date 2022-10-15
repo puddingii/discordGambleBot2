@@ -6,7 +6,7 @@ interface DataInfo {
 	stock: StockManager;
 	weapon: WeaponManager;
 	user: UserManager;
-	globalStatus: { code: number };
+	globalStatus: { grantMoney: number; curTime: number };
 }
 
 interface DataConstructor<T extends keyof DataInfo> {
@@ -25,6 +25,7 @@ export default class DataManager {
 
 	private constructor() {
 		this.dataInfo = new Map();
+		this.set('globalStatus', { grantMoney: 0, curTime: 0 });
 	}
 
 	get<T extends keyof DataInfo>(type: T): DataInfo[T] {

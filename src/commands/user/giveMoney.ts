@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
+import userController from '../../controller/userController';
 
 const {
-	cradle: { UserModel, logger },
+	cradle: { logger },
 } = dependency;
 
 export default {
@@ -16,7 +16,7 @@ export default {
 		.addNumberOption(option =>
 			option.setName('액수').setDescription('얼마나 줄건지').setRequired(true),
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
@@ -28,17 +28,7 @@ export default {
 				return;
 			}
 
-			const myInfo = game.getUser({ discordId });
-			const ptrInfo = game.getUser({ nickname: ptrNickname });
-			if (!myInfo || !ptrInfo) {
-				await interaction.reply({ content: '유저정보가 없습니다.' });
-				return;
-			}
-
-			myInfo.updateMoney(cnt * -1);
-			ptrInfo.updateMoney(cnt);
-
-			await UserModel.updateMoney([myInfo, ptrInfo]);
+			userController.giveMoney({ discordId }, { nickname: ptrNickname }, cnt);
 
 			await interaction.reply({ content: '기부완료!' });
 		} catch (err) {
