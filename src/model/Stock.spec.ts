@@ -155,6 +155,51 @@ describe('User Model Test', function () {
 		});
 	});
 
+	describe('#getUpdateHistory', function () {
+		before(async function () {
+			const stock = await Stock.findOne({ name: TEST_STOCK_INFO.name });
+			Array(49)
+				.fill(false)
+				.forEach((_, idx) => {
+					stock?.updHistory.push({
+						value: idx,
+						date: '123123',
+					});
+				});
+			await stock?.save();
+		});
+
+		it('Get Overflow Count', async function () {
+			try {
+				const list = await Stock.getUpdateHistory(TEST_STOCK_INFO.name, 70);
+				equal(list.length, 50);
+			} catch (e) {
+				console.log(e);
+				fail('DB Action Error...');
+			}
+		});
+
+		it('Get Under Count', async function () {
+			try {
+				const list = await Stock.getUpdateHistory(TEST_STOCK_INFO.name, 30);
+				equal(list.length, 30);
+			} catch (e) {
+				console.log(e);
+				fail('DB Action Error...');
+			}
+		});
+
+		it('Get Correct Count', async function () {
+			try {
+				const list = await Stock.getUpdateHistory(TEST_STOCK_INFO.name, 50);
+				equal(list.length, 50);
+			} catch (e) {
+				console.log(e);
+				fail('DB Action Error...');
+			}
+		});
+	});
+
 	describe('#deleteOne', function () {
 		it('Delete Unknown Stock', async function () {
 			try {

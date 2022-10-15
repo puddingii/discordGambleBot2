@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
+import stockController from '../../controller/stockController';
 
 const {
 	cradle: { logger, util },
@@ -31,12 +31,12 @@ export default {
 				},
 			),
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
-			const stockType = interaction.options.getString('종류') || 'all';
-			const condition =
-				game.gamble.conditionPeriod - (game.gamble.curTime % game.gamble.conditionPeriod);
+			const stockType =
+				<'coin' | 'stock' | 'all'>interaction.options.getString('종류') || 'all';
+			const condition = stockController.getNextUpdateTime();
 
 			const embedBox = new EmbedBuilder();
 			embedBox
@@ -51,12 +51,8 @@ export default {
 				.setTimestamp();
 
 			/** DB Info */
-			const stockTypeList = ['coin', 'stock', 'all'];
-			if (!stockTypeList.includes(stockType)) {
-				await interaction.reply({ content: 'Builder Error' });
-				return;
-			}
-			const stockList = game.gamble.getAllStock(<'coin' | 'stock' | 'all'>stockType);
+
+			const stockList = stockController.getAllStock(stockType);
 			stockList.forEach(stock => {
 				embedBox.addFields({
 					name: `${stock.name} ${

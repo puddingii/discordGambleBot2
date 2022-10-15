@@ -1,12 +1,16 @@
+import dayjs from 'dayjs';
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
 import Coin from '../game/Stock/Coin';
 import DataManager from '../game/DataManager';
+import StockModel from '../model/Stock';
 
 const dataManager = DataManager.getInstance();
 const userManager = dataManager.get('user');
 const stockManager = dataManager.get('stock');
+const globalManager = dataManager.get('globalStatus');
 
+/** 주식사기 */
 export const buySellStock = ({
 	discordId,
 	stockName,
@@ -30,6 +34,68 @@ export const buySellStock = ({
 
 	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
 	return stockResult;
+};
+
+export const getAllStock = (type: 'coin' | 'stock' | 'all') => {
+	const stockTypeList = ['coin', 'stock', 'all'];
+	if (!stockTypeList.includes(type)) {
+		throw Error('Builder Error');
+	}
+	return stockManager.getAllStock(type);
+};
+
+/** 현재 주식흐름 */
+export const getCurrentCondition = () => {
+	return stockManager.curCondition;
+};
+
+/** 다음 컨디션 업데이트까지 남은시간 */
+export const getNextUpdateTime = () => {
+	return (
+		stockManager.conditionPeriod - (globalManager.curTime % stockManager.curCondition)
+	);
+};
+
+export const getChartData = async ({
+	stockName,
+	stickTime,
+	chartType,
+}: {
+	stockName: string;
+	stickTime: number;
+	chartType: 'stick' | 'line';
+}): Promise<{ xDataList: Array<string>; yDataList: Array<Array<number> | number> }> => {
+	const type = 'stock';
+	const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
+	const stockInfo = await StockModel.getUpdateHistory(stockName, stickPerCnt * 30);
+	const stockCnt = stockInfo.length;
+
+	let beforeHistory = 0;
+	const xDataList = [];
+	const yDataList = [];
+	for (let i = 0; i < stockCnt; i += stickPerCnt) {
+		const stickData = stockInfo.slice(i, i + stickPerCnt);
+		const stickLastIdx = stickData.length - 1;
+		if (stickData.length === -1) {
+			break;
+		}
+		const valueList = stickData.map(data => data.value);
+		beforeHistory && valueList.unshift(beforeHistory);
+		const stickValue =
+			chartType === 'stick'
+				? [
+						valueList[0],
+						valueList[stickLastIdx],
+						Math.min(...valueList),
+						Math.max(...valueList),
+				  ]
+				: valueList[stickLastIdx];
+		beforeHistory = valueList[stickLastIdx];
+		xDataList.push(dayjs(stickData[0].date).format('MM.DD'));
+		yDataList.push(stickValue);
+	}
+
+	return { xDataList, yDataList };
 };
 
 /** 돈 갱신 */
@@ -62,6 +128,10 @@ export const update = (): { stockList: Array<Stock | Coin>; userList: User[] } =
 
 export default {
 	buySellStock,
+	getAllStock,
+	getChartData,
+	getCurrentCondition,
+	getNextUpdateTime,
 	updateMoney,
 	update,
 };

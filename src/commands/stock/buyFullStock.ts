@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
+import stockController from '../../controller/stockController';
 
 const {
-	cradle: { UserModel, logger },
+	cradle: { logger },
 } = dependency;
 
 export default {
@@ -13,24 +13,13 @@ export default {
 		.addStringOption(option =>
 			option.setName('이름').setDescription('주식이름').setRequired(true),
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름') ?? '';
 
-			const gambleResult = game.gamble.buySellStock(discordId, name, 1, true);
-
-			const dbResult = await UserModel.updateStock(discordId, {
-				name,
-				cnt: gambleResult.cnt,
-				value: gambleResult.value,
-				money: gambleResult.money,
-			});
-			if (!dbResult.code) {
-				await interaction.reply({ content: dbResult.message });
-				return;
-			}
+			stockController.buySellStock({ discordId, stockName: name, cnt: 1, isFull: true });
 
 			await interaction.reply({ content: '풀매수완료!' });
 		} catch (err) {

@@ -13,13 +13,6 @@ interface DataInfo {
 
 /** Singleton Stock Data Manager */
 export default class StockManager {
-	private static instance: StockManager;
-	public static getInstance(dataInfo?: DataInfo) {
-		if (!StockManager.instance) {
-			StockManager.instance = new StockManager(dataInfo);
-		}
-		return StockManager.instance;
-	}
 	coinList: DataInfo['coinList'] = [];
 	conditionPeriod: DataInfo['conditionPeriod'] = 24;
 	conditionRatioPerList: DataInfo['conditionRatioPerList'] = [4, 16, 16, 4];
@@ -27,7 +20,7 @@ export default class StockManager {
 	curTime: DataInfo['curTime'] = 0;
 	stockList: DataInfo['stockList'] = [];
 
-	private constructor(dataInfo?: DataInfo) {
+	constructor(dataInfo?: DataInfo) {
 		if (dataInfo) {
 			const {
 				coinList,

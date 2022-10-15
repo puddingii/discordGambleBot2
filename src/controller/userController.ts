@@ -1,10 +1,26 @@
-import { UserFlagsBitField } from 'discord.js';
+import _ from 'lodash';
 import User from '../game/User/User';
 import DataManager from '../game/DataManager';
 
 const dataManager = DataManager.getInstance();
 const userManager = dataManager.get('user');
 
+interface MyStockInfo {
+	stockList: Array<{
+		name: string;
+		cnt: number;
+		myRatio: number;
+		myValue: number;
+		stockValue: number;
+		stockType: 'stock' | 'coin';
+		stockBeforeRatio: number;
+		profilMargin: number;
+	}>;
+	totalMyValue: number;
+	totalStockValue: number;
+}
+
+/** 다른 사람한테 돈 기부 */
 export const giveMoney = (
 	myInfo: Partial<{ discordId: string; nickname: string }>,
 	ptrInfo: Partial<{ discordId: string; nickname: string }>,
@@ -20,6 +36,7 @@ export const giveMoney = (
 	ptrUser.updateMoney(money);
 };
 
+/** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */
 export const getMinUser = (): User => {
 	const userList = userManager.getUserList();
 
@@ -39,6 +56,7 @@ export const getMinUser = (): User => {
 	return minUser;
 };
 
+/** 유저정보 반환 */
 export const getUser = (info: Partial<{ discordId: string; nickname: string }>): User => {
 	const user = userManager.getUser(info);
 	if (!user) {
@@ -47,8 +65,38 @@ export const getUser = (info: Partial<{ discordId: string; nickname: string }>):
 	return user;
 };
 
+/** 게임에 참여하는 유저리스트 반환 */
 export const getUserList = () => {
 	return userManager.getUserList();
+};
+
+/** 내가 가지고 있는 주식리스트 */
+export const getMyStockList = (discordId: string): MyStockInfo => {
+	const user = getUser({ discordId });
+
+	const stockInfo = user.stockList.reduce(
+		(acc: MyStockInfo, myStock) => {
+			if (myStock.cnt > 0) {
+				const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
+				acc.totalMyValue += myStock.cnt * myStock.value;
+				acc.totalStockValue += myStock.cnt * myStock.stock.value;
+				acc.stockList.push({
+					name: myStock.stock.name,
+					cnt: myStock.cnt,
+					myValue: myStock.value,
+					myRatio,
+					stockValue: myStock.stock.value,
+					stockType: myStock.stock.type,
+					stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
+					profilMargin: myStock.cnt * (myStock.stock.value - myStock.value),
+				});
+			}
+			return acc;
+		},
+		{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
+	);
+
+	return stockInfo;
 };
 
 /** 주식 + 내돈 합친 값 */
@@ -75,4 +123,5 @@ export default {
 	getUser,
 	giveMoney,
 	getRankingList,
+	getMyStockList,
 };

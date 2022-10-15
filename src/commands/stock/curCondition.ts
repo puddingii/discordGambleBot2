@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
+import stockController from '../../controller/stockController';
 
 const {
-	cradle: { UserModel, logger },
+	cradle: { logger },
 } = dependency;
 
 export default {
@@ -12,11 +12,11 @@ export default {
 		.setDescription(
 			'주식 흐름임. 주식 종류에 따라 이 영향을 많이 받을수도 아닐수도 있음. [비용: 1만원]',
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const condition = game.gamble.curCondition;
+			const condition = stockController.getCurrentCondition();
 			let conditionText = '';
 			switch (condition) {
 				case 1:
@@ -35,12 +35,7 @@ export default {
 					conditionText = '아무일도 없음';
 			}
 
-			const userInfo = game.gamble.updateMoney(discordId, -10000);
-			const dbResult = await UserModel.updateMoney([userInfo]);
-			if (!dbResult.code) {
-				await interaction.reply({ content: 'DB Error', ephemeral: true });
-				return;
-			}
+			stockController.updateMoney(discordId, -10000);
 
 			await interaction.reply({ content: conditionText, ephemeral: true });
 		} catch (err) {

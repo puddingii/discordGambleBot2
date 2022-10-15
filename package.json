@@ -6,13 +6,13 @@
 		"start": "cross-env NODE_ENV=production node build/deploy-command.js && cross-env NODE_ENV=production node build/app.js",
 		"start:commandBuild": "cross-env NODE_ENV=production node build/deploy-command.js",
 		"build": "tsc",
-		"test": "cross-env NODE_ENV=production env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' mocha",
+		"test": "cross-env NODE_ENV=production mocha",
 		"dev:app": "cross-env NODE_ENV=development ts-node src/deploy-command.ts && cross-env NODE_ENV=development ts-node src/app.ts",
 		"dev:deploy": "cross-env NODE_ENV=development ts-node src/deploy-command.ts",
 		"dev:server": "cross-env NODE_ENV=development ts-node src/app.ts",
 		"dev:tscheck": "tsc-watch",
 		"dev:jsapp": "tsc && cross-env NODE_ENV=development node build/app.js",
-		"dev:test": "cross-env NODE_ENV=development env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' mocha"
+		"dev:test": "cross-env NODE_ENV=development mocha"
 	},
 	"author": "",
 	"license": "ISC",

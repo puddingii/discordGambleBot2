@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
+import userController from '../../controller/userController';
 
 const {
 	cradle: { logger, util },
@@ -14,7 +14,7 @@ const {
 
 export default {
 	data: new SlashCommandBuilder().setName('내주식').setDescription('내 주식임'),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
@@ -27,15 +27,14 @@ export default {
 				.setTimestamp();
 
 			/** DB Info */
-			const myStock = game.gamble.getMyStock(discordId);
+			const { stockList, totalMyValue, totalStockValue } =
+				userController.getMyStockList(discordId);
 
-			const { stockList, totalMyValue, totalStockValue } = myStock;
 			const upDownEmoji = (num: number) => {
 				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
 			};
 			const totalCalc = stockList.reduce((acc, stock) => {
-				const calcPrice = stock.cnt * (stock.stockValue - stock.myValue);
-				acc += calcPrice;
+				acc += stock.profilMargin;
 				embedBox.addFields({
 					name: `${stock.name} ${
 						stock.stockType === 'stock' ? '주식' : '코인'
@@ -45,7 +44,7 @@ export default {
 					value: `내 포지션: ${util.setComma(
 						stock.myValue,
 						true,
-					)}원\n손익,수익률: ${util.setComma(calcPrice, true)}원 (${
+					)}원\n손익,수익률: ${util.setComma(stock.profilMargin, true)}원 (${
 						stock.myRatio
 					}%)\n보유비중: ${stock.cnt}개 | ${_.round(
 						((stock.cnt * stock.myValue) / totalMyValue) * 100,

@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import * as echarts from 'echarts';
 import sharp from 'sharp';
-import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
+import stockController from '../../controller/stockController';
 
 const {
-	cradle: { StockModel, logger },
+	cradle: { logger },
 } = dependency;
 
 type ChartOption = {
@@ -61,13 +61,14 @@ export default {
 			/** Discord Info */
 			const name = interaction.options.getString('이름') ?? '';
 			const stickTime = interaction.options.getNumber('시간봉') ?? 8;
-			const chartType = interaction.options.getString('차트종류') ?? 'stick';
+			const chartType =
+				<'stick' | 'line'>interaction.options.getString('차트종류') ?? 'stick';
 
-			const stockInfo = await StockModel.findByName(name);
-			if (!stockInfo) {
-				await interaction.reply({ content: '주식정보를 찾을 수 없습니다.' });
-				return;
-			}
+			const { xDataList, yDataList } = await stockController.getChartData({
+				stockName: name,
+				chartType,
+				stickTime,
+			});
 
 			const chart = echarts.init(null, undefined, {
 				renderer: 'svg',
@@ -78,46 +79,14 @@ export default {
 
 			const chartOptions: ChartOption = {
 				xAxis: {
-					data: [],
+					data: xDataList,
 				},
 				yAxis: {},
-				series: [{ type: chartType === 'stick' ? 'candlestick' : 'line', data: [] }],
+				series: [
+					{ type: chartType === 'stick' ? 'candlestick' : 'line', data: yDataList },
+				],
 				backgroundColor: '#FFFFFF',
 			};
-
-			const type = 'stock';
-			const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
-			let historyStartIdx = stockInfo.updHistory.length - stickPerCnt * 30;
-			let beforeHistory = 0;
-			historyStartIdx = historyStartIdx < 0 ? 0 : historyStartIdx;
-			for (
-				historyStartIdx;
-				historyStartIdx < stockInfo.updHistory.length;
-				historyStartIdx += stickPerCnt
-			) {
-				const stickData = stockInfo.updHistory.slice(
-					historyStartIdx,
-					historyStartIdx + stickPerCnt,
-				);
-				const stickLastIdx = stickData.length - 1;
-				if (stickData.length === -1) {
-					break;
-				}
-				const valueList = stickData.map(data => data.value);
-				beforeHistory && valueList.unshift(beforeHistory);
-				const stickValue =
-					chartType === 'stick'
-						? [
-								valueList[0],
-								valueList[stickLastIdx],
-								Math.min(...valueList),
-								Math.max(...valueList),
-						  ]
-						: valueList[stickLastIdx];
-				beforeHistory = valueList[stickLastIdx];
-				chartOptions.xAxis.data.push(dayjs(stickData[0].date).format('MM.DD'));
-				chartOptions.series[0].data.push(stickValue);
-			}
 
 			// 스틱차트는 총 30개로, 스틱 하나당 8시간
 			chart.setOption(chartOptions);

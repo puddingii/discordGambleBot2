@@ -62,6 +62,9 @@ export interface IStockStatics extends Model<IStock> {
 		stockInfo: CoinClass | StockClass,
 	): Promise<{ code: number; message?: string }>;
 
+	/** 업데이트 히스토리 가져오기 */
+	getUpdateHistory(name: string, limitedCnt: number): Promise<IStock['updHistory']>;
+
 	/** 주식 List 업데이트(주식 히스토리 누적) */
 	updateStockList(updateList: (CoinClass | StockClass)[]): Promise<void>;
 
@@ -128,6 +131,16 @@ const Stock = new Schema<IStock, IStockStatics>({
 		default: 0.005,
 	},
 });
+
+Stock.statics.getUpdateHistory = async function (name: string, limitedCnt: number) {
+	const stock = await this.findOne({ name });
+	const historyList = stock?.updHistory ?? [];
+	let sliceCnt = 0;
+	if (limitedCnt < historyList.length) {
+		sliceCnt = historyList.length - limitedCnt;
+	}
+	return historyList.slice(sliceCnt) ?? [];
+};
 
 Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
 	const condition = type === 'all' ? {} : { type };
