@@ -1,11 +1,12 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import { setComma } from '../../config/util';
-import Game from '../../controller/Game';
+import userController from '../../controller/userController';
 import { getNewSelectMenu, getModal } from './common';
 
 const {
-	cradle: { UserModel },
+	cradle: {
+		util: { setComma },
+	},
 } = dependency;
 
 export default {
@@ -25,7 +26,7 @@ export default {
 		},
 	},
 	modalSubmit: {
-		async giveMoney(interaction: ModalSubmitInteraction, game: Game) {
+		async giveMoney(interaction: ModalSubmitInteraction) {
 			const nickname = interaction.fields.getTextInputValue('userNick');
 			const cnt = Number(interaction.fields.getTextInputValue('cnt'));
 
@@ -38,7 +39,7 @@ export default {
 				return;
 			}
 
-			const userInfo = game.getUser({ nickname });
+			const userInfo = userController.getUser({ nickname });
 			if (!userInfo) {
 				await interaction.reply({
 					content: '유저정보가 없습니다.',
@@ -49,8 +50,6 @@ export default {
 			}
 
 			userInfo.updateMoney(cnt);
-
-			await UserModel.updateMoney([userInfo]);
 
 			await interaction.reply({
 				content: `${nickname}에게 ${setComma(cnt)}원을 줬습니다`,

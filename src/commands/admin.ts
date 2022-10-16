@@ -12,6 +12,7 @@ import userManager from './admin/userManager';
 import statusManager from './admin/gameStatusManager';
 import { getNewSelectMenu } from './admin/common';
 import Game from '../controller/Game';
+import stockController from '../controller/stockController';
 
 const {
 	cradle: { logger, secretKey },
@@ -81,17 +82,22 @@ export default {
 	) {
 		try {
 			const command = selectedList[0].split('-');
-			const stockList = game.gamble.getAllStock().map(stock => ({
+			const stockList = stockController.getAllStock('all').map(stock => ({
 				label: stock.name,
 				value: `updateStock-${stock.name}`,
 				description: stock.type,
 			}));
+			// const stockList = game.gamble.getAllStock().map(stock => ({
+			// 	label: stock.name,
+			// 	value: `updateStock-${stock.name}`,
+			// 	description: stock.type,
+			// }));
 			switch (command[0]) {
 				case 'showAddStockModal': // 주식종류 추가하는 모달창 띄우기
 					await showStockModal(interaction);
 					break;
 				case 'updateStock': // 주식 업데이트
-					await showStockModal(interaction, game, command[1]);
+					await showStockModal(interaction, command[1]);
 					break;
 				case 'selectStock': // 주식 업데이트에서 누른 주식
 					await interaction.reply({
@@ -111,7 +117,7 @@ export default {
 					await showGiveMoneyModal(interaction);
 					break;
 				case 'showGameStatusModal':
-					await showGameStatusModal(interaction, game);
+					await showGameStatusModal(interaction);
 					break;
 				default:
 					break;
@@ -137,16 +143,16 @@ export default {
 		try {
 			switch (callFuncName) {
 				case 'addStock':
-					await updateStock(interaction, game, true);
+					await updateStock(interaction, true);
 					break;
 				case 'updateStock':
-					await updateStock(interaction, game);
+					await updateStock(interaction);
 					break;
 				case 'giveMoney':
-					await giveMoney(interaction, game);
+					await giveMoney(interaction);
 					break;
 				case 'updateStatus':
-					await updateStatus(interaction, game);
+					await updateStatus(interaction);
 					break;
 				default:
 			}

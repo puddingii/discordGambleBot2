@@ -6,7 +6,6 @@ interface DataInfo {
 	coinList: Array<Coin>;
 	stockList: Array<Stock>;
 	curCondition: number;
-	curTime: number;
 	conditionPeriod: number;
 	conditionRatioPerList: number[];
 }
@@ -17,7 +16,6 @@ export default class StockManager {
 	conditionPeriod: DataInfo['conditionPeriod'] = 24;
 	conditionRatioPerList: DataInfo['conditionRatioPerList'] = [4, 16, 16, 4];
 	curCondition: DataInfo['curCondition'] = 0;
-	curTime: DataInfo['curTime'] = 0;
 	stockList: DataInfo['stockList'] = [];
 
 	constructor(dataInfo?: DataInfo) {
@@ -26,7 +24,6 @@ export default class StockManager {
 				coinList,
 				stockList,
 				curCondition,
-				curTime,
 				conditionPeriod,
 				conditionRatioPerList,
 			} = dataInfo;
@@ -34,7 +31,6 @@ export default class StockManager {
 			this.stockList = stockList;
 			this.conditionRatioPerList = conditionRatioPerList;
 			this.curCondition = curCondition;
-			this.curTime = curTime;
 			this.conditionPeriod = conditionPeriod;
 		}
 	}
@@ -73,18 +69,18 @@ export default class StockManager {
 	}
 
 	/** 주식정보 갱신하기 */
-	update(): { stockList: Array<Stock>; coinList: Array<Coin> } {
+	update(curTime: number): { stockList: Array<Stock>; coinList: Array<Coin> } {
 		const updStockList: Array<Stock> = [];
 		const updCoinList: Array<Coin> = [];
 		this.stockList.forEach(stock => {
 			const myStock = new Condition(stock);
 			const ratio = myStock.getRandomRatio();
-			const updResult = stock.update(this.curTime, ratio, this.curCondition);
+			const updResult = stock.update(curTime, ratio, this.curCondition);
 			updResult.code && updStockList.push(stock);
 		});
 		this.coinList.forEach(coin => {
 			const ratio = coin.getRandomRatio();
-			const result = coin.update(this.curTime, ratio);
+			const result = coin.update(curTime, ratio);
 			result.code && updCoinList.push(coin);
 		});
 		return { stockList: updStockList, coinList: updCoinList };

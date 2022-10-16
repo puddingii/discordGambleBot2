@@ -1,12 +1,12 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
 import { getNewSelectMenu, getModal } from './common';
-import Stock from '../../controller/Gamble/Stock';
-import Coin from '../../controller/Gamble/Coin';
-import Game from '../../controller/Game';
+import Stock from '../../game/Stock/Stock';
+import Coin from '../../game/Stock/Coin';
+import stockController from '../../controller/stockController';
 
 const {
-	cradle: { StockModel, secretKey },
+	cradle: { secretKey },
 } = dependency;
 
 type InputBoxInfo = {
@@ -37,11 +37,7 @@ interface CoinParam extends DefaultStockParam {
 	type: 'coin';
 }
 
-const showStockModal = async (
-	interaction: SelectMenuInteraction,
-	game?: Game,
-	stockName?: string,
-) => {
+const showStockModal = async (interaction: SelectMenuInteraction, stockName?: string) => {
 	const modalInfo = {
 		id: `어드민-${stockName ? 'updateStock' : 'addStock'}`,
 		title: '주식 추가/업데이트',
@@ -54,16 +50,15 @@ const showStockModal = async (
 		comment: { label: '설명', style: 'PARAGRAPH' },
 	};
 
-	if (game && stockName) {
-		// FIXME
-		const stock = <Stock>game.gamble.getStock('stock', stockName);
-		if (stock) {
-			inputBoxInfo.nameType.value = `${stock.name}/${stock.type}`;
-			inputBoxInfo.value.value = `${stock.value}`;
-			const { min, max } = stock.getRatio();
+	if (stockName) {
+		const stock = stockController.getStock('stock', stockName);
+		inputBoxInfo.nameType.value = `${stock.name}/${stock.type}`;
+		inputBoxInfo.value.value = `${stock.value}`;
+		const { min, max } = stock.getRatio();
+		inputBoxInfo.comment.value = `${stock.comment}`;
+		if (stock instanceof Stock) {
 			inputBoxInfo.ratio.value = `${min}/${max}/${stock.dividend}/${stock.correctionCnt}`;
 			inputBoxInfo.conditionList.value = `${stock?.conditionList.join('/')}`;
-			inputBoxInfo.comment.value = `${stock.comment}`;
 		}
 	}
 
@@ -71,11 +66,7 @@ const showStockModal = async (
 	await interaction.showModal(modal);
 };
 
-const updateStock = async (
-	interaction: ModalSubmitInteraction,
-	game: Game,
-	isNew?: boolean,
-) => {
+const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean) => {
 	const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
 	const value = Number(interaction.fields.getTextInputValue('value'));
 	const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
@@ -141,37 +132,8 @@ const updateStock = async (
 		type: 'coin',
 	};
 
-	// 새 주식인 경우
-	if (isNew) {
-		const stock = type === 'stock' ? new Stock(stockParam) : new Coin(coinParam);
-		game.gamble.addStock(stock);
-
-		const dbResult = await StockModel.addStock(stock);
-		content = dbResult.code ? '주식추가 완료' : <string>dbResult.message;
-	}
-	// 기존 주식 업데이트인 경우
-	else {
-		const stock = game.gamble.getStock(<'stock' | 'coin'>type, name);
-		if (!stock) {
-			await interaction.reply({
-				content: `해당하는 이름의 ${type === 'stock' ? '주식' : '코인'}이 없습니다.`,
-				components: [getNewSelectMenu()],
-				ephemeral: true,
-			});
-			return;
-		}
-		stock.comment = param.comment;
-		stock.value = param.value;
-		stock.setRatio({ min: param.minRatio, max: param.maxRatio });
-		stock.correctionCnt = param.correctionCnt;
-		if (stock instanceof Stock) {
-			stock.conditionList = param.conditionList;
-			stock.dividend = param.dividend;
-		}
-
-		const dbResult = await StockModel.updateStock(param);
-		content = dbResult.code ? '주식 업데이트 완료' : <string>dbResult.message;
-	}
+	stockController.updateStock(isNew ?? false, type === 'stock' ? stockParam : coinParam);
+	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';
 
 	await interaction.reply({
 		content,
