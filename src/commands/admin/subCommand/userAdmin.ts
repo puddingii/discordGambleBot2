@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
-import userController from '../../controller/userController';
+import dependency from '../../../config/dependencyInjection';
+import userController from '../../../controller/userController';
 import { getNewSelectMenu, getModal } from './common';
 
 const {

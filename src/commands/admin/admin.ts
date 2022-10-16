@@ -6,12 +6,12 @@ import {
 	SelectMenuInteraction,
 	SlashCommandBuilder,
 } from 'discord.js';
-import dependency from '../config/dependencyInjection';
-import stockManager from './admin/stockManager';
-import userManager from './admin/userManager';
-import statusManager from './admin/gameStatusManager';
-import { getNewSelectMenu } from './admin/common';
-import stockController from '../controller/stockController';
+import dependency from '../../config/dependencyInjection';
+import stockAdmin from './subCommand/stockAdmin';
+import userAdmin from './subCommand/userAdmin';
+import gameStatusAdmin from './subCommand/gameStatusAdmin';
+import { getNewSelectMenu } from './subCommand/common';
+import stockController from '../../controller/stockController';
 
 const {
 	cradle: { logger, secretKey },
@@ -20,17 +20,17 @@ const {
 const {
 	modalSubmit: { updateStock },
 	select: { showStockModal },
-} = stockManager;
+} = stockAdmin;
 
 const {
 	modalSubmit: { giveMoney },
 	select: { showGiveMoneyModal },
-} = userManager;
+} = userAdmin;
 
 const {
 	modalSubmit: { updateStatus },
 	select: { showGameStatusModal },
-} = statusManager;
+} = gameStatusAdmin;
 
 export default {
 	data: new SlashCommandBuilder()

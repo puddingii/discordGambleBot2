@@ -1,9 +1,12 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
+import dependency from '../../../config/dependencyInjection';
 import { getNewSelectMenu, getModal } from './common';
-import Stock from '../../game/Stock/Stock';
-import Coin from '../../game/Stock/Coin';
-import stockController, { CoinParam, StockParam } from '../../controller/stockController';
+import Stock from '../../../game/Stock/Stock';
+import Coin from '../../../game/Stock/Coin';
+import stockController, {
+	CoinParam,
+	StockParam,
+} from '../../../controller/stockController';
 
 const {
 	cradle: { secretKey },

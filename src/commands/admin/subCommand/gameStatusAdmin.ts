@@ -1,14 +1,13 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
-import globalController from '../../controller/globalController';
-import stockController from '../../controller/stockController';
+import stockController from '../../../controller/stockController';
 
 const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
-	const curCondition = globalController.getCurTime();
+	const curCondition = stockController.getCurrentCondition();
 	const { conditionPeriod, conditionRatioPerList } = stockController.getGambleStatus();
 	const modalInfo = {
 		id: '어드민-updateStatus',
-		title: '게임상태 업데이트',
+		title: '주식상태 업데이트',
 	};
 	const inputBoxInfo = {
 		curCondition: {
@@ -20,7 +19,7 @@ const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
 			value: `${conditionPeriod}`,
 		},
 		conditionRatioPerList: {
-			label: '컨디션이 바뀔 확률(씹악/악/호/씹호)',
+			label: '컨디션이 바뀔 확률(씹악/악/호/씹호) (단위: %)',
 			value: conditionRatioPerList.join('/'),
 		},
 	};

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import dependency from '../config/dependencyInjection';
-import userController from '../controller/userController';
+import dependency from '../../config/dependencyInjection';
+import userController from '../../controller/userController';
 
 const {
 	cradle: { UserModel, logger },
