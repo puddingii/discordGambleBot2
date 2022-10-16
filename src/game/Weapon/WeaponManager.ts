@@ -1,19 +1,3 @@
-import Sword from './Sword';
-import dependency from '../../config/dependencyInjection';
-
-const {
-	cradle: {
-		util: { getRandomNumber },
-	},
-} = dependency;
-
-type EnhanceWeaponType = {
-	/** 1: 성공, 2: 실패, 3: 터짐 */
-	code: 1 | 2 | 3;
-	myWeapon: Sword;
-	money: number;
-};
-
 export default class WeaponManager {
 	private swordInfo: {
 		ratioList: { moneyRatio: number; failRatio: number; destroyRatio: number }[];

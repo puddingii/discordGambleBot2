@@ -33,11 +33,11 @@ export default class DataManager {
 		if (!dataList.includes(type)) {
 			throw Error('잘못된 타입값입니다.');
 		}
-		const dataManager = <DataInfo[T]>this.dataInfo.get(type);
-		return dataManager;
+		const manager = <DataInfo[T]>this.dataInfo.get(type);
+		return manager;
 	}
 
-	set<T extends keyof DataInfo>(type: T, dataList: DataInfo[T]) {
-		this.dataInfo.set(type, dataList);
+	set<T extends keyof DataInfo>(type: T, manager: DataInfo[T]) {
+		this.dataInfo.set(type, manager);
 	}
 }

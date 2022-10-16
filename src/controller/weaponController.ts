@@ -30,7 +30,7 @@ export const getMyWeapon = ({
 	type: 'sword';
 }) => {
 	const userManager = dataManager.get('user');
-	return userManager.getMyWeaponList({ discordId, type });
+	return userManager.getMyWeapon({ discordId, type });
 };
 
 /** 타입에 해당하는 무기정보 class 리턴 */

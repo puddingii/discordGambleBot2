@@ -68,7 +68,7 @@ export default class StockManager {
 		});
 	}
 
-	/** 주식정보 갱신하기 */
+	/** 주식정보 랜덤 갱신하기 */
 	update(curTime: number): { stockList: Array<Stock>; coinList: Array<Coin> } {
 		const updStockList: Array<Stock> = [];
 		const updCoinList: Array<Coin> = [];
