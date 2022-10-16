@@ -8,6 +8,6 @@ export default async ({ client }: { client: Client }): Promise<void> => {
 	if (!dbResult.code) {
 		return;
 	}
-	const game = await gameLoader();
-	await botLoader(client, game);
+	await gameLoader();
+	await botLoader(client);
 };

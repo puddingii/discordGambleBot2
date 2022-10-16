@@ -1,19 +1,25 @@
 import { Types } from 'mongoose';
-import Gamble from '../controller/Gamble/Gamble';
-import Stock from '../controller/Gamble/Stock';
-import Coin from '../controller/Gamble/Coin';
-import Game from '../controller/Game';
-import User from '../controller/User';
-import Weapon from '../controller/Weapon/Weapon';
-import Sword from '../controller/Weapon/Sword';
 import dependencyInjection from '../config/dependencyInjection';
+import DataManager from '../game/DataManager';
+import Stock from '../game/Stock/Stock';
+import Coin from '../game/Stock/Coin';
+import User from '../game/User/User';
+import Sword from '../game/Weapon/Sword';
+import StockManager from '../game/Stock/StockManager';
+import UserManager from '../game/User/UserManager';
+import WeaponManager from '../game/Weapon/WeaponManager';
+import GlobalManager from '../game/Status/GlobalManager';
+import stockController from '../controller/stockController';
 
 const {
 	cradle: { UserModel, StockModel, StatusModel, secretKey },
 } = dependencyInjection;
 
+const dataManager = DataManager.getInstance();
+
 export default async () => {
 	const stockAllList = await StockModel.findAllList('all');
+
 	const { stockList, coinList } = stockAllList.reduce(
 		(acc: { stockList: Stock[]; coinList: Coin[] }, cur) => {
 			if (cur.type === 'stock') {
@@ -91,29 +97,30 @@ export default async () => {
 		gamble: { curTime, curCondition, conditionPeriod, conditionRatioPerList },
 	} = await StatusModel.getStatus();
 
-	const weapon = new Weapon();
-	const gamble = new Gamble({
-		coinList,
-		stockList,
-		conditionPeriod,
-		curTime,
-		curCondition,
-		conditionRatioPerList,
-	});
-	const game = new Game({ userList, gamble, weapon, grantMoney });
-	setInterval(() => { // FIXME node-scheduler
+	dataManager.set('globalStatus', new GlobalManager({ curTime, grantMoney }));
+	dataManager.set(
+		'stock',
+		new StockManager({
+			coinList,
+			stockList,
+			conditionPeriod,
+			conditionRatioPerList,
+			curCondition,
+		}),
+	);
+	dataManager.set('user', new UserManager(userList));
+	dataManager.set('weapon', new WeaponManager());
+
+	setInterval(() => {
+		// FIXME node-scheduler
 		/** 12시간마다 컨디션 조정 */
-		if (game.gamble.curTime % game.gamble.conditionPeriod === 0) {
-			game.gamble.updateCondition();
-		}
-		game.gamble.curTime++;
-		game.updateGrantMoney();
-		const { stockList, userList } = game.gamble.update();
+		const globalManager = dataManager.get('globalStatus');
+		const stockManager = dataManager.get('stock');
+		stockManager.updateCondition(globalManager.curTime);
+		globalManager.curTime++;
+		globalManager.updateGrantMoney();
+		const { stockList, userList } = stockController.update(globalManager.curTime);
 		stockList.length && StockModel.updateStockList(stockList);
 		userList.length && UserModel.updateMoney(userList);
-		if (game.gamble.curTime % 4 === 0) {
-			StatusModel.updateStatus(game);
-		}
 	}, 1000 * secretKey.gambleUpdateTime); // 맨 뒤의 값이 분단위임
-	return game;
 };

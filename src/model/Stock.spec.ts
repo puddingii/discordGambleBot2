@@ -1,7 +1,7 @@
 import { equal, fail, ok } from 'assert';
 import mongoose from 'mongoose';
 import Stock, { UpdatedStockInfo } from './Stock';
-import StockController, { StockConstructor } from '../controller/Gamble/Stock';
+import StockController, { StockConstructor } from '../game/Stock/Stock';
 // import CoinController from '../controller/Gamble/Coin';
 // FIXME 아직 Coin쪽은 미구현이라 나중에 구현되면 테스트코드도 바꿔줘야 함
 

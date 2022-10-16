@@ -1,7 +1,7 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
-import UserContorller from '../controller/User';
+import UserContorller from '../game/User/User';
 import SwordController from '../game/Weapon/Sword';
 
 interface WeaponInfo {

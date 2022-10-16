@@ -1,7 +1,7 @@
 import { equal, ok, fail } from 'assert';
 import mongoose from 'mongoose';
 import User from './User';
-import UserControlller from '../controller/User';
+import UserControlller from '../game/User/User';
 import SwordController from '../game/Weapon/Sword';
 
 // 건빵 id는 계속 db에 남겨둘것.

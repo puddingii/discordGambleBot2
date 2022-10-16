@@ -85,4 +85,23 @@ export default class StockManager {
 		});
 		return { stockList: updStockList, coinList: updCoinList };
 	}
+
+	/** Gamble의 condition 조정 */
+	updateCondition(curTime: number) {
+		if (curTime % this.conditionPeriod !== 0) {
+			return;
+		}
+		const randIdx = Math.floor(Math.random() * 100) + 1;
+		let perTotal = 0;
+
+		this.curCondition = 0;
+		this.conditionRatioPerList.some((ratio, idx) => {
+			if (randIdx <= ratio + perTotal) {
+				this.curCondition = idx + 1;
+				return true;
+			}
+			perTotal += ratio;
+			return false;
+		});
+	}
 }

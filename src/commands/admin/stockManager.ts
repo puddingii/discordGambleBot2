@@ -3,7 +3,7 @@ import dependency from '../../config/dependencyInjection';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
-import stockController from '../../controller/stockController';
+import stockController, { CoinParam, StockParam } from '../../controller/stockController';
 
 const {
 	cradle: { secretKey },
@@ -16,26 +16,6 @@ type InputBoxInfo = {
 		value?: string;
 	};
 };
-
-interface DefaultStockParam {
-	name: string;
-	type: 'stock' | 'coin';
-	value: number;
-	comment: string;
-	ratio: { min: number; max: number };
-	correctionCnt: number;
-	updateTime: number;
-}
-
-interface StockParam extends DefaultStockParam {
-	type: 'stock';
-	conditionList: Array<number>;
-	dividend: number;
-}
-
-interface CoinParam extends DefaultStockParam {
-	type: 'coin';
-}
 
 const showStockModal = async (interaction: SelectMenuInteraction, stockName?: string) => {
 	const modalInfo = {

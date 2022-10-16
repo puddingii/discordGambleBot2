@@ -4,8 +4,8 @@ import dayjs from 'dayjs';
 import secretKey from '../config/secretKey';
 import logger from '../config/logger';
 
-import CoinClass from '../controller/Gamble/Coin';
-import StockClass from '../controller/Gamble/Stock';
+import CoinClass from '../game/Stock/Coin';
+import StockClass from '../game/Stock/Stock';
 
 export interface UpdatedStockInfo {
 	name: string;

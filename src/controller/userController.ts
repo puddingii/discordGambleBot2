@@ -3,7 +3,6 @@ import User from '../game/User/User';
 import DataManager from '../game/DataManager';
 
 const dataManager = DataManager.getInstance();
-const userManager = dataManager.get('user');
 
 interface MyStockInfo {
 	stockList: Array<{
@@ -20,12 +19,19 @@ interface MyStockInfo {
 	totalStockValue: number;
 }
 
+/** 신규유저 추가 */
+export const addUser = (userInfo: { id: string; nickname: string }) => {
+	const userManager = dataManager.get('user');
+	userManager.addUser(userInfo);
+};
+
 /** 다른 사람한테 돈 기부 */
 export const giveMoney = (
 	myInfo: Partial<{ discordId: string; nickname: string }>,
 	ptrInfo: Partial<{ discordId: string; nickname: string }>,
 	money: number,
 ) => {
+	const userManager = dataManager.get('user');
 	const user = userManager.getUser(myInfo);
 	const ptrUser = userManager.getUser(ptrInfo);
 	if (!user || !ptrUser) {
@@ -38,6 +44,7 @@ export const giveMoney = (
 
 /** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */
 export const getMinUser = (): User => {
+	const userManager = dataManager.get('user');
 	const userList = userManager.getUserList();
 
 	const getTotalMoney = (info: User) =>
@@ -58,6 +65,7 @@ export const getMinUser = (): User => {
 
 /** 유저정보 반환 */
 export const getUser = (info: Partial<{ discordId: string; nickname: string }>): User => {
+	const userManager = dataManager.get('user');
 	const user = userManager.getUser(info);
 	if (!user) {
 		throw Error('유저정보가 없습니다');
@@ -67,6 +75,7 @@ export const getUser = (info: Partial<{ discordId: string; nickname: string }>):
 
 /** 게임에 참여하는 유저리스트 반환 */
 export const getUserList = () => {
+	const userManager = dataManager.get('user');
 	return userManager.getUserList();
 };
 
@@ -119,6 +128,7 @@ export const getRankingList = () => {
 };
 
 export default {
+	addUser,
 	getMinUser,
 	getUser,
 	giveMoney,

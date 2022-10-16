@@ -8,12 +8,13 @@ export default class UserManager {
 	}
 
 	/** 유저등록 */
-	addUser(userInfo: User) {
-		const isExistUser = this.getUser({ discordId: userInfo.getId() });
+	addUser(userInfo: { id: string; nickname: string }) {
+		const isExistUser = this.getUser({ discordId: userInfo.id });
 		if (isExistUser) {
 			throw Error('이미 있는 유저입니다.');
 		}
-		this.userList.push(userInfo);
+		const user = new User(userInfo);
+		this.userList.push(user);
 	}
 
 	/** 내가 가지고 있는 무기 반환 */

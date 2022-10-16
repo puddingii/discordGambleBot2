@@ -1,9 +1,8 @@
 import { Collection, Client } from 'discord.js';
 import path from 'path';
 import fs from 'fs';
-import Game from '../controller/Game';
 
-export default async (client: Client, game: Game) => {
+export default async (client: Client) => {
 	/** commands때문에 index.d.ts수정. */
 	client.commands = new Collection();
 
@@ -44,9 +43,9 @@ export default async (client: Client, game: Game) => {
 	eventFiles.forEach(async file => {
 		const { default: event } = await import(`../events/${file}`);
 		if (event.once) {
-			client.once(event.name, (...args) => event.execute(...args, game));
+			client.once(event.name, (...args) => event.execute(...args));
 		} else {
-			client.on(event.name, (...args) => event.execute(...args, game));
+			client.on(event.name, (...args) => event.execute(...args));
 		}
 	});
 };

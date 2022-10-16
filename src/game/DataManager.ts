@@ -1,12 +1,13 @@
 import StockManager from './Stock/StockManager';
 import UserManager from './User/UserManager';
 import WeaponManager from './Weapon/WeaponManager';
+import GlobalManager from './Status/GlobalManager';
 
 interface DataInfo {
 	stock: StockManager;
 	weapon: WeaponManager;
 	user: UserManager;
-	globalStatus: { grantMoney: number; curTime: number };
+	globalStatus: GlobalManager;
 }
 
 interface DataConstructor<T extends keyof DataInfo> {
@@ -16,7 +17,7 @@ interface DataConstructor<T extends keyof DataInfo> {
 export default class DataManager {
 	private static instance: DataManager;
 	public static getInstance() {
-		if (DataManager.instance) {
+		if (!DataManager.instance) {
 			DataManager.instance = new DataManager();
 		}
 		return DataManager.instance;
@@ -25,12 +26,11 @@ export default class DataManager {
 
 	private constructor() {
 		this.dataInfo = new Map();
-		this.set('globalStatus', { grantMoney: 0, curTime: 0 });
 	}
 
 	get<T extends keyof DataInfo>(type: T): DataInfo[T] {
 		const dataList = ['stock', 'weapon', 'user', 'globalStatus'];
-		if (dataList.includes(type)) {
+		if (!dataList.includes(type)) {
 			throw Error('잘못된 타입값입니다.');
 		}
 		const dataManager = <DataInfo[T]>this.dataInfo.get(type);

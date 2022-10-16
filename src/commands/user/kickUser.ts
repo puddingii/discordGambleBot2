@@ -4,7 +4,6 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
-import Game from '../../controller/Game';
 
 const {
 	cradle: { logger },
@@ -21,7 +20,7 @@ export default {
 				.setDescription('무야호')
 				.addChannelTypes(ChannelType.GuildVoice),
 		),
-	async execute(interaction: ChatInputCommandInteraction, game: Game) {
+	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();

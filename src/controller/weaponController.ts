@@ -10,8 +10,6 @@ const {
 } = dependency;
 
 const dataManager = DataManager.getInstance();
-const weaponManager = dataManager.get('weapon');
-const userManager = dataManager.get('user');
 
 type EnhanceWeaponType = {
 	/** 1: 성공, 2: 실패, 3: 터짐 */
@@ -23,6 +21,7 @@ type EnhanceWeaponType = {
 
 type FormattedRatioList = Array<{ value: string; name: string }>;
 
+/** 내 무기들 가져오기 */
 export const getMyWeapon = ({
 	discordId,
 	type,
@@ -30,11 +29,13 @@ export const getMyWeapon = ({
 	discordId: string;
 	type: 'sword';
 }) => {
+	const userManager = dataManager.get('user');
 	return userManager.getMyWeaponList({ discordId, type });
 };
 
 /** 타입에 해당하는 무기정보 class 리턴 */
 export const getWeaponInfo = (type: 'sword') => {
+	const weaponManager = dataManager.get('weapon');
 	return weaponManager.getDefaultValue(type);
 };
 
@@ -43,6 +44,7 @@ export const getFormattedRatioList = (
 	type: 'sword',
 	perCnt: number,
 ): FormattedRatioList => {
+	const weaponManager = dataManager.get('weapon');
 	const { ratioList: list, value } = weaponManager.getInfo(type);
 	let money = value;
 	const resultList: FormattedRatioList = [];
@@ -72,6 +74,7 @@ export const getNextRatio = ({
 	discordId: string;
 }) => {
 	const userWeapon = getMyWeapon({ discordId, type });
+	const weaponManager = dataManager.get('weapon');
 	const curPower = userWeapon?.curPower ?? 0;
 
 	return weaponManager.getNextRatio({ type, curPower });
@@ -89,6 +92,8 @@ export const enhanceWeapon = ({
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
 }): EnhanceWeaponType => {
+	const userManager = dataManager.get('user');
+	const weaponManager = dataManager.get('weapon');
 	const userInfo = userManager.getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');

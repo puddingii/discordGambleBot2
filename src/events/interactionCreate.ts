@@ -1,7 +1,6 @@
 import { BaseInteraction } from 'discord.js';
 import dependency from '../config/dependencyInjection';
 import { isEnrolledUser } from '../config/middleware';
-import Game from '../controller/Game';
 
 const {
 	cradle: { logger },
@@ -9,7 +8,7 @@ const {
 
 export default {
 	name: 'interactionCreate',
-	async execute(interaction: BaseInteraction, game: Game) {
+	async execute(interaction: BaseInteraction) {
 		const {
 			user: { username },
 		} = interaction;
@@ -42,18 +41,18 @@ export default {
 		try {
 			let logMessage = '';
 			if (interaction.isSelectMenu()) {
-				await command.select(interaction, game, {
+				await command.select(interaction, {
 					selectedList: interaction.values,
 					callFuncName: interaction.customId.split('-')[1],
 				});
 				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
 			} else if (interaction.isModalSubmit()) {
-				await command.modalSubmit(interaction, game, {
+				await command.modalSubmit(interaction, {
 					callFuncName: interaction.customId.split('-')[1],
 				});
 				logMessage = `[interactionCreate-modalSubmit]${username} - ${commandName}[Modal]`;
 			} else {
-				await command.execute(interaction, game);
+				await command.execute(interaction);
 				logMessage = `[interactionCreate]${username} - ${commandName}`;
 			}
 			logger.info(logMessage);

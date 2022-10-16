@@ -11,7 +11,6 @@ import stockManager from './admin/stockManager';
 import userManager from './admin/userManager';
 import statusManager from './admin/gameStatusManager';
 import { getNewSelectMenu } from './admin/common';
-import Game from '../controller/Game';
 import stockController from '../controller/stockController';
 
 const {
@@ -77,7 +76,6 @@ export default {
 	},
 	async select(
 		interaction: SelectMenuInteraction,
-		game: Game,
 		{ selectedList }: { selectedList: string[] },
 	) {
 		try {
@@ -137,7 +135,6 @@ export default {
 	},
 	async modalSubmit(
 		interaction: ModalSubmitInteraction,
-		game: Game,
 		{ callFuncName }: { callFuncName: string },
 	) {
 		try {

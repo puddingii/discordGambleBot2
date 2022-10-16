@@ -1,5 +1,4 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
-import Game from '../controller/Game';
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -19,7 +18,7 @@ interface IStatus extends Document, DoucmentResult<IStatus> {
 
 interface IStatusStatics extends Model<IStatus> {
 	getStatus(): Promise<HydratedDocument<IStatus, IStatusStatics>>;
-	updateStatus(statusInfo: Game): Promise<{ code: number }>;
+	updateStatus(): Promise<{ code: number }>; // FIXME
 }
 
 const Status = new Schema<IStatus, IStatusStatics>({
@@ -58,17 +57,17 @@ Status.statics.getStatus = async function () {
 	return status;
 };
 
-Status.statics.updateStatus = async function (statusInfo: Game) {
+Status.statics.updateStatus = async function () {
 	const status = await this.findOne({});
 	if (!status) {
 		return { code: 0 };
 	}
-	status.user.grantMoney = statusInfo.grantMoney;
-	status.gamble.curTime = statusInfo.gamble.curTime;
-	status.gamble.curCondition = statusInfo.gamble.curCondition;
-	status.gamble.conditionPeriod = statusInfo.gamble.conditionPeriod;
-	status.gamble.conditionRatioPerList.splice(0);
-	status.gamble.conditionRatioPerList.push(...statusInfo.gamble.conditionRatioPerList);
+	// status.user.grantMoney = statusInfo.grantMoney;
+	// status.gamble.curTime = statusInfo.gamble.curTime;
+	// status.gamble.curCondition = statusInfo.gamble.curCondition;
+	// status.gamble.conditionPeriod = statusInfo.gamble.conditionPeriod;
+	// status.gamble.conditionRatioPerList.splice(0);
+	// status.gamble.conditionRatioPerList.push(...statusInfo.gamble.conditionRatioPerList);
 	await status.save();
 
 	return { code: 1 };

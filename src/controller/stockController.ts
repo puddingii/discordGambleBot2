@@ -6,9 +6,9 @@ import DataManager from '../game/DataManager';
 import StockModel from '../model/Stock';
 
 const dataManager = DataManager.getInstance();
-const userManager = dataManager.get('user');
 const stockManager = dataManager.get('stock');
-const globalManager = dataManager.get('globalStatus');
+
+type StockManager = typeof stockManager;
 
 interface DefaultStockParam {
 	name: string;
@@ -20,13 +20,13 @@ interface DefaultStockParam {
 	updateTime: number;
 }
 
-interface StockParam extends DefaultStockParam {
+export interface StockParam extends DefaultStockParam {
 	type: 'stock';
 	conditionList: Array<number>;
 	dividend: number;
 }
 
-interface CoinParam extends DefaultStockParam {
+export interface CoinParam extends DefaultStockParam {
 	type: 'coin';
 }
 
@@ -42,7 +42,8 @@ export const buySellStock = ({
 	cnt: number;
 	isFull: boolean;
 }): { cnt: number; value: number; money: number } => {
-	const userInfo = userManager.getUser({ discordId });
+	const stockManager = dataManager.get('stock');
+	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
@@ -56,7 +57,9 @@ export const buySellStock = ({
 	return stockResult;
 };
 
+/** 주식정보 가져오기 */
 export const getStock = (type: 'coin' | 'stock' | '', name: string) => {
+	const stockManager = dataManager.get('stock');
 	const stockTypeList = ['coin', 'stock', 'all'];
 	if (!stockTypeList.includes(type)) {
 		throw Error('타입에러');
@@ -68,7 +71,9 @@ export const getStock = (type: 'coin' | 'stock' | '', name: string) => {
 	return stock;
 };
 
+/** 타입에 해당하는 모든 주식 가져오기 */
 export const getAllStock = (type: 'coin' | 'stock' | 'all') => {
+	const stockManager = dataManager.get('stock');
 	const stockTypeList = ['coin', 'stock', 'all'];
 	if (!stockTypeList.includes(type)) {
 		throw Error('타입에러');
@@ -76,7 +81,9 @@ export const getAllStock = (type: 'coin' | 'stock' | 'all') => {
 	return stockManager.getAllStock(type);
 };
 
+/** 도박 컨텐츠 게임 상태값들 가져오기 */
 export const getGambleStatus = () => {
+	const stockManager = dataManager.get('stock');
 	return {
 		curCondition: stockManager.curCondition,
 		conditionPeriod: stockManager.conditionPeriod,
@@ -86,16 +93,20 @@ export const getGambleStatus = () => {
 
 /** 현재 주식흐름 */
 export const getCurrentCondition = () => {
+	const stockManager = dataManager.get('stock');
 	return stockManager.curCondition;
 };
 
 /** 다음 컨디션 업데이트까지 남은시간 */
 export const getNextUpdateTime = () => {
+	const stockManager = dataManager.get('stock');
+	const globalManager = dataManager.get('globalStatus');
 	return (
-		stockManager.conditionPeriod - (globalManager.curTime % stockManager.curCondition)
+		stockManager.conditionPeriod - (globalManager.curTime % stockManager.conditionPeriod)
 	);
 };
 
+/** 차트 데이터 생성 */
 export const getChartData = async ({
 	stockName,
 	stickTime,
@@ -138,15 +149,17 @@ export const getChartData = async ({
 	return { xDataList, yDataList };
 };
 
+/** 도박 컨텐츠 게임 상태값들 셋팅 */
 export const setGambleStatus = ({
 	curCondition,
 	conditionRatioPerList,
 	conditionPeriod,
 }: {
-	curCondition?: typeof stockManager.curCondition;
-	conditionRatioPerList?: typeof stockManager.conditionRatioPerList;
-	conditionPeriod?: typeof stockManager.conditionPeriod;
+	curCondition?: StockManager['curCondition'];
+	conditionRatioPerList?: StockManager['conditionRatioPerList'];
+	conditionPeriod?: StockManager['conditionPeriod'];
 }) => {
+	const stockManager = dataManager.get('stock');
 	if (curCondition) {
 		stockManager.curCondition = curCondition;
 	}
@@ -160,7 +173,7 @@ export const setGambleStatus = ({
 
 /** 돈 갱신 */
 export const updateMoney = (discordId: string, value: number): User => {
-	const userInfo = userManager.getUser({ discordId });
+	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
@@ -168,7 +181,9 @@ export const updateMoney = (discordId: string, value: number): User => {
 	return userInfo;
 };
 
+/** 주식 업데이트 */
 export const updateStock = (isNew: boolean, param: StockParam | CoinParam) => {
+	const stockManager = dataManager.get('stock');
 	if (isNew) {
 		const stock = param.type === 'stock' ? new Stock(param) : new Coin(param);
 		stockManager.addStock(stock);
@@ -191,13 +206,15 @@ export const updateStock = (isNew: boolean, param: StockParam | CoinParam) => {
 	}
 };
 
+// FIXME 고쳐야함
 /** 주식정보 갱신 및 배당금 지급 */
 export const update = (
 	curTime: number,
 ): { stockList: Array<Stock | Coin>; userList: User[] } => {
+	const stockManager = dataManager.get('stock');
 	// 이쪽 아래로 StockManager.update() 호출후 업데이트된 주
 	const { stockList, coinList } = stockManager.update(curTime);
-	const userList = userManager.getUserList();
+	const userList = dataManager.get('user').getUserList();
 	let updUserList: User[] = [];
 
 	// 주식 배당금 시간값 가져와서
