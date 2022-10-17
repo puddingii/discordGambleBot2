@@ -1,3 +1,4 @@
+import Condition from './ExternalOption/Condition';
 import StockAbstract, { StockAbstractConstructor } from './StockAbstract';
 
 interface CheckStockValidationParam {
@@ -59,7 +60,9 @@ export default class Stock extends StockAbstract {
 		this.conditionList = info.conditionList ?? [0, -0.06, -0.04, 0.04, 0.06];
 	}
 
-	update(curTime: number, ratio: number, curCondition: number): { code: number } {
+	update(curTime: number, curCondition: number): { code: number } {
+		const myStock = new Condition(this);
+		const ratio = myStock.getRandomRatio();
 		if (this.isUpdateTime(curTime)) {
 			return { code: 0 };
 		}

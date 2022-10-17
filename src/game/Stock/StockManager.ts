@@ -1,4 +1,3 @@
-import Condition from './ExternalOption/Condition';
 import Coin from './Coin';
 import Stock from './Stock';
 
@@ -73,14 +72,11 @@ export default class StockManager {
 		const updStockList: Array<Stock> = [];
 		const updCoinList: Array<Coin> = [];
 		this.stockList.forEach(stock => {
-			const myStock = new Condition(stock);
-			const ratio = myStock.getRandomRatio();
-			const updResult = stock.update(curTime, ratio, this.curCondition);
-			updResult.code && updStockList.push(stock);
+			const result = stock.update(curTime, this.curCondition);
+			result.code && updStockList.push(stock);
 		});
 		this.coinList.forEach(coin => {
-			const ratio = coin.getRandomRatio();
-			const result = coin.update(curTime, ratio);
+			const result = coin.update(curTime);
 			result.code && updCoinList.push(coin);
 		});
 		return { stockList: updStockList, coinList: updCoinList };

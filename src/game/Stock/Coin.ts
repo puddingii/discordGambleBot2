@@ -28,7 +28,8 @@ export default class Coin extends StockAbstract {
 		return { code: 1 };
 	}
 
-	update(curTime: number, ratio: number): { code: number } {
+	update(curTime: number): { code: number } {
+		const ratio = this.getRandomRatio();
 		if (this.isUpdateTime(curTime)) {
 			return { code: 0 };
 		}
