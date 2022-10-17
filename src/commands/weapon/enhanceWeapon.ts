@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
-import weaponController from '../../controller/weaponController';
+import weaponController from '../../controller/bot/weaponController';
 
 const {
 	cradle: { UserModel, logger },

@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import DataManager from '../game/DataManager';
-import Sword from '../game/Weapon/Sword';
-import dependency from '../config/dependencyInjection';
+import DataManager from '../../game/DataManager';
+import Sword from '../../game/Weapon/Sword';
+import dependency from '../../config/dependencyInjection';
 
 const {
 	cradle: {

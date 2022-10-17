@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import dependency from '../../config/dependencyInjection';
-import stockController from '../../controller/stockController';
+import stockController from '../../controller/bot/stockController';
 
 const {
 	cradle: { logger, util },

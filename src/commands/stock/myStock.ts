@@ -6,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 import _ from 'lodash';
 import dependency from '../../config/dependencyInjection';
-import userController from '../../controller/userController';
+import userController from '../../controller/bot/userController';
 
 const {
 	cradle: { logger, util },

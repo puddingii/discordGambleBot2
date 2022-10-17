@@ -9,7 +9,7 @@ import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
 import WeaponManager from '../game/Weapon/WeaponManager';
 import GlobalManager from '../game/Status/GlobalManager';
-import stockController from '../controller/stockController';
+import stockController from '../controller/bot/stockController';
 
 const {
 	cradle: { UserModel, StockModel, StatusModel, secretKey },

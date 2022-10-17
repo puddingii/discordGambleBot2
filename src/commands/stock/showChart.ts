@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import * as echarts from 'echarts';
 import sharp from 'sharp';
 import dependency from '../../config/dependencyInjection';
-import stockController from '../../controller/stockController';
+import stockController from '../../controller/bot/stockController';
 
 const {
 	cradle: { logger },

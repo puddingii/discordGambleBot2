@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import User from '../game/User/User';
-import Stock from '../game/Stock/Stock';
-import Coin from '../game/Stock/Coin';
-import DataManager from '../game/DataManager';
-import StockModel from '../model/Stock';
+import User from '../../game/User/User';
+import Stock from '../../game/Stock/Stock';
+import Coin from '../../game/Stock/Coin';
+import DataManager from '../../game/DataManager';
+import StockModel from '../../model/Stock';
 
 const dataManager = DataManager.getInstance();
 const stockManager = dataManager.get('stock');

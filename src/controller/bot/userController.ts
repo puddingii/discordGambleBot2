@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import User from '../game/User/User';
-import DataManager from '../game/DataManager';
+import User from '../../game/User/User';
+import DataManager from '../../game/DataManager';
 
 const dataManager = DataManager.getInstance();
 

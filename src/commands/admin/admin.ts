@@ -11,7 +11,7 @@ import stockAdmin from './subCommand/stockAdmin';
 import userAdmin from './subCommand/userAdmin';
 import gameStatusAdmin from './subCommand/gameStatusAdmin';
 import { getNewSelectMenu } from './subCommand/common';
-import stockController from '../../controller/stockController';
+import stockController from '../../controller/bot/stockController';
 
 const {
 	cradle: { logger, secretKey },

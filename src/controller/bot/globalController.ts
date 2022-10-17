@@ -1,4 +1,4 @@
-import DataManager from '../game/DataManager';
+import DataManager from '../../game/DataManager';
 
 const dataManager = DataManager.getInstance();
 

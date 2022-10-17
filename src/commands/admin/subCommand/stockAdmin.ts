@@ -6,7 +6,7 @@ import Coin from '../../../game/Stock/Coin';
 import stockController, {
 	CoinParam,
 	StockParam,
-} from '../../../controller/stockController';
+} from '../../../controller/bot/stockController';
 
 const {
 	cradle: { secretKey },
