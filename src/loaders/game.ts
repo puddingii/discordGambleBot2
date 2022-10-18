@@ -9,10 +9,9 @@ import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
 import WeaponManager from '../game/Weapon/WeaponManager';
 import GlobalManager from '../game/Status/GlobalManager';
-import stockController from '../controller/bot/stockController';
 
 const {
-	cradle: { UserModel, StockModel, StatusModel, secretKey },
+	cradle: { UserModel, StockModel, StatusModel },
 } = dependencyInjection;
 
 const dataManager = DataManager.getInstance();
@@ -110,17 +109,4 @@ export default async () => {
 	);
 	dataManager.set('user', new UserManager(userList));
 	dataManager.set('weapon', new WeaponManager());
-
-	setInterval(() => {
-		// FIXME node-scheduler
-		/** 12시간마다 컨디션 조정 */
-		const globalManager = dataManager.get('globalStatus');
-		const stockManager = dataManager.get('stock');
-		stockManager.updateCondition(globalManager.curTime);
-		globalManager.curTime++;
-		globalManager.updateGrantMoney();
-		const { stockList, userList } = stockController.update(globalManager.curTime);
-		stockList.length && StockModel.updateStockList(stockList);
-		userList.length && UserModel.updateMoney(userList);
-	}, 1000 * secretKey.gambleUpdateTime); // 맨 뒤의 값이 분단위임
 };
