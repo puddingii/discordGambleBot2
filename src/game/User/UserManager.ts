@@ -2,6 +2,7 @@ import User from './User';
 
 export default class UserManager {
 	userList: Array<User>;
+	waitingList: Set<User> = new Set();
 
 	constructor(userList: Array<User>) {
 		this.userList = userList;
@@ -44,5 +45,17 @@ export default class UserManager {
 	/** 유저리스트 가져오기 */
 	getUserList(): Array<User> {
 		return this.userList;
+	}
+
+	/** DB업데이트를 기다리고 있는 리스트들 다 가져오고 빈 배열로 만든다. */
+	popAllWaitingList(): Array<User> {
+		const myList = [...this.waitingList];
+		this.waitingList.clear();
+		return myList;
+	}
+
+	/** DB업데이트 목록에 유저정보 추가 */
+	pushWaitingUser(user: User) {
+		this.waitingList.add(user);
 	}
 }
