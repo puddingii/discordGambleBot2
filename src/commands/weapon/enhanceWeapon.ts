@@ -34,10 +34,10 @@ export default {
 				isPreventDown: isPreventFail,
 			});
 
-			let content = `${beforePower}강 ▶︎ ${myWeapon.curPower}강 (확률: ${_.round(
+			let content = `${beforePower}강 ▶︎ ${myWeapon.curPower}강 (성공확률: ${_.round(
 				successRatio,
 				2,
-			)}`;
+			)}%)`;
 			switch (code) {
 				case 2:
 					content = `실패! ${content}`;
