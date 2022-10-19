@@ -55,7 +55,15 @@ export default class UserManager {
 	}
 
 	/** DB업데이트 목록에 유저정보 추가 */
-	pushWaitingUser(user: User) {
-		this.waitingList.add(user);
+	pushWaitingUser(userInfo: User | Array<User>) {
+		if (Array.isArray(userInfo)) {
+			userInfo.forEach(userClass => {
+				if (userClass instanceof User) {
+					this.waitingList.add(userClass);
+				}
+			});
+			return;
+		}
+		this.waitingList.add(userInfo);
 	}
 }

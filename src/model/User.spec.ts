@@ -7,6 +7,19 @@ import SwordController from '../game/Weapon/Sword';
 // 건빵 id는 계속 db에 남겨둘것.
 const TEST_NICKNAME = '모카테스트';
 const TEST_DISCORD_ID = '1234567890';
+const formatCatchError = (err: unknown, defaultMessage: string) => {
+	let errorMessage = '';
+	if (err instanceof Error) {
+		errorMessage = err.message;
+	}
+	if (typeof err === 'string') {
+		errorMessage = err;
+	}
+	if (!err) {
+		errorMessage = defaultMessage;
+	}
+	return errorMessage;
+};
 
 describe('User Model Test', function () {
 	before(async function () {
@@ -73,45 +86,70 @@ describe('User Model Test', function () {
 
 	describe('#findByDiscordId', function () {
 		it('Unknown UserId', async function () {
-			const unknownInfo = await User.findByDiscordId('122');
-			equal(!!unknownInfo, false);
+			try {
+				const unknownInfo = await User.findByDiscordId('122');
+				equal(!!unknownInfo, false);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 
 		it('Correct UserId', async function () {
-			const myInfo = await User.findByDiscordId(TEST_DISCORD_ID);
-			equal(!!myInfo, true);
+			try {
+				const myInfo = await User.findByDiscordId(TEST_DISCORD_ID);
+				equal(!!myInfo, true);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 	});
 
 	describe('#updateStock', function () {
 		it('Unknown User', async function () {
-			const unknownUserResult = await User.updateStock('123', {
-				name: '응애',
-				cnt: 1,
-				value: 1000,
-				money: 1000,
-			});
-			equal(unknownUserResult.code, 0);
+			try {
+				const unknownUserResult = await User.updateStock('123', {
+					name: '응애',
+					cnt: 1,
+					value: 1000,
+					money: 1000,
+				});
+				equal(unknownUserResult.code, 0);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 
 		it('Unknown Stock', async function () {
-			const unknownStockResult = await User.updateStock(TEST_DISCORD_ID, {
-				name: '응z',
-				cnt: 1,
-				value: 1000,
-				money: 1000,
-			});
-			equal(unknownStockResult.code, 0);
+			try {
+				const unknownStockResult = await User.updateStock(TEST_DISCORD_ID, {
+					name: '응z',
+					cnt: 1,
+					value: 1000,
+					money: 1000,
+				});
+				equal(unknownStockResult.code, 0);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 
 		it('Correct Update', async function () {
-			const updateResult = await User.updateStock(TEST_DISCORD_ID, {
-				name: '응애',
-				cnt: 1,
-				value: 1000,
-				money: 1000,
-			});
-			equal(updateResult.code, 1);
+			try {
+				const updateResult = await User.updateStock(TEST_DISCORD_ID, {
+					name: '응애',
+					cnt: 1,
+					value: 1000,
+					money: 1000,
+				});
+				equal(updateResult.code, 1);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 	});
 
@@ -133,20 +171,39 @@ describe('User Model Test', function () {
 
 		const controllerList = [myUser, unknownUser];
 		it("update userList's money", async function () {
-			const result = await User.updateMoney(controllerList);
-			equal(result.code, 1);
+			try {
+				await User.updateMoney(controllerList);
+				ok(1);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 	});
 
 	describe('#updateWeapon', function () {
 		const mySwordController = new SwordController({ curPower: 5 });
 		it('Unknown User', async function () {
-			const result = await User.updateWeapon('asdf', mySwordController, 5000000);
-			equal(result.code, 0);
+			try {
+				const result = await User.updateWeapon('asdf', mySwordController, 5000000);
+				equal(result.code, 0);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 		it('Correct Update', async function () {
-			const result = await User.updateWeapon(TEST_DISCORD_ID, mySwordController, 5000000);
-			equal(result.code, 1);
+			try {
+				const result = await User.updateWeapon(
+					TEST_DISCORD_ID,
+					mySwordController,
+					5000000,
+				);
+				equal(result.code, 1);
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'DB Error');
+				fail(errorMessage);
+			}
 		});
 	});
 
@@ -170,8 +227,9 @@ describe('User Model Test', function () {
 					nickname: TEST_NICKNAME,
 				});
 				equal(result.deletedCount, 1);
-			} catch (e) {
-				fail('Fail to delete test user');
+			} catch (err) {
+				const errorMessage = formatCatchError(err, 'Fail to delete test user');
+				fail(errorMessage);
 			}
 		});
 	});

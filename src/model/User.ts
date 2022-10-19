@@ -42,7 +42,7 @@ interface IUserStatics extends Model<IUser> {
 			money: number;
 		},
 	): Promise<{ code: number; message?: string }>;
-	updateMoney(userList: UserContorller[]): Promise<{ code: number }>;
+	updateMoney(userList: UserContorller[]): Promise<void>;
 	updateWeapon(
 		discordId: string,
 		updWeaponInfo: SwordController,
@@ -207,7 +207,6 @@ User.statics.updateMoney = async function (userList: UserContorller[]) {
 			logger.error(`${result.reason}`);
 		}
 	});
-	return { code: 1 };
 };
 
 /** 무기 업데이트 */
