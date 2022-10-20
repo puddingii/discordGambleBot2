@@ -127,8 +127,10 @@ describe('User Model Test', function () {
 			conditionList: [1, 2, 3, 4, 5],
 			correctionCnt: 4,
 			dividend: 4,
-			maxRatio: TEST_STOCK_INFO.ratio.max,
-			minRatio: TEST_STOCK_INFO.ratio.min,
+			ratio: {
+				max: TEST_STOCK_INFO.ratio.max,
+				min:TEST_STOCK_INFO.ratio.min,
+			},
 			name: TEST_STOCK_INFO.name,
 			type: TEST_STOCK_INFO.type,
 			value: TEST_STOCK_INFO.value,

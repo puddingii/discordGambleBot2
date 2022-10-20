@@ -4,7 +4,7 @@ import dependency from '../../config/dependencyInjection';
 import weaponController from '../../controller/bot/weaponController';
 
 const {
-	cradle: { UserModel, logger },
+	cradle: { logger },
 } = dependency;
 
 export default {
@@ -27,14 +27,14 @@ export default {
 			const [successRatio] = Object.values(
 				weaponController.getNextRatio({ discordId, type: 'sword' }),
 			).map(ratio => ratio * 100);
-			const { code, myWeapon, money, beforePower } = weaponController.enhanceWeapon({
+			const { code, curPower, beforePower } = weaponController.enhanceWeapon({
 				discordId,
 				type: 'sword',
 				isPreventDestroy: false,
 				isPreventDown: isPreventFail,
 			});
 
-			let content = `${beforePower}강 ▶︎ ${myWeapon.curPower}강 (성공확률: ${_.round(
+			let content = `${beforePower}강 ▶︎ ${curPower}강 (성공확률: ${_.round(
 				successRatio,
 				2,
 			)}%)`;
@@ -47,13 +47,6 @@ export default {
 					break;
 				default:
 					content = `성공! ${content}`;
-			}
-
-			const dbResult = await UserModel.updateWeapon(discordId, myWeapon, money);
-
-			if (!dbResult.code) {
-				await interaction.reply({ content: dbResult.message });
-				return;
 			}
 
 			await interaction.reply({ content });

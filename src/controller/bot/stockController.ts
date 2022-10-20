@@ -42,6 +42,7 @@ export const buySellStock = ({
 	cnt: number;
 	isFull: boolean;
 }): { cnt: number; value: number; money: number } => {
+	const userManager = dataManager.get('user');
 	const stockManager = dataManager.get('stock');
 	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
@@ -54,6 +55,7 @@ export const buySellStock = ({
 	}
 
 	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
+	userManager.pushWaitingUser(userInfo);
 	return stockResult;
 };
 
@@ -159,6 +161,7 @@ export const setGambleStatus = ({
 	conditionRatioPerList?: StockManager['conditionRatioPerList'];
 	conditionPeriod?: StockManager['conditionPeriod'];
 }) => {
+	// TODO DB 저장하고 있는지 확인할 것
 	const stockManager = dataManager.get('stock');
 	if (curCondition) {
 		stockManager.curCondition = curCondition;
@@ -173,20 +176,23 @@ export const setGambleStatus = ({
 
 /** 돈 갱신 */
 export const updateMoney = (discordId: string, value: number): User => {
+	const userManager = dataManager.get('user');
 	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
 	userInfo.updateMoney(value);
+	userManager.pushWaitingUser(userInfo);
 	return userInfo;
 };
 
 /** 주식 업데이트 */
-export const updateStock = (isNew: boolean, param: StockParam | CoinParam) => {
+export const updateStock = async (isNew: boolean, param: StockParam | CoinParam) => {
 	const stockManager = dataManager.get('stock');
 	if (isNew) {
 		const stock = param.type === 'stock' ? new Stock(param) : new Coin(param);
 		stockManager.addStock(stock);
+		await StockModel.addStock(stock);
 	} else {
 		const stock = stockManager.getStock(param.type, param.name);
 		if (!stock) {
@@ -203,6 +209,7 @@ export const updateStock = (isNew: boolean, param: StockParam | CoinParam) => {
 			stock.conditionList = param.conditionList;
 			stock.dividend = param.dividend;
 		}
+		await StockModel.updateStock(param);
 	}
 };
 

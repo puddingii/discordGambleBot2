@@ -12,11 +12,10 @@ export interface UpdatedStockInfo {
 	type: string;
 	value: number;
 	comment: string;
-	minRatio: number;
-	maxRatio: number;
+	ratio: { max: number; min: number };
 	correctionCnt: number;
-	conditionList: number[];
-	dividend: number;
+	conditionList?: number[];
+	dividend?: number;
 }
 
 interface DoucmentResult<T> {
@@ -69,9 +68,7 @@ export interface IStockStatics extends Model<IStock> {
 	updateStockList(updateList: (CoinClass | StockClass)[]): Promise<void>;
 
 	/** 주식 단일 업데이트(주식 히스토리 미누적) */
-	updateStock(
-		updatedStockInfo: UpdatedStockInfo,
-	): Promise<{ code: number; message?: string }>;
+	updateStock(updatedStockInfo: UpdatedStockInfo): Promise<void>;
 }
 
 const Stock = new Schema<IStock, IStockStatics>({
@@ -163,17 +160,16 @@ Stock.statics.findByName = async function (name: string) {
 };
 
 Stock.statics.updateStockList = async function (updateList: (CoinClass | StockClass)[]) {
-	const updPromiseList = updateList.map(async updStock => {
-		const stock = await this.findOne({ name: updStock.name });
-		if (stock) {
-			stock.value = updStock.value;
-			stock.updHistory.push({ value: updStock.value, date: dayjs().toDate().toString() });
-			return stock.save();
-		}
-		const errorPromise = new Promise((_, reject) => {
-			reject(new Error('Class에 들어있는 주식정보가 DB에 없습니다.'));
-		});
-		return errorPromise;
+	const updPromiseList = updateList.map(updStock => {
+		return this.findOneAndUpdate(
+			{ name: updStock.name },
+			{
+				$set: { value: updStock.value },
+				$push: {
+					updHistory: { value: updStock.value, date: dayjs().toDate().toString() },
+				},
+			},
+		);
 	});
 
 	const resultList = await Promise.allSettled(updPromiseList);
@@ -186,20 +182,17 @@ Stock.statics.updateStockList = async function (updateList: (CoinClass | StockCl
 };
 
 Stock.statics.updateStock = async function (updatedStockInfo: UpdatedStockInfo) {
-	const stock = await this.findOne({ name: updatedStockInfo.name });
-	if (!stock) {
-		return { code: 0, message: '해당하는 주식이 없습니다.' };
-	}
-	stock.comment = updatedStockInfo.comment;
-	stock.conditionList.splice(0);
-	stock.conditionList.push(...updatedStockInfo.conditionList);
-	stock.correctionCnt = updatedStockInfo.correctionCnt;
-	stock.dividend = updatedStockInfo.dividend;
-	stock.maxRatio = updatedStockInfo.maxRatio;
-	stock.minRatio = updatedStockInfo.minRatio;
-	stock.value = updatedStockInfo.value;
-	await stock.save();
-	return { code: 1 };
+	await this.findOneAndUpdate(
+		{ name: updatedStockInfo.name },
+		{
+			comment: updatedStockInfo.comment,
+			conditionList: updatedStockInfo?.conditionList ?? [],
+			correctionCnt: updatedStockInfo.correctionCnt,
+			ratio: { max: updatedStockInfo.ratio.max, min: updatedStockInfo.ratio.min },
+			value: updatedStockInfo.value,
+			dividend: updatedStockInfo.dividend ?? 0,
+		},
+	);
 };
 
 export default model<IStock, IStockStatics>('Stock', Stock);

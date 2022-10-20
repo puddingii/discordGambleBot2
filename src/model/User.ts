@@ -1,7 +1,7 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
-import UserContorller from '../game/User/User';
+import UserController from '../game/User/User';
 import SwordController from '../game/Weapon/Sword';
 
 interface WeaponInfo {
@@ -42,7 +42,7 @@ interface IUserStatics extends Model<IUser> {
 			money: number;
 		},
 	): Promise<{ code: number; message?: string }>;
-	updateMoney(userList: UserContorller[]): Promise<void>;
+	updateMoney(userList: UserController[]): Promise<void>;
 	updateWeapon(
 		discordId: string,
 		updWeaponInfo: SwordController,
@@ -51,6 +51,7 @@ interface IUserStatics extends Model<IUser> {
 		code: number;
 		message?: string;
 	}>;
+	updateAll(userList: UserController[]): Promise<void>;
 }
 
 interface PopulatedParent {
@@ -187,18 +188,13 @@ User.statics.updateStock = async function (
 };
 
 /** 유저 머니 업데이트 */
-User.statics.updateMoney = async function (userList: UserContorller[]) {
-	const updPromiseList = userList.map(async updUser => {
-		const user = await this.findOne({ discordId: updUser.getId() });
-		if (!user) {
-			return {
-				status: 'rejected',
-				reason: '없는 유저로 머니 업데이트를 할 수 없습니다.',
-			};
-		}
-		user.money = updUser.money;
-		return user.save();
-	});
+User.statics.updateMoney = async function (userList: UserController[]) {
+	const updPromiseList = userList.map(updUser =>
+		this.findOneAndUpdate(
+			{ discordId: updUser.getId() },
+			{ $set: { money: updUser.money } },
+		),
+	);
 
 	const resultList = await Promise.allSettled(updPromiseList);
 
@@ -248,6 +244,46 @@ User.statics.updateWeapon = async function (
 
 	await userInfo.save();
 	return { code: 1 };
+};
+
+User.statics.updateAll = async function (userList: UserController[]) {
+	const stockAllList = await StockModel.findAllList('all');
+	const updPromiseList = userList.map(updUser => {
+		const weaponList = updUser.weaponList.map(user => ({
+			type: user.type,
+			curPower: user.curPower,
+			failCnt: user.failCnt,
+			successCnt: user.successCnt,
+			destroyCnt: user.destroyCnt,
+			bonusPower: user.bonusPower,
+			hitRatio: user.hitRatio,
+			missRatio: user.missRatio,
+		}));
+		const stockList = updUser.stockList.reduce(
+			(acc: Array<{ stock: IStock; cnt: number; value: number }>, stockInfo) => {
+				const myStock = stockAllList.find(stock => stock.name === stockInfo.stock.name);
+				if (myStock) {
+					acc.push({ stock: myStock, cnt: stockInfo.cnt, value: stockInfo.value });
+				}
+				return acc;
+			},
+			[],
+		);
+		return this.findOneAndUpdate(
+			{ discordId: updUser.getId() },
+			{
+				$set: { money: updUser.money, nickname: updUser.nickname, weaponList, stockList },
+			},
+		);
+	});
+
+	const resultList = await Promise.allSettled(updPromiseList);
+
+	resultList.forEach(result => {
+		if (result.status !== 'fulfilled') {
+			logger.error(`${result.reason}`);
+		}
+	});
 };
 
 export default model<IUser, IUserStatics>('User', User);

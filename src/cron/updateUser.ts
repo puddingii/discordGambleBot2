@@ -1,12 +1,11 @@
 import schedule from 'node-schedule';
 import dayjs from 'dayjs';
 import DataManager from '../game/DataManager';
-import stockController from '../controller/bot/stockController';
 import dependencyInjection from '../config/dependencyInjection';
 
 const {
 	cradle: {
-		StockModel,
+		UserModel,
 		secretKey,
 		logger,
 		util: { convertSecond },
@@ -14,7 +13,8 @@ const {
 } = dependencyInjection;
 
 try {
-	const { type, value } = convertSecond(secretKey.gambleUpdateTime);
+	const dataManager = DataManager.getInstance();
+	const { type, value } = convertSecond(secretKey.userUpdateTime);
 	const defaultRule = '* * *';
 	let rule: string;
 	switch (type) {
@@ -34,17 +34,11 @@ try {
 	/** 시간 분석해주는 유틸 필요해보임.  */
 	schedule.scheduleJob(rule, function (cronTime) {
 		try {
-			const dataManager = DataManager.getInstance();
-			/** 12시간마다 컨디션 조정 */
-			const globalManager = dataManager.get('globalStatus');
-			const stockManager = dataManager.get('stock');
-			stockManager.updateCondition(globalManager.curTime);
-			globalManager.curTime++;
-			globalManager.updateGrantMoney();
-      
-			const stockList = stockController.update(globalManager.curTime);
-			stockList.length && StockModel.updateStockList(stockList);
-			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
+			const userManager = dataManager.get('user');
+			const userList = userManager.popAllWaitingList();
+			console.log(userList);
+			userList.length && UserModel.updateAll(userList);
+			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - User Update`);
 		} catch (err) {
 			let errorMessage = err;
 			if (err instanceof Error) {
@@ -53,7 +47,7 @@ try {
 			logger.error(
 				`[CRON] ${dayjs(cronTime).format(
 					'YYYY.MM.DD',
-				)} - Stock Update Error: ${errorMessage}`,
+				)} - User Update Error: ${errorMessage}`,
 			);
 		}
 	});
@@ -62,5 +56,5 @@ try {
 	if (err instanceof Error) {
 		errorMessage = err.message;
 	}
-	logger.error(`[CRON] UpdateStock: ${errorMessage}`);
+	logger.error(`[CRON] UpdateUser: ${errorMessage}`);
 }
