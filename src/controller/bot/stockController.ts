@@ -206,12 +206,10 @@ export const updateStock = (isNew: boolean, param: StockParam | CoinParam) => {
 	}
 };
 
-// FIXME 고쳐야함
 /** 주식정보 갱신 및 배당금 지급 */
-export const update = (
-	curTime: number,
-): { stockList: Array<Stock | Coin>; userList: User[] } => {
+export const update = (curTime: number): Array<Stock | Coin> => {
 	const stockManager = dataManager.get('stock');
+	const userManager = dataManager.get('user');
 	// 이쪽 아래로 StockManager.update() 호출후 업데이트된 주
 	const { stockList, coinList } = stockManager.update(curTime);
 	const userList = dataManager.get('user').getUserList();
@@ -223,9 +221,10 @@ export const update = (
 			const result = user.giveDividend();
 			return !!result.code;
 		});
+		userManager.pushWaitingUser(updUserList);
 	}
 
-	return { stockList: [...stockList, ...coinList], userList: updUserList };
+	return [...stockList, ...coinList];
 };
 
 export default {

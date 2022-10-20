@@ -5,32 +5,61 @@ import stockController from '../controller/bot/stockController';
 import dependencyInjection from '../config/dependencyInjection';
 
 const {
-	cradle: { UserModel, StockModel, secretKey, logger },
+	cradle: {
+		StockModel,
+		secretKey,
+		logger,
+		util: { convertSecond },
+	},
 } = dependencyInjection;
 
-/** 시간 분석해주는 유틸 필요해보임.  */
-schedule.scheduleJob(`*/${secretKey.gambleUpdateTime} * * * * *`, function (cronTime) {
-	try {
-		const dataManager = DataManager.getInstance();
-		/** 12시간마다 컨디션 조정 */
-		const globalManager = dataManager.get('globalStatus');
-		const stockManager = dataManager.get('stock');
-		stockManager.updateCondition(globalManager.curTime);
-		globalManager.curTime++;
-		globalManager.updateGrantMoney();
-		const { stockList, userList } = stockController.update(globalManager.curTime);
-		stockList.length && StockModel.updateStockList(stockList);
-		userList.length && UserModel.updateMoney(userList);
-		logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
-	} catch (err) {
-		let errorMessage = err;
-		if (err instanceof Error) {
-			errorMessage = err.message;
-		}
-		logger.error(
-			`[CRON] ${dayjs(cronTime).format(
-				'YYYY.MM.DD',
-			)} - Stock Update Error: ${errorMessage}`,
-		);
+try {
+	const { type, value } = convertSecond(secretKey.gambleUpdateTime);
+	const defaultRule = '* * *';
+	let rule: string;
+	switch (type) {
+		case 's':
+			rule = `*/${value} * * ${defaultRule}`;
+			break;
+		case 'm':
+			rule = `* */${value} * ${defaultRule}`;
+			break;
+		case 'h':
+			rule = `* * */${value} ${defaultRule}`;
+			break;
+		default:
+			throw Error('Rule설정 에러.');
 	}
-});
+
+	/** 시간 분석해주는 유틸 필요해보임.  */
+	schedule.scheduleJob(rule, function (cronTime) {
+		try {
+			const dataManager = DataManager.getInstance();
+			/** 12시간마다 컨디션 조정 */
+			const globalManager = dataManager.get('globalStatus');
+			const stockManager = dataManager.get('stock');
+			stockManager.updateCondition(globalManager.curTime);
+			globalManager.curTime++;
+			globalManager.updateGrantMoney();
+			const stockList = stockController.update(globalManager.curTime);
+			stockList.length && StockModel.updateStockList(stockList);
+			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
+		} catch (err) {
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(
+				`[CRON] ${dayjs(cronTime).format(
+					'YYYY.MM.DD',
+				)} - Stock Update Error: ${errorMessage}`,
+			);
+		}
+	});
+} catch (err) {
+	let errorMessage = err;
+	if (err instanceof Error) {
+		errorMessage = err.message;
+	}
+	logger.error(`[CRON] UpdateStock: ${errorMessage}`);
+}
