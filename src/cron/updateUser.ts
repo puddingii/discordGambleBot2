@@ -36,7 +36,6 @@ try {
 		try {
 			const userManager = dataManager.get('user');
 			const userList = userManager.popAllWaitingList();
-			console.log(userList);
 			userList.length && UserModel.updateAll(userList);
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - User Update`);
 		} catch (err) {

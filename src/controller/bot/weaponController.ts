@@ -128,30 +128,34 @@ export const enhanceWeapon = ({
 	const MAX_NUMBER = 1000;
 	const randomNum = getRandomNumber(MAX_NUMBER, 1);
 	const { failRatio, destroyRatio } = weaponManager.getRatioList(type)[myWeapon.curPower];
+	let result: EnhanceWeaponType;
 	// 실패
 	if (failRatio * MAX_NUMBER >= randomNum) {
 		myWeapon.failCnt++;
 		if (!isPreventDown && myWeapon.curPower > 0) {
 			myWeapon.curPower--;
 		}
-		userManager.pushWaitingUser(userInfo); // FIXME 구조가...영...
-		return { code: 2, curPower: myWeapon.curPower, beforePower };
+		userManager.pushWaitingUser(userInfo);
+		result = { code: 2, curPower: myWeapon.curPower, beforePower };
 	}
 	// 터짐
-	if ((failRatio + destroyRatio) * MAX_NUMBER >= randomNum) {
+	else if ((failRatio + destroyRatio) * MAX_NUMBER >= randomNum) {
 		if (!isPreventDestroy) {
 			myWeapon.curPower = 0;
 			myWeapon.destroyCnt++;
 		}
 		userManager.pushWaitingUser(userInfo);
-		return { code: 3, curPower: myWeapon.curPower, beforePower };
+		result = { code: 3, curPower: myWeapon.curPower, beforePower };
 	}
 
 	// 성공
-	myWeapon.curPower++;
-	myWeapon.successCnt++;
+	else {
+		myWeapon.curPower++;
+		myWeapon.successCnt++;
+		result = { code: 1, curPower: myWeapon.curPower, beforePower };
+	}
 	userManager.pushWaitingUser(userInfo);
-	return { code: 1, curPower: myWeapon.curPower, beforePower };
+	return result;
 };
 
 export default {

@@ -115,7 +115,7 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		type: 'coin',
 	};
 
-	stockController.updateStock(isNew ?? false, type === 'stock' ? stockParam : coinParam);
+	await stockController.updateStock(isNew ?? false, type === 'stock' ? stockParam : coinParam);
 	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';
 
 	await interaction.reply({

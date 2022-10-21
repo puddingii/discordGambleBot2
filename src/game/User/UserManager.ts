@@ -16,6 +16,7 @@ export default class UserManager {
 		}
 		const user = new User(userInfo);
 		this.userList.push(user);
+		this.pushWaitingUser(user);
 	}
 
 	/** 내가 가지고 있는 무기 반환 */

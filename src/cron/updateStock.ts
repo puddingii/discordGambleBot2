@@ -32,7 +32,7 @@ try {
 	}
 
 	/** 시간 분석해주는 유틸 필요해보임.  */
-	schedule.scheduleJob(rule, function (cronTime) {
+	schedule.scheduleJob(rule, async function (cronTime) {
 		try {
 			const dataManager = DataManager.getInstance();
 			/** 12시간마다 컨디션 조정 */
@@ -41,9 +41,10 @@ try {
 			stockManager.updateCondition(globalManager.curTime);
 			globalManager.curTime++;
 			globalManager.updateGrantMoney();
-      
+
 			const stockList = stockController.update(globalManager.curTime);
-			stockList.length && StockModel.updateStockList(stockList);
+			stockList.length && (await StockModel.updateStockList(stockList));
+			// FIXME
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
 		} catch (err) {
 			let errorMessage = err;

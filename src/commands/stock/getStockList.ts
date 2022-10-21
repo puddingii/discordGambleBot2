@@ -50,8 +50,6 @@ export default {
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
-			/** DB Info */
-
 			const stockList = stockController.getAllStock(stockType);
 			stockList.forEach(stock => {
 				embedBox.addFields({

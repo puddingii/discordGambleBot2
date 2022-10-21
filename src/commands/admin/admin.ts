@@ -85,11 +85,7 @@ export default {
 				value: `updateStock-${stock.name}`,
 				description: stock.type,
 			}));
-			// const stockList = game.gamble.getAllStock().map(stock => ({
-			// 	label: stock.name,
-			// 	value: `updateStock-${stock.name}`,
-			// 	description: stock.type,
-			// }));
+
 			switch (command[0]) {
 				case 'showAddStockModal': // 주식종류 추가하는 모달창 띄우기
 					await showStockModal(interaction);

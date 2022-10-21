@@ -49,7 +49,7 @@ const updateStatus = async (interaction: ModalSubmitInteraction) => {
 		return;
 	}
 
-	stockController.setGambleStatus({
+	await stockController.setGambleStatus({
 		curCondition,
 		conditionRatioPerList,
 		conditionPeriod,
