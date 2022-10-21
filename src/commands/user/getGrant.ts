@@ -23,12 +23,12 @@ export default {
 			const nowMinUser = userController.getMinUser();
 
 			if (nowMinUser.getId() !== discordId) {
-				await interaction.reply({ content: '꼴찌도 아닌 놈이 받을려해! 갈!!!!!!!!' });
-				return;
+				throw Error('꼴찌도 아닌 놈이 받을려해! 갈!!!!!!!!');
 			}
 
 			const money = globalController.getGrantMoney();
-			nowMinUser.updateMoney(money);
+			globalController.giveGrantMoney(nowMinUser, money);
+
 			await interaction.reply({
 				content: `${setComma(money)}원을 받았습니다.`,
 			});

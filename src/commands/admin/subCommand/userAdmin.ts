@@ -39,17 +39,7 @@ export default {
 				return;
 			}
 
-			const userInfo = userController.getUser({ nickname });
-			if (!userInfo) {
-				await interaction.reply({
-					content: '유저정보가 없습니다.',
-					components: [getNewSelectMenu()],
-					ephemeral: true,
-				});
-				return;
-			}
-
-			userInfo.updateMoney(cnt);
+			userController.adjustMoney({ nickname }, cnt);
 
 			await interaction.reply({
 				content: `${nickname}에게 ${setComma(cnt)}원을 줬습니다`,

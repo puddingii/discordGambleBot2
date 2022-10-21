@@ -25,6 +25,20 @@ export const addUser = (userInfo: { id: string; nickname: string }) => {
 	userManager.addUser(userInfo);
 };
 
+/** 유저머니 조정. */
+export const adjustMoney = (
+	userInfo: Partial<{ discordId: string; nickname: string }>,
+	money: number,
+) => {
+	const userManager = dataManager.get('user');
+	const user = userManager.getUser(userInfo);
+	if (!user) {
+		throw Error('유저정보가 없습니다.');
+	}
+	user.updateMoney(money);
+	userManager.pushWaitingUser(user);
+};
+
 /** 다른 사람한테 돈 기부 */
 export const giveMoney = (
 	myInfo: Partial<{ discordId: string; nickname: string }>,
@@ -40,6 +54,8 @@ export const giveMoney = (
 
 	user.updateMoney(money * -1);
 	ptrUser.updateMoney(money);
+	userManager.pushWaitingUser(user);
+	userManager.pushWaitingUser(ptrUser);
 };
 
 /** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */
@@ -129,6 +145,7 @@ export const getRankingList = () => {
 
 export default {
 	addUser,
+	adjustMoney,
 	getMinUser,
 	getUser,
 	giveMoney,
