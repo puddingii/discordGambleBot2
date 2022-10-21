@@ -1,5 +1,17 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 
+type UpdateStatusParam = Partial<{
+	gamble: Partial<{
+		curTime: number;
+		curCondition: number;
+		conditionPeriod: number;
+		conditionRatioPerList: Array<number>;
+	}>;
+	user: {
+		grantMoney: number;
+	};
+}>;
+
 interface DoucmentResult<T> {
 	_doc: T;
 }
@@ -18,7 +30,7 @@ interface IStatus extends Document, DoucmentResult<IStatus> {
 
 interface IStatusStatics extends Model<IStatus> {
 	getStatus(): Promise<HydratedDocument<IStatus, IStatusStatics>>;
-	updateStatus(): Promise<{ code: number }>; // FIXME
+	updateStatus(statusInfo: UpdateStatusParam): Promise<void>;
 }
 
 const Status = new Schema<IStatus, IStatusStatics>({
@@ -57,20 +69,11 @@ Status.statics.getStatus = async function () {
 	return status;
 };
 
-Status.statics.updateStatus = async function () {
-	const status = await this.findOne({});
-	if (!status) {
-		return { code: 0 };
+Status.statics.updateStatus = async function (statusInfo: UpdateStatusParam) {
+	if (Object.keys(statusInfo).length === 0) {
+		throw Error('아무 옵션도 없습니다.');
 	}
-	// status.user.grantMoney = statusInfo.grantMoney;
-	// status.gamble.curTime = statusInfo.gamble.curTime;
-	// status.gamble.curCondition = statusInfo.gamble.curCondition;
-	// status.gamble.conditionPeriod = statusInfo.gamble.conditionPeriod;
-	// status.gamble.conditionRatioPerList.splice(0);
-	// status.gamble.conditionRatioPerList.push(...statusInfo.gamble.conditionRatioPerList);
-	await status.save();
-
-	return { code: 1 };
+	await this.findOneAndUpdate({}, { $set: statusInfo });
 };
 
 export default model<IStatus, IStatusStatics>('Status', Status);

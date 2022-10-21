@@ -1,8 +1,6 @@
-import { equal } from 'assert';
+import { equal, fail, ok } from 'assert';
 import mongoose from 'mongoose';
-import Sword from '../game/Weapon/Sword';
 import Status from './Status';
-// FIXME
 
 describe('Status Model Test', function () {
 	before(async function () {
@@ -25,12 +23,26 @@ describe('Status Model Test', function () {
 		equal(!!myStatus, true);
 	});
 
-	// it('#updateStatus', async function () {
-	// 	const weapon = new Sword();
-	// 	const gamble = new Gamble({});
-	// 	const myGame = new Game({ userList: [], weapon, gamble });
+	describe('#updateStatus', function () {
+		it('Update Status', async function () {
+			try {
+				await Status.updateStatus({ gamble: { curCondition: 3, conditionPeriod: 2 } });
+				const status = await Status.getStatus();
+				equal(status.gamble.curCondition, 3);
+				equal(status.gamble.conditionPeriod, 2);
+			} catch (e) {
+				console.log(e);
+				fail('DB Action Error');
+			}
+		});
 
-	// 	const result = await Status.updateStatus(myGame);
-	// 	equal(result.code, 1);
-	// });
+		it('Update Status', async function () {
+			try {
+				await Status.updateStatus({});
+				fail('This Status update test is expected to fail...');
+			} catch (e) {
+				ok(true);
+			}
+		});
+	});
 });

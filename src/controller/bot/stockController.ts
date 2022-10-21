@@ -4,11 +4,18 @@ import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
 import StockModel from '../../model/Stock';
+import Status from '../../model/Status';
 
 const dataManager = DataManager.getInstance();
 const stockManager = dataManager.get('stock');
 
 type StockManager = typeof stockManager;
+
+interface UpdateStatusParam {
+	curCondition: StockManager['curCondition'];
+	conditionRatioPerList: StockManager['conditionRatioPerList'];
+	conditionPeriod: StockManager['conditionPeriod'];
+}
 
 interface DefaultStockParam {
 	name: string;
@@ -152,16 +159,8 @@ export const getChartData = async ({
 };
 
 /** 도박 컨텐츠 게임 상태값들 셋팅 */
-export const setGambleStatus = ({
-	curCondition,
-	conditionRatioPerList,
-	conditionPeriod,
-}: {
-	curCondition?: StockManager['curCondition'];
-	conditionRatioPerList?: StockManager['conditionRatioPerList'];
-	conditionPeriod?: StockManager['conditionPeriod'];
-}) => {
-	// TODO DB 저장하고 있는지 확인할 것
+export const setGambleStatus = async (status: Partial<UpdateStatusParam>) => {
+	const { curCondition, conditionRatioPerList, conditionPeriod } = status;
 	const stockManager = dataManager.get('stock');
 	if (curCondition) {
 		stockManager.curCondition = curCondition;
@@ -172,6 +171,7 @@ export const setGambleStatus = ({
 	if (conditionRatioPerList) {
 		stockManager.conditionRatioPerList = conditionRatioPerList;
 	}
+	await Status.updateStatus({ gamble: status });
 };
 
 /** 돈 갱신 */
