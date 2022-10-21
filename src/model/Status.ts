@@ -73,7 +73,15 @@ Status.statics.updateStatus = async function (statusInfo: UpdateStatusParam) {
 	if (Object.keys(statusInfo).length === 0) {
 		throw Error('아무 옵션도 없습니다.');
 	}
-	await this.findOneAndUpdate({}, { $set: statusInfo });
+	const updInfo: UpdateStatusParam = {};
+	if (statusInfo.gamble) {
+		updInfo.gamble = statusInfo.gamble;
+	}
+	if (statusInfo.user) {
+		updInfo.user = statusInfo.user;
+	}
+
+	await this.findOneAndUpdate({}, { $set: updInfo }, { upsert: true }); // FIXME 이거 자꾸 overwrite 됨. 해결방법 찾아야함 아니면 스키마를 바꾸던지
 };
 
 export default model<IStatus, IStatusStatics>('Status', Status);

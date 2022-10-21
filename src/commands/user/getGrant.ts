@@ -30,7 +30,7 @@ export default {
 			globalController.giveGrantMoney(nowMinUser, money);
 
 			await interaction.reply({
-				content: `${setComma(money)}원을 받았습니다.`,
+				content: `${setComma(money, true)}원을 받았습니다.`,
 			});
 			globalController.updateGrantMoney(0);
 		} catch (err) {

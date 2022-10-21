@@ -7,6 +7,7 @@ import dependencyInjection from '../config/dependencyInjection';
 const {
 	cradle: {
 		StockModel,
+		StatusModel,
 		secretKey,
 		logger,
 		util: { convertSecond },
@@ -44,7 +45,10 @@ try {
 
 			const stockList = stockController.update(globalManager.curTime);
 			stockList.length && (await StockModel.updateStockList(stockList));
-			// FIXME
+			await StatusModel.updateStatus({
+				gamble: { curTime: globalManager.curTime },
+				user: { grantMoney: globalManager.grantMoney },
+			});
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
 		} catch (err) {
 			let errorMessage = err;
