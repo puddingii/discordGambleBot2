@@ -8,28 +8,28 @@ describe('Status Model Test', function () {
 		await mongoose.connect(mongoUri);
 	});
 
-	after(function () {
+	after(async function () {
+		await Status.deleteMany({ isTest: true });
 		mongoose.connection.close();
 	});
 
-	beforeEach('Status Count Test', async function () {
-		const statusList = await Status.find({});
-		equal(statusList.length, 1);
-	});
-
-	// Status
 	it('#getStatus', async function () {
-		const myStatus = await Status.getStatus();
+		const myStatus = await Status.getStatus(true);
 		equal(!!myStatus, true);
 	});
 
 	describe('#updateStatus', function () {
 		it('Update Status', async function () {
 			try {
-				await Status.updateStatus({ gamble: { curCondition: 3, conditionPeriod: 2 } });
-				const status = await Status.getStatus();
+				const beforeStatus = await Status.getStatus(true);
+				await Status.updateStatus(
+					{ gamble: { curCondition: 3, conditionPeriod: 4 } },
+					true,
+				);
+				const status = await Status.getStatus(true);
 				equal(status.gamble.curCondition, 3);
-				equal(status.gamble.conditionPeriod, 2);
+				equal(status.gamble.conditionPeriod, 4);
+				equal(beforeStatus.gamble.curTime, status.gamble.curTime);
 			} catch (e) {
 				console.log(e);
 				fail('DB Action Error');

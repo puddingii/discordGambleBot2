@@ -1,6 +1,6 @@
 import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
 
-type UpdateStatusParam = Partial<{
+type UpdateStatusParam = {
 	gamble: Partial<{
 		curTime: number;
 		curCondition: number;
@@ -10,13 +10,14 @@ type UpdateStatusParam = Partial<{
 	user: {
 		grantMoney: number;
 	};
-}>;
+};
 
 interface DoucmentResult<T> {
 	_doc: T;
 }
 
 interface IStatus extends Document, DoucmentResult<IStatus> {
+	isTest: boolean;
 	user: {
 		grantMoney: number;
 	};
@@ -29,11 +30,15 @@ interface IStatus extends Document, DoucmentResult<IStatus> {
 }
 
 interface IStatusStatics extends Model<IStatus> {
-	getStatus(): Promise<HydratedDocument<IStatus, IStatusStatics>>;
-	updateStatus(statusInfo: UpdateStatusParam): Promise<void>;
+	getStatus(isTest?: boolean): Promise<HydratedDocument<IStatus, IStatusStatics>>;
+	updateStatus(statusInfo: Partial<UpdateStatusParam>, isTest?: boolean): Promise<void>;
 }
 
 const Status = new Schema<IStatus, IStatusStatics>({
+	isTest: {
+		type: Boolean,
+		default: false,
+	},
 	user: {
 		grantMoney: {
 			type: Number,
@@ -61,27 +66,34 @@ const Status = new Schema<IStatus, IStatusStatics>({
 	},
 });
 
-Status.statics.getStatus = async function () {
-	let status = await this.findOne({});
+Status.statics.getStatus = async function (isTest = false) {
+	let status = await this.findOne({ isTest });
 	if (!status) {
-		status = await this.create({});
+		status = await this.create({ isTest });
 	}
 	return status;
 };
 
-Status.statics.updateStatus = async function (statusInfo: UpdateStatusParam) {
+Status.statics.updateStatus = async function (
+	statusInfo: Partial<UpdateStatusParam>,
+	isTest = false,
+) {
 	if (Object.keys(statusInfo).length === 0) {
 		throw Error('아무 옵션도 없습니다.');
 	}
-	const updInfo: UpdateStatusParam = {};
-	if (statusInfo.gamble) {
-		updInfo.gamble = statusInfo.gamble;
-	}
-	if (statusInfo.user) {
-		updInfo.user = statusInfo.user;
-	}
+	const updInfo: { [key: string]: number | Array<number> } = {};
+	(Object.keys(statusInfo) as Array<keyof typeof statusInfo>).forEach(statusType => {
+		const options = statusInfo[statusType];
+		if (options && typeof options === 'object' && !Array.isArray(options)) {
+			(Object.keys(options) as Array<keyof typeof options>).forEach(option => {
+				if (options[option]) {
+					updInfo[`${statusType}.${option}`] = options[option];
+				}
+			});
+		}
+	});
 
-	await this.findOneAndUpdate({}, { $set: updInfo }, { upsert: true }); // FIXME 이거 자꾸 overwrite 됨. 해결방법 찾아야함 아니면 스키마를 바꾸던지
+	await this.findOneAndUpdate({ isTest }, { $set: updInfo }, { upsert: true });
 };
 
 export default model<IStatus, IStatusStatics>('Status', Status);
