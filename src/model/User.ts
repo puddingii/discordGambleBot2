@@ -2,7 +2,7 @@ import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoos
 import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
 import UserController from '../game/User/User';
-import SwordController from '../game/Weapon/Sword';
+// import SwordController from '../game/Weapon/Sword';
 
 interface WeaponInfo {
 	type: 'sword' | 'pickaxe';
@@ -42,15 +42,12 @@ interface IUserStatics extends Model<IUser> {
 			money: number;
 		},
 	): Promise<{ code: number; message?: string }>;
-	updateMoney(userList: UserController[]): Promise<void>;
-	updateWeapon(
-		discordId: string,
-		updWeaponInfo: SwordController,
-		money: number,
-	): Promise<{
-		code: number;
-		message?: string;
-	}>;
+	// updateMoney(userList: UserController[]): Promise<void>;
+	// updateWeapon(
+	// 	discordId: string,
+	// 	updWeaponInfo: SwordController,
+	// 	money: number,
+	// ): Promise<void>;
 	updateAll(userList: UserController[]): Promise<void>;
 }
 
@@ -187,64 +184,72 @@ User.statics.updateStock = async function (
 	return { code: 1 };
 };
 
-/** 유저 머니 업데이트 */
-User.statics.updateMoney = async function (userList: UserController[]) {
-	const updPromiseList = userList.map(updUser =>
-		this.findOneAndUpdate(
-			{ discordId: updUser.getId() },
-			{ $set: { money: updUser.money } },
-		),
-	);
+// /** 유저 머니 업데이트 */
+// User.statics.updateMoney = async function (userList: UserController[]) {
+// 	const updPromiseList = userList.map(updUser =>
+// 		this.findOneAndUpdate(
+// 			{ discordId: updUser.getId() },
+// 			{ $set: { money: updUser.money } },
+// 		),
+// 	);
 
-	const resultList = await Promise.allSettled(updPromiseList);
+// 	const resultList = await Promise.allSettled(updPromiseList);
 
-	resultList.forEach(result => {
-		if (result.status !== 'fulfilled') {
-			logger.error(`${result.reason}`);
-		}
-	});
-};
+// 	resultList.forEach(result => {
+// 		if (result.status !== 'fulfilled') {
+// 			logger.error(`${result.reason}`);
+// 		}
+// 	});
+// };
 
-/** 무기 업데이트 */
-User.statics.updateWeapon = async function (
-	discordId: string,
-	updWeaponInfo: SwordController,
-	money: number,
-) {
-	const userInfo = await this.findOne({ discordId });
-	if (!userInfo) {
-		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
-	}
+// /** 무기 업데이트 */
+// User.statics.updateWeapon = async function (
+// 	discordId: string,
+// 	updWeaponInfo: SwordController,
+// 	money: number,
+// ) {
+// 	const userInfo = await this.findOneAndUpdate(
+// 		{ discordId, 'weaponList.type': updWeaponInfo.type },
+// 		{
+// 			$set: {
+// 				money,
+// 				'weaponList.$.bonusPower': updWeaponInfo.bonusPower,
+// 				'weaponList.$.curPower': updWeaponInfo.curPower,
+// 				'weaponList.$.destroyCnt': updWeaponInfo.destroyCnt,
+// 				'weaponList.$.failCnt': updWeaponInfo.failCnt,
+// 				'weaponList.$.successCnt': updWeaponInfo.successCnt,
+// 				'weaponList.$.hitRatio': updWeaponInfo.hitRatio,
+// 				'weaponList.$.missRatio': updWeaponInfo.missRatio,
+// 			},
+// 		},
+// 		{ new: true },
+// 	);
 
-	const myWeapon = userInfo.weaponList.find(weapon => {
-		return weapon.type === updWeaponInfo.type;
-	});
+// 	if (userInfo) {
+// 		return;
+// 	}
 
-	if (myWeapon) {
-		myWeapon.bonusPower = updWeaponInfo.bonusPower;
-		myWeapon.curPower = updWeaponInfo.curPower;
-		myWeapon.destroyCnt = updWeaponInfo.destroyCnt;
-		myWeapon.failCnt = updWeaponInfo.failCnt;
-		myWeapon.successCnt = updWeaponInfo.successCnt;
-		myWeapon.hitRatio = updWeaponInfo.hitRatio;
-		myWeapon.missRatio = updWeaponInfo.missRatio;
-	} else {
-		userInfo.weaponList.push({
-			type: updWeaponInfo.type,
-			curPower: updWeaponInfo.curPower,
-			failCnt: updWeaponInfo.failCnt,
-			successCnt: updWeaponInfo.successCnt,
-			destroyCnt: updWeaponInfo.destroyCnt,
-			bonusPower: updWeaponInfo.bonusPower,
-			hitRatio: updWeaponInfo.hitRatio,
-			missRatio: updWeaponInfo.missRatio,
-		});
-	}
-	userInfo.money = money;
+// 	const pushedUserInfo = await this.findOneAndUpdate(
+// 		{ discordId },
+// 		{
+// 			$set: { money },
+// 			$push: {
+// 				weaponList: {
+// 					type: updWeaponInfo.type,
+// 					curPower: updWeaponInfo.curPower,
+// 					failCnt: updWeaponInfo.failCnt,
+// 					successCnt: updWeaponInfo.successCnt,
+// 					destroyCnt: updWeaponInfo.destroyCnt,
+// 					bonusPower: updWeaponInfo.bonusPower,
+// 					hitRatio: updWeaponInfo.hitRatio,
+// 					missRatio: updWeaponInfo.missRatio,
+// 				},
+// 			},
+// 		},
+// 	);
 
-	await userInfo.save();
-	return { code: 1 };
-};
+// 	if()
+// };
 
 User.statics.updateAll = async function (userList: UserController[]) {
 	const stockAllList = await StockModel.findAllList('all');

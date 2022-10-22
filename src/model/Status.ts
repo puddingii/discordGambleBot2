@@ -2,9 +2,13 @@ import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoos
 
 type UpdateStatusParam = {
 	gamble: Partial<{
+		/** 게임 내 시간 */
 		curTime: number;
+		/** 현재 주식 흐름 */
 		curCondition: number;
+		/** 주식 흐름 바뀌는 주기 */
 		conditionPeriod: number;
+		/** 주식 흐름 바뀌는 확률 */
 		conditionRatioPerList: Array<number>;
 	}>;
 	user: {
