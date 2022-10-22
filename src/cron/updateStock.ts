@@ -23,10 +23,10 @@ try {
 			rule = `*/${value} * * ${defaultRule}`;
 			break;
 		case 'm':
-			rule = `* */${value} * ${defaultRule}`;
+			rule = `*/${value} * ${defaultRule}`;
 			break;
 		case 'h':
-			rule = `* * */${value} ${defaultRule}`;
+			rule = `* */${value} ${defaultRule}`;
 			break;
 		default:
 			throw Error('Rule설정 에러.');
