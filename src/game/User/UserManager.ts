@@ -1,4 +1,20 @@
 import User from './User';
+import dependency from '../../config/dependencyInjection';
+import Sword from '../Weapon/Sword';
+import Stock from '../Stock/Stock';
+import Coin from '../Stock/Coin';
+
+const {
+	cradle: { UserModel },
+} = dependency;
+/**
+ * sm: 주식과돈
+ * wm: 무기와돈
+ * m: 돈
+ * s: 주식
+ * w: 무기
+ */
+type UpdateTypeInfo = 'sm' | 'wm' | 'm' | 's' | 'w';
 
 export default class UserManager {
 	userList: Array<User>;
@@ -54,7 +70,6 @@ export default class UserManager {
 		this.waitingList.clear();
 		return myList;
 	}
-
 	/** DB업데이트 목록에 유저정보 추가 */
 	pushWaitingUser(userInfo: User | Array<User>) {
 		if (Array.isArray(userInfo)) {
@@ -66,5 +81,42 @@ export default class UserManager {
 			return;
 		}
 		this.waitingList.add(userInfo);
+	}
+
+	async update(
+		// FIXME
+		type: UpdateTypeInfo,
+		userInfo: Partial<{ discordId: string; nickname: string }>,
+		optionalInfo?: Sword | Stock | Coin,
+	): Promise<boolean> {
+		const myInfo = this.getUser(userInfo);
+
+		if (!myInfo) {
+			return false;
+		}
+
+		let result = false;
+		switch (type) {
+			case 'm':
+				result = await UserModel.updateMoney(myInfo.getId(), myInfo.money);
+				break;
+			case 'wm':
+				result = optionalInfo
+					? await UserModel.updateWeaponAndMoney(
+							myInfo.getId(),
+							<Sword>optionalInfo,
+							myInfo.money,
+					  )
+					: false;
+				break;
+			case 'w':
+				result = optionalInfo
+					? await UserModel.updateWeaponAndMoney(myInfo.getId(), <Sword>optionalInfo)
+					: false;
+				break;
+			default:
+		}
+
+		return result;
 	}
 }
