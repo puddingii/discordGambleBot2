@@ -7,32 +7,29 @@ import Coin from '../Stock/Coin';
 const {
 	cradle: { UserModel },
 } = dependency;
+
 /**
  * sm: 주식과돈
  * wm: 무기와돈
+ * mm: 다른사용자에게 돈 줄때 Transaction이용
  * m: 돈
  * s: 주식
  * w: 무기
  */
-type UpdateTypeInfo = 'sm' | 'wm' | 'm' | 's' | 'w';
+type UpdateTypeInfo = 'sm' | 'wm' | 'mm' | 'm' | 's' | 'w';
+type UpdateParamInfo = {
+	type: UpdateTypeInfo;
+	userInfo: Partial<{ discordId: string; nickname: string }>;
+	optionalInfo?: Sword | Stock | Coin;
+};
 
 export default class UserManager {
 	userList: Array<User>;
 	waitingList: Set<User> = new Set();
+	waitingList2: Map<User, Array<{ type: string; subType?: string }>> = new Map();
 
 	constructor(userList: Array<User>) {
 		this.userList = userList;
-	}
-
-	/** 유저등록 */
-	addUser(userInfo: { id: string; nickname: string }) {
-		const isExistUser = this.getUser({ discordId: userInfo.id });
-		if (isExistUser) {
-			throw Error('이미 있는 유저입니다.');
-		}
-		const user = new User(userInfo);
-		this.userList.push(user);
-		this.pushWaitingUser(user);
 	}
 
 	/** 내가 가지고 있는 무기 반환 */
@@ -70,25 +67,40 @@ export default class UserManager {
 		this.waitingList.clear();
 		return myList;
 	}
+
 	/** DB업데이트 목록에 유저정보 추가 */
-	pushWaitingUser(userInfo: User | Array<User>) {
-		if (Array.isArray(userInfo)) {
-			userInfo.forEach(userClass => {
-				if (userClass instanceof User) {
-					this.waitingList.add(userClass);
-				}
-			});
-			return;
-		}
+	pushWaitingUser(userInfo: User) {
 		this.waitingList.add(userInfo);
 	}
 
-	async update(
-		// FIXME
-		type: UpdateTypeInfo,
-		userInfo: Partial<{ discordId: string; nickname: string }>,
-		optionalInfo?: Sword | Stock | Coin,
-	): Promise<boolean> {
+	/** 유저등록 */
+	async addUser(userInfo: { id: string; nickname: string }) {
+		const isExistUser = this.getUser({ discordId: userInfo.id });
+		if (isExistUser) {
+			throw Error('이미 있는 유저입니다.');
+		}
+		const user = new User(userInfo);
+		this.userList.push(user);
+		await UserModel.create({ discordId: userInfo.id, nickname: userInfo.nickname });
+	}
+
+	/** 트랜잭션 업데이트 */
+	async transactionUpdate(list: Array<UpdateParamInfo>) {
+		const mySession = await UserModel.manageTransaction();
+		if (!mySession) {
+			return;
+		}
+
+		// eslint-disable-next-line no-restricted-syntax
+		for await (const updateInfo of list) {
+			await this.update(updateInfo);
+		}
+		await UserModel.manageTransaction(mySession);
+	}
+
+	/** 업데이트 */
+	async update(updateInfo: UpdateParamInfo): Promise<boolean> {
+		const { type, userInfo, optionalInfo } = updateInfo;
 		const myInfo = this.getUser(userInfo);
 
 		if (!myInfo) {

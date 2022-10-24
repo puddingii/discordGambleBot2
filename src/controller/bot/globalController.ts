@@ -13,10 +13,10 @@ export const getGrantMoney = () => {
 	return globalManager.grantMoney;
 };
 
-export const giveGrantMoney = (user: User, money: number) => {
+export const giveGrantMoney = async (user: User, money: number) => {
 	const userManager = dataManager.get('user');
 	user.updateMoney(money);
-	userManager.pushWaitingUser(user);
+	await userManager.update({ type: 'm', userInfo: { discordId: user.getId() } });
 };
 
 export const updateGrantMoney = (value: number) => {

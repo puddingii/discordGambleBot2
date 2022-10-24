@@ -27,7 +27,7 @@ export default {
 			}
 
 			const money = globalController.getGrantMoney();
-			globalController.giveGrantMoney(nowMinUser, money);
+			await globalController.giveGrantMoney(nowMinUser, money);
 
 			await interaction.reply({
 				content: `${setComma(money, true)}원을 받았습니다.`,

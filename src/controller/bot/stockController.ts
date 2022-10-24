@@ -228,7 +228,9 @@ export const update = (curTime: number): Array<Stock | Coin> => {
 			const result = user.giveDividend();
 			return !!result.code;
 		});
-		userManager.pushWaitingUser(updUserList);
+		updUserList.forEach(user => {
+			userManager.pushWaitingUser(user);
+		});
 	}
 
 	return [...stockList, ...coinList];

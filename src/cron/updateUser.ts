@@ -32,11 +32,11 @@ try {
 	}
 
 	/** 시간 분석해주는 유틸 필요해보임.  */
-	schedule.scheduleJob(rule, function (cronTime) {
+	schedule.scheduleJob(rule, async function (cronTime) {
 		try {
 			const userManager = dataManager.get('user');
 			const userList = userManager.popAllWaitingList();
-			userList.length && UserModel.updateAll(userList);
+			userList.length && (await UserModel.updateAll(userList));
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - User Update`);
 		} catch (err) {
 			let errorMessage = err;
