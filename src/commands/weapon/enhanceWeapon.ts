@@ -27,7 +27,7 @@ export default {
 			const [successRatio] = Object.values(
 				weaponController.getNextRatio({ discordId, type: 'sword' }),
 			).map(ratio => ratio * 100);
-			const { code, curPower, beforePower } = weaponController.enhanceWeapon({
+			const { code, curPower, beforePower } = await weaponController.enhanceWeapon({
 				discordId,
 				type: 'sword',
 				isPreventDestroy: false,

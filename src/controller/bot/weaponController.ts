@@ -80,7 +80,7 @@ export const getNextRatio = ({
 };
 
 /** 무기강화 */
-export const enhanceWeapon = ({
+export const enhanceWeapon = async ({
 	discordId,
 	type,
 	isPreventDestroy = false,
@@ -90,7 +90,7 @@ export const enhanceWeapon = ({
 	type: 'sword';
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
-}): EnhanceWeaponType => {
+}): Promise<EnhanceWeaponType> => {
 	const userManager = dataManager.get('user');
 	const weaponManager = dataManager.get('weapon');
 	const userInfo = userManager.getUser({ discordId });
@@ -152,7 +152,7 @@ export const enhanceWeapon = ({
 		myWeapon.successCnt++;
 		result = { code: 1, curPower: myWeapon.curPower, beforePower };
 	}
-	userManager.pushWaitingUser(userInfo);
+	await userManager.update({ type: 'wm', userInfo, optionalInfo: myWeapon });
 	return result;
 };
 
