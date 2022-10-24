@@ -57,6 +57,15 @@ interface IUserStatics extends Model<IUser> {
 		updWeaponInfo: SwordController,
 		money?: number,
 	): Promise<boolean>;
+	updateStockAndMoney(
+		discordId: string,
+		updStockInfo: {
+			name: string;
+			cnt: number;
+			value: number;
+		},
+		money?: number,
+	): Promise<boolean>;
 	updateAll(userList: UserController[]): Promise<void>;
 	manageTransaction(session?: ClientSession): Promise<void | ClientSession>;
 }
@@ -214,7 +223,6 @@ User.statics.updateMoney = async function (discordId: string, money: number) {
 	return !!isSucceed;
 };
 
-// FIXME
 User.statics.updateStockAndMoney = async function (
 	discordId: string,
 	updStockInfo: {

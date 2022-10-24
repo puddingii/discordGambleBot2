@@ -62,7 +62,15 @@ export const buySellStock = ({
 	}
 
 	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
-	userManager.pushWaitingUser(userInfo);
+	userManager.update({
+		type: 'sm',
+		userInfo,
+		optionalInfo: {
+			name: stockInfo.name,
+			cnt: stockResult.cnt,
+			value: stockResult.value,
+		},
+	});
 	return stockResult;
 };
 
@@ -174,6 +182,7 @@ export const setGambleStatus = async (status: Partial<UpdateStatusParam>) => {
 	await Status.updateStatus({ gamble: status });
 };
 
+// FIXME userController쪽으로 옮겨야함
 /** 돈 갱신 */
 export const updateMoney = (discordId: string, value: number): User => {
 	const userManager = dataManager.get('user');
@@ -182,7 +191,7 @@ export const updateMoney = (discordId: string, value: number): User => {
 		throw Error('유저정보가 없습니다');
 	}
 	userInfo.updateMoney(value);
-	userManager.pushWaitingUser(userInfo);
+	userManager.update({ type: 'm', userInfo });
 	return userInfo;
 };
 
@@ -222,7 +231,7 @@ export const update = (curTime: number): Array<Stock | Coin> => {
 	const userList = dataManager.get('user').getUserList();
 	let updUserList: User[] = [];
 
-	// 주식 배당금 시간값 가져와서
+	// FIXME 스케쥴러로 이동 필요함. 주식 배당금 시간값 가져와서
 	if (curTime % 48 === 0) {
 		updUserList = userList.filter(user => {
 			const result = user.giveDividend();

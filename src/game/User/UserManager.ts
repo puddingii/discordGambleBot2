@@ -1,8 +1,6 @@
 import User from './User';
 import dependency from '../../config/dependencyInjection';
 import Sword from '../Weapon/Sword';
-import Stock from '../Stock/Stock';
-import Coin from '../Stock/Coin';
 
 const {
 	cradle: { UserModel },
@@ -16,11 +14,12 @@ const {
  * s: 주식
  * w: 무기
  */
-type UpdateTypeInfo = 'sm' | 'wm' | 'mm' | 'm' | 's' | 'w';
+type UpdateTypeInfo = 'sm' | 'wm' | 'm' | 's' | 'w';
+type StockOptionalType = { name: string; cnt: number; value: number };
 type UpdateParamInfo = {
 	type: UpdateTypeInfo;
 	userInfo: Partial<{ discordId: string; nickname: string }>;
-	optionalInfo?: Sword | Stock | Coin;
+	optionalInfo?: Sword | StockOptionalType;
 };
 
 export default class UserManager {
@@ -124,6 +123,15 @@ export default class UserManager {
 			case 'w':
 				result = optionalInfo
 					? await UserModel.updateWeaponAndMoney(myInfo.getId(), <Sword>optionalInfo)
+					: false;
+				break;
+			case 'sm':
+				result = optionalInfo
+					? await UserModel.updateStockAndMoney(
+							myInfo.getId(),
+							<StockOptionalType>optionalInfo,
+							myInfo.money,
+					  )
 					: false;
 				break;
 			default:
