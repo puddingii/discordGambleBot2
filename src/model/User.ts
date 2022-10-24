@@ -1,4 +1,12 @@
-import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
+import {
+	Schema,
+	Model,
+	model,
+	Types,
+	HydratedDocument,
+	Document,
+	ClientSession,
+} from 'mongoose';
 import StockModel, { IStock, IStockStatics } from './Stock';
 import logger from '../config/logger';
 import UserController from '../game/User/User';
@@ -49,6 +57,7 @@ interface IUserStatics extends Model<IUser> {
 		money?: number,
 	): Promise<boolean>;
 	updateAll(userList: UserController[]): Promise<void>;
+	manageTransaction(session?: ClientSession): Promise<void | ClientSession>;
 }
 
 interface PopulatedParent {
@@ -296,6 +305,14 @@ User.statics.updateAll = async function (userList: UserController[]) {
 			logger.error(`${result.reason}`);
 		}
 	});
+};
+
+User.statics.manageTransaction = async function (session?: ClientSession) {
+	if (!session) {
+		const mySession = await this.startSession();
+		return mySession;
+	}
+	await session.endSession();
 };
 
 export default model<IUser, IUserStatics>('User', User);

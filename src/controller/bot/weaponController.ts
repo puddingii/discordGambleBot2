@@ -135,7 +135,6 @@ export const enhanceWeapon = ({
 		if (!isPreventDown && myWeapon.curPower > 0) {
 			myWeapon.curPower--;
 		}
-		userManager.pushWaitingUser(userInfo);
 		result = { code: 2, curPower: myWeapon.curPower, beforePower };
 	}
 	// 터짐
@@ -144,7 +143,6 @@ export const enhanceWeapon = ({
 			myWeapon.curPower = 0;
 			myWeapon.destroyCnt++;
 		}
-		userManager.pushWaitingUser(userInfo);
 		result = { code: 3, curPower: myWeapon.curPower, beforePower };
 	}
 
