@@ -40,6 +40,7 @@ interface IUser extends Document, DoucmentResult<IUser> {
 }
 
 interface IUserStatics extends Model<IUser> {
+	addNewUser(discordId: string, nickname: string): Promise<void>;
 	findByDiscordId(discordId: string): Promise<HydratedDocument<IUser>>;
 	updateStock(
 		discordId: string,
@@ -142,6 +143,16 @@ const User = new Schema<IUser, IUserStatics>({
 		},
 	],
 });
+
+User.statics.addNewUser = async function (discordId: string, nickname: string) {
+	const stockList = (await StockModel.findAllList('all')).map(stock => {
+		return { stock: new Types.ObjectId(stock._id), cnt: 0, value: 0 };
+	});
+
+	const weaponList = [{ type: 'sword' }];
+
+	await this.create({ discordId, nickname, stockList, weaponList });
+};
 
 /** 아이디로 유저정보 탐색 */
 User.statics.findByDiscordId = async function (discordId: string) {

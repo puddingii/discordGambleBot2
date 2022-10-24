@@ -81,7 +81,7 @@ export default class UserManager {
 		}
 		const user = new User(userInfo);
 		this.userList.push(user);
-		await UserModel.create({ discordId: userInfo.id, nickname: userInfo.nickname });
+		await UserModel.addNewUser(userInfo.id, userInfo.nickname);
 	}
 
 	/** 트랜잭션 업데이트 */
