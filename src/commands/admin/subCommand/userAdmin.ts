@@ -31,15 +31,10 @@ export default {
 			const cnt = Number(interaction.fields.getTextInputValue('cnt'));
 
 			if (!nickname || !cnt) {
-				await interaction.reply({
-					content: '닉네임, 금액을 제대로 적어주세요',
-					components: [getNewSelectMenu()],
-					ephemeral: true,
-				});
-				return;
+				throw Error('닉네임, 금액을 제대로 적어주세요');
 			}
 
-			userController.adjustMoney({ nickname }, cnt);
+			await userController.adjustMoney({ nickname }, cnt);
 
 			await interaction.reply({
 				content: `${nickname}에게 ${setComma(cnt)}원을 줬습니다`,

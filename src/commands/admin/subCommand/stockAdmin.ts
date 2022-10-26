@@ -75,26 +75,16 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 	};
 
 	if (!['coin', 'stock'].includes(param.type)) {
-		await interaction.reply({
-			content: 'type을 잘못 입력함',
-			components: [getNewSelectMenu()],
-			ephemeral: true,
-		});
-		return;
+		throw Error('type을 잘못 입력함');
 	}
 	const { code, message } =
 		type === 'stock'
 			? Stock.checkStockValidation(<Omit<typeof param, 'type'> & { type: 'stock' }>param)
 			: Coin.checkStockValidation(<Omit<typeof param, 'type'> & { type: 'coin' }>param);
 	if (!code) {
-		await interaction.reply({
-			content: message,
-			components: [getNewSelectMenu()],
-			ephemeral: true,
-		});
-		return;
+		throw Error(message);
 	}
-	/** DB Info */
+
 	let content = '';
 	const defaultClassParam = {
 		name: param.name,
@@ -115,7 +105,10 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		type: 'coin',
 	};
 
-	await stockController.updateStock(isNew ?? false, type === 'stock' ? stockParam : coinParam);
+	await stockController.updateStock(
+		isNew ?? false,
+		type === 'stock' ? stockParam : coinParam,
+	);
 	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';
 
 	await interaction.reply({

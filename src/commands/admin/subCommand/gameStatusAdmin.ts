@@ -41,12 +41,7 @@ const updateStatus = async (interaction: ModalSubmitInteraction) => {
 		!conditionRatioPerList ||
 		!conditionPeriod
 	) {
-		await interaction.reply({
-			content: '제대로 입력해라',
-			components: [getNewSelectMenu()],
-			ephemeral: true,
-		});
-		return;
+		throw Error('제대로 입력해라');
 	}
 
 	await stockController.setGambleStatus({

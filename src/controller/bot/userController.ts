@@ -20,9 +20,9 @@ interface MyStockInfo {
 }
 
 /** 신규유저 추가 */
-export const addUser = (userInfo: { id: string; nickname: string }) => {
+export const addUser = async (userInfo: { id: string; nickname: string }) => {
 	const userManager = dataManager.get('user');
-	userManager.addUser(userInfo);
+	await userManager.addUser(userInfo);
 };
 
 /** 유저머니 조정. */
@@ -146,14 +146,14 @@ export const getRankingList = () => {
 };
 
 /** 돈 갱신 */
-export const updateMoney = (discordId: string, value: number): User => {
+export const updateMoney = async (discordId: string, value: number): Promise<User> => {
 	const userManager = dataManager.get('user');
 	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
 	userInfo.updateMoney(value);
-	userManager.update({ type: 'm', userInfo });
+	await userManager.update({ type: 'm', userInfo });
 	return userInfo;
 };
 

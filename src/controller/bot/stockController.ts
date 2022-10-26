@@ -42,7 +42,7 @@ export interface CoinParam extends DefaultStockParam {
 }
 
 /** 주식사기 */
-export const buySellStock = ({
+export const buySellStock = async ({
 	discordId,
 	stockName,
 	cnt,
@@ -52,7 +52,7 @@ export const buySellStock = ({
 	stockName: string;
 	cnt: number;
 	isFull: boolean;
-}): { cnt: number; value: number; money: number } => {
+}): Promise<{ cnt: number; value: number; money: number }> => {
 	const userManager = dataManager.get('user');
 	const stockManager = dataManager.get('stock');
 	const userInfo = dataManager.get('user').getUser({ discordId });
@@ -66,7 +66,7 @@ export const buySellStock = ({
 	}
 
 	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
-	userManager.update({
+	await userManager.update({
 		type: 'sm',
 		userInfo,
 		optionalInfo: {

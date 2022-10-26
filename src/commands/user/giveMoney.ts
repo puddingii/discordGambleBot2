@@ -28,7 +28,7 @@ export default {
 				return;
 			}
 
-			userController.giveMoney({ discordId }, { nickname: ptrNickname }, cnt);
+			await userController.giveMoney({ discordId }, { nickname: ptrNickname }, cnt);
 
 			await interaction.reply({ content: '기부완료!' });
 		} catch (err) {

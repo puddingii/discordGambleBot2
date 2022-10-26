@@ -26,8 +26,7 @@ export default {
 				throw Error('꼴찌도 아닌 놈이 받을려해! 갈!!!!!!!!');
 			}
 
-			const money = globalController.getGrantMoney();
-			await globalController.giveGrantMoney(nowMinUser, money);
+			const money = await globalController.giveGrantMoney(nowMinUser);
 
 			await interaction.reply({
 				content: `${setComma(money, true)}원을 받았습니다.`,

@@ -19,7 +19,12 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름') ?? '';
 
-			stockController.buySellStock({ discordId, stockName: name, cnt: -1, isFull: true });
+			await stockController.buySellStock({
+				discordId,
+				stockName: name,
+				cnt: -1,
+				isFull: true,
+			});
 
 			await interaction.reply({ content: '풀매도완료!' });
 		} catch (err) {

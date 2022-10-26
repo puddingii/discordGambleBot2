@@ -28,7 +28,12 @@ export default {
 				return;
 			}
 
-			stockController.buySellStock({ discordId, stockName: name, cnt, isFull: false });
+			await stockController.buySellStock({
+				discordId,
+				stockName: name,
+				cnt,
+				isFull: false,
+			});
 
 			await interaction.reply({ content: '매수완료!' });
 		} catch (err) {

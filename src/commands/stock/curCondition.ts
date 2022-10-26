@@ -36,7 +36,7 @@ export default {
 					conditionText = '아무일도 없음';
 			}
 
-			userController.updateMoney(discordId, -10000);
+			await userController.updateMoney(discordId, -10000);
 
 			await interaction.reply({ content: conditionText, ephemeral: true });
 		} catch (err) {
