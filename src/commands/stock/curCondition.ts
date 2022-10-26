@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
 import stockController from '../../controller/bot/stockController';
+import userController from '../../controller/bot/userController';
 
 const {
 	cradle: { logger },
@@ -35,7 +36,7 @@ export default {
 					conditionText = '아무일도 없음';
 			}
 
-			stockController.updateMoney(discordId, -10000);
+			userController.updateMoney(discordId, -10000);
 
 			await interaction.reply({ content: conditionText, ephemeral: true });
 		} catch (err) {

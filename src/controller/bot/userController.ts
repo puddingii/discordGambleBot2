@@ -145,6 +145,18 @@ export const getRankingList = () => {
 	return rankingList;
 };
 
+/** 돈 갱신 */
+export const updateMoney = (discordId: string, value: number): User => {
+	const userManager = dataManager.get('user');
+	const userInfo = dataManager.get('user').getUser({ discordId });
+	if (!userInfo) {
+		throw Error('유저정보가 없습니다');
+	}
+	userInfo.updateMoney(value);
+	userManager.update({ type: 'm', userInfo });
+	return userInfo;
+};
+
 export default {
 	addUser,
 	adjustMoney,
@@ -153,4 +165,5 @@ export default {
 	giveMoney,
 	getRankingList,
 	getMyStockList,
+	updateMoney,
 };
