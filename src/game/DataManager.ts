@@ -1,13 +1,13 @@
 import StockManager from './Stock/StockManager';
 import UserManager from './User/UserManager';
 import WeaponManager from './Weapon/WeaponManager';
-import GlobalManager from './Status/GlobalManager';
+import StatusManager from './Status/StatusManager';
 
 interface DataInfo {
 	stock: StockManager;
 	weapon: WeaponManager;
 	user: UserManager;
-	globalStatus: GlobalManager;
+	globalStatus: StatusManager;
 }
 
 interface DataConstructor<T extends keyof DataInfo> {

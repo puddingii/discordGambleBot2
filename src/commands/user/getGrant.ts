@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import dependency from '../../config/dependencyInjection';
 import userController from '../../controller/bot/userController';
-import globalController from '../../controller/bot/globalController';
+import globalController from '../../controller/bot/statusController';
 
 const {
 	cradle: {

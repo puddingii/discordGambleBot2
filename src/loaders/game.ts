@@ -8,7 +8,7 @@ import Sword from '../game/Weapon/Sword';
 import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
 import WeaponManager from '../game/Weapon/WeaponManager';
-import GlobalManager from '../game/Status/GlobalManager';
+import GlobalManager from '../game/Status/StatusManager';
 
 const {
 	cradle: { UserModel, StockModel, StatusModel },
