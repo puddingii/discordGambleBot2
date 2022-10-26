@@ -106,52 +106,52 @@ describe('User Model Test', function () {
 		});
 	});
 
-	describe('#updateStock', function () {
-		it('Unknown User', async function () {
-			try {
-				const unknownUserResult = await User.updateStock('123', {
-					name: '응애',
-					cnt: 1,
-					value: 1000,
-					money: 1000,
-				});
-				equal(unknownUserResult.code, 0);
-			} catch (err) {
-				const errorMessage = formatCatchError(err, 'DB Error');
-				fail(errorMessage);
-			}
-		});
+	// describe('#updateStock', function () {
+	// 	it('Unknown User', async function () {
+	// 		try {
+	// 			const unknownUserResult = await User.updateStock('123', {
+	// 				name: '응애',
+	// 				cnt: 1,
+	// 				value: 1000,
+	// 				money: 1000,
+	// 			});
+	// 			equal(unknownUserResult.code, 0);
+	// 		} catch (err) {
+	// 			const errorMessage = formatCatchError(err, 'DB Error');
+	// 			fail(errorMessage);
+	// 		}
+	// 	});
 
-		it('Unknown Stock', async function () {
-			try {
-				const unknownStockResult = await User.updateStock(TEST_DISCORD_ID, {
-					name: '응z',
-					cnt: 1,
-					value: 1000,
-					money: 1000,
-				});
-				equal(unknownStockResult.code, 0);
-			} catch (err) {
-				const errorMessage = formatCatchError(err, 'DB Error');
-				fail(errorMessage);
-			}
-		});
+	// 	it('Unknown Stock', async function () {
+	// 		try {
+	// 			const unknownStockResult = await User.updateStock(TEST_DISCORD_ID, {
+	// 				name: '응z',
+	// 				cnt: 1,
+	// 				value: 1000,
+	// 				money: 1000,
+	// 			});
+	// 			equal(unknownStockResult.code, 0);
+	// 		} catch (err) {
+	// 			const errorMessage = formatCatchError(err, 'DB Error');
+	// 			fail(errorMessage);
+	// 		}
+	// 	});
 
-		it('Correct Update', async function () {
-			try {
-				const updateResult = await User.updateStock(TEST_DISCORD_ID, {
-					name: '응애',
-					cnt: 1,
-					value: 1000,
-					money: 1000,
-				});
-				equal(updateResult.code, 1);
-			} catch (err) {
-				const errorMessage = formatCatchError(err, 'DB Error');
-				fail(errorMessage);
-			}
-		});
-	});
+	// 	it('Correct Update', async function () {
+	// 		try {
+	// 			const updateResult = await User.updateStock(TEST_DISCORD_ID, {
+	// 				name: '응애',
+	// 				cnt: 1,
+	// 				value: 1000,
+	// 				money: 1000,
+	// 			});
+	// 			equal(updateResult.code, 1);
+	// 		} catch (err) {
+	// 			const errorMessage = formatCatchError(err, 'DB Error');
+	// 			fail(errorMessage);
+	// 		}
+	// 	});
+	// });
 
 	// describe('#updateMoney', function () {
 	// 	const myUser = new UserControlller({

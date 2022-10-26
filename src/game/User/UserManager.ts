@@ -60,18 +60,6 @@ export default class UserManager {
 		return this.userList;
 	}
 
-	/** DB업데이트를 기다리고 있는 리스트들 다 가져오고 빈 배열로 만든다. */
-	popAllWaitingList(): Array<User> {
-		const myList = [...this.waitingList];
-		this.waitingList.clear();
-		return myList;
-	}
-
-	/** DB업데이트 목록에 유저정보 추가 */
-	pushWaitingUser(userInfo: User) {
-		this.waitingList.add(userInfo);
-	}
-
 	/** 유저등록 */
 	async addUser(userInfo: { id: string; nickname: string }) {
 		const isExistUser = this.getUser({ discordId: userInfo.id });

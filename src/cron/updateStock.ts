@@ -42,13 +42,18 @@ try {
 			stockManager.updateCondition(globalManager.curTime);
 			globalManager.curTime++;
 			globalManager.updateGrantMoney();
-
-			const stockList = stockController.update(globalManager.curTime);
-			stockList.length && (await StockModel.updateStockList(stockList));
 			await StatusModel.updateStatus({
-				gamble: { curTime: globalManager.curTime },
+				gamble: {
+					curTime: globalManager.curTime,
+					curCondition: stockManager.curCondition,
+				},
 				user: { grantMoney: globalManager.grantMoney },
 			});
+
+			const stockList = stockController.updateStockRandom(globalManager.curTime);
+			stockList.length && (await StockModel.updateStockList(stockList));
+			await stockController.giveDividend(globalManager.curTime);
+
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
 		} catch (err) {
 			let errorMessage = err;

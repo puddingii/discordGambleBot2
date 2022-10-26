@@ -3,8 +3,12 @@ import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
-import StockModel from '../../model/Stock';
 import Status from '../../model/Status';
+import dependency from '../../config/dependencyInjection';
+
+const {
+	cradle: { StockModel, UserModel },
+} = dependency;
 
 const dataManager = DataManager.getInstance();
 const stockManager = dataManager.get('stock');
@@ -210,25 +214,29 @@ export const updateStock = async (isNew: boolean, param: StockParam | CoinParam)
 };
 
 /** 주식정보 갱신 및 배당금 지급 */
-export const update = (curTime: number): Array<Stock | Coin> => {
+export const updateStockRandom = (curTime: number): Array<Stock | Coin> => {
 	const stockManager = dataManager.get('stock');
-	const userManager = dataManager.get('user');
-	// 이쪽 아래로 StockManager.update() 호출후 업데이트된 주
 	const { stockList, coinList } = stockManager.update(curTime);
-	const userList = dataManager.get('user').getUserList();
-	let updUserList: User[] = [];
-
-	if (curTime % 48 === 0) {
-		updUserList = userList.filter(user => {
-			const result = user.giveDividend();
-			return !!result.code;
-		});
-		updUserList.forEach(user => {
-			userManager.pushWaitingUser(user);
-		});
-	}
 
 	return [...stockList, ...coinList];
+};
+
+/** 유저에게 배당금 주기 */
+export const giveDividend = async (curTime: number) => {
+	if (curTime % 48 !== 0) {
+		return;
+	}
+	const userManager = dataManager.get('user');
+	const userList = userManager.getUserList();
+	let updUserList: User[] = [];
+	updUserList = userList.filter(user => {
+		const result = user.giveDividend();
+		return !!result.code;
+	});
+	// eslint-disable-next-line no-restricted-syntax
+	for await (const user of updUserList) {
+		await UserModel.updateMoney(user.getId(), user.money);
+	}
 };
 
 export default {
@@ -239,7 +247,8 @@ export default {
 	getCurrentCondition,
 	getNextUpdateTime,
 	getGambleStatus,
+	giveDividend,
 	setGambleStatus,
 	updateStock,
-	update,
+	updateStockRandom,
 };

@@ -7,7 +7,7 @@ import {
 	Document,
 	ClientSession,
 } from 'mongoose';
-import StockModel, { IStock, IStockStatics } from './Stock';
+import StockModel, { IStock } from './Stock';
 import logger from '../config/logger';
 import UserController from '../game/User/User';
 import SwordController from '../game/Weapon/Sword';
@@ -42,15 +42,6 @@ interface IUser extends Document, DoucmentResult<IUser> {
 interface IUserStatics extends Model<IUser> {
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	findByDiscordId(discordId: string): Promise<HydratedDocument<IUser>>;
-	updateStock(
-		discordId: string,
-		updStockInfo: {
-			name: string;
-			cnt: number;
-			value: number;
-			money: number;
-		},
-	): Promise<{ code: number; message?: string }>;
 	updateMoney(discordId: string, money: number): Promise<boolean>;
 	updateWeaponAndMoney(
 		discordId: string,
@@ -68,10 +59,6 @@ interface IUserStatics extends Model<IUser> {
 	): Promise<boolean>;
 	updateAll(userList: UserController[]): Promise<void>;
 	manageTransaction(session?: ClientSession): Promise<void | ClientSession>;
-}
-
-interface PopulatedParent {
-	'stockList.stock': IStockStatics | null;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -167,50 +154,6 @@ User.statics.addNewUser = async function (discordId: string, nickname: string) {
 User.statics.findByDiscordId = async function (discordId: string) {
 	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
 	return userInfo;
-};
-
-/** 주식정보 업데이트 */
-User.statics.updateStock = async function (
-	discordId: string,
-	updStockInfo: {
-		name: string;
-		cnt: number;
-		value: number;
-		money: number;
-	},
-) {
-	const userInfo = await this.findOne({ discordId }).populate<
-		Pick<PopulatedParent, 'stockList.stock'>
-	>('stockList.stock');
-	if (!userInfo) {
-		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
-	}
-
-	const myStock = userInfo.stockList.find(myStock => {
-		return (
-			myStock.stock instanceof StockModel && myStock.stock.name === updStockInfo.name
-		);
-	});
-
-	if (myStock) {
-		myStock.value = updStockInfo.value;
-		myStock.cnt = updStockInfo.cnt;
-	} else {
-		// 아예 처음사는 경우
-		const stock = await StockModel.findByName(updStockInfo.name);
-		if (!stock) {
-			return { code: 0, message: '[DB]주식정보를 찾을 수 없습니다.' };
-		}
-		userInfo.stockList.push({
-			stock,
-			value: updStockInfo.value,
-			cnt: updStockInfo.cnt,
-		});
-	}
-	userInfo.money = updStockInfo.money;
-
-	await userInfo.save();
-	return { code: 1 };
 };
 
 /** 유저 머니 업데이트 */
