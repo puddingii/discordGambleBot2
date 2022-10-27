@@ -2,12 +2,11 @@ import schedule from 'node-schedule';
 import dayjs from 'dayjs';
 import DataManager from '../game/DataManager';
 import stockController from '../controller/bot/stockController';
+import statusController from '../controller/bot/statusController';
 import dependencyInjection from '../config/dependencyInjection';
 
 const {
 	cradle: {
-		StockModel,
-		StatusModel,
 		secretKey,
 		logger,
 		util: { convertSecond },
@@ -38,20 +37,11 @@ try {
 			const dataManager = DataManager.getInstance();
 			/** 12시간마다 컨디션 조정 */
 			const globalManager = dataManager.get('globalStatus');
-			const stockManager = dataManager.get('stock');
-			stockManager.updateCondition(globalManager.curTime);
-			globalManager.curTime++;
-			globalManager.updateGrantMoney();
-			await StatusModel.updateStatus({
-				gamble: {
-					curTime: globalManager.curTime,
-					curCondition: stockManager.curCondition,
-				},
-				user: { grantMoney: globalManager.grantMoney },
-			});
+			await stockController.updateCondition(globalManager.curTime);
+			await statusController.updateCurTime();
+			await statusController.updateGrantMoney();
 
-			const stockList = stockController.updateStockRandom(globalManager.curTime);
-			stockList.length && (await StockModel.updateStockList(stockList));
+			await stockController.updateStockRandom(globalManager.curTime);
 			await stockController.giveDividend(globalManager.curTime);
 
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);

@@ -214,11 +214,14 @@ export const updateStock = async (isNew: boolean, param: StockParam | CoinParam)
 };
 
 /** 주식정보 갱신 및 배당금 지급 */
-export const updateStockRandom = (curTime: number): Array<Stock | Coin> => {
+export const updateStockRandom = async (curTime: number) => {
 	const stockManager = dataManager.get('stock');
 	const { stockList, coinList } = stockManager.update(curTime);
 
-	return [...stockList, ...coinList];
+	const totalList = [...stockList, ...coinList];
+	if (totalList.length > 0) {
+		await StockModel.updateStockList(totalList);
+	}
 };
 
 /** 유저에게 배당금 주기 */
@@ -239,6 +242,11 @@ export const giveDividend = async (curTime: number) => {
 	}
 };
 
+export const updateCondition = async (curTime: number) => {
+	const stockManager = dataManager.get('stock');
+	await stockManager.updateCondition(curTime);
+};
+
 export default {
 	buySellStock,
 	getAllStock,
@@ -251,4 +259,5 @@ export default {
 	setGambleStatus,
 	updateStock,
 	updateStockRandom,
+	updateCondition,
 };

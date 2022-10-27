@@ -13,22 +13,23 @@ export const getGrantMoney = () => {
 	return globalManager.grantMoney;
 };
 
+export const updateGrantMoney = async (value?: number) => {
+	const globalManager = dataManager.get('globalStatus');
+	await globalManager.updateGrantMoney(value);
+};
+
 export const giveGrantMoney = async (user: User) => {
 	const userManager = dataManager.get('user');
 	const money = getGrantMoney();
 	user.updateMoney(money);
 	await userManager.update({ type: 'm', userInfo: { discordId: user.getId() } });
+	await updateGrantMoney(0);
 	return money;
 };
 
-export const updateGrantMoney = (value: number) => {
+export const updateCurTime = async (value?: number) => {
 	const globalManager = dataManager.get('globalStatus');
-	globalManager.grantMoney = value;
-};
-
-export const updateCurTime = (value: number) => {
-	const globalManager = dataManager.get('globalStatus');
-	globalManager.curTime = value;
+	await globalManager.updateCurTime(value);
 };
 
 export default {

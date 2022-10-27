@@ -6,6 +6,7 @@ import {
 	HydratedDocument,
 	Document,
 	ClientSession,
+	startSession,
 } from 'mongoose';
 import StockModel, { IStock } from './Stock';
 import logger from '../config/logger';
@@ -271,7 +272,7 @@ User.statics.updateAll = async function (userList: UserController[]) {
 
 User.statics.manageTransaction = async function (session?: ClientSession) {
 	if (!session) {
-		const mySession = await this.startSession();
+		const mySession = await startSession();
 		return mySession;
 	}
 	await session.endSession();

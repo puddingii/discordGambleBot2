@@ -1,5 +1,10 @@
+import dependency from '../../config/dependencyInjection';
 import Coin from './Coin';
 import Stock from './Stock';
+
+const {
+	cradle: { StatusModel },
+} = dependency;
 
 interface DataInfo {
 	coinList: Array<Coin>;
@@ -83,7 +88,7 @@ export default class StockManager {
 	}
 
 	/** Gamble의 condition 조정 */
-	updateCondition(curTime: number) {
+	async updateCondition(curTime: number) {
 		if (curTime % this.conditionPeriod !== 0) {
 			return;
 		}
@@ -99,5 +104,7 @@ export default class StockManager {
 			perTotal += ratio;
 			return false;
 		});
+
+		await StatusModel.updateStatus({ gamble: { curCondition: this.curCondition } });
 	}
 }

@@ -31,7 +31,6 @@ export default {
 			await interaction.reply({
 				content: `${setComma(money, true)}원을 받았습니다.`,
 			});
-			globalController.updateGrantMoney(0);
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });
