@@ -1,3 +1,4 @@
+import { ClientSession } from 'mongoose';
 import User from './User';
 import dependency from '../../config/dependencyInjection';
 import Sword from '../Weapon/Sword';
@@ -71,22 +72,11 @@ export default class UserManager {
 		await UserModel.addNewUser(userInfo.id, userInfo.nickname);
 	}
 
-	/** 트랜잭션 업데이트 */
-	async transactionUpdate(list: Array<UpdateParamInfo>) {
-		const mySession = await UserModel.manageTransaction();
-		if (!mySession) {
-			return;
-		}
-
-		// eslint-disable-next-line no-restricted-syntax
-		for await (const updateInfo of list) {
-			await this.update(updateInfo);
-		}
-		await UserModel.manageTransaction(mySession);
-	}
-
 	/** 업데이트 */
-	async update(updateInfo: UpdateParamInfo): Promise<boolean> {
+	async update(
+		updateInfo: UpdateParamInfo,
+		session: ClientSession | null = null,
+	): Promise<boolean> {
 		const { type, userInfo, optionalInfo } = updateInfo;
 		const myInfo = this.getUser(userInfo);
 
@@ -97,7 +87,7 @@ export default class UserManager {
 		let result = false;
 		switch (type) {
 			case 'm':
-				result = await UserModel.updateMoney(myInfo.getId(), myInfo.money);
+				result = await UserModel.updateMoney(myInfo.getId(), myInfo.money, session);
 				break;
 			case 'wm':
 				result = optionalInfo

@@ -43,7 +43,11 @@ interface IUser extends Document, DoucmentResult<IUser> {
 interface IUserStatics extends Model<IUser> {
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	findByDiscordId(discordId: string): Promise<HydratedDocument<IUser>>;
-	updateMoney(discordId: string, money: number): Promise<boolean>;
+	updateMoney(
+		discordId: string,
+		money: number,
+		session?: ClientSession | null,
+	): Promise<boolean>;
 	updateWeaponAndMoney(
 		discordId: string,
 		updWeaponInfo: SwordController,
@@ -59,7 +63,6 @@ interface IUserStatics extends Model<IUser> {
 		money?: number,
 	): Promise<boolean>;
 	updateAll(userList: UserController[]): Promise<void>;
-	manageTransaction(session?: ClientSession): Promise<void | ClientSession>;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -158,12 +161,16 @@ User.statics.findByDiscordId = async function (discordId: string) {
 };
 
 /** 유저 머니 업데이트 */
-User.statics.updateMoney = async function (discordId: string, money: number) {
+User.statics.updateMoney = async function (
+	discordId: string,
+	money: number,
+	session = null,
+) {
 	const isSucceed = await this.findOneAndUpdate(
 		{ discordId },
 		{ $set: { money } },
 		{ new: true },
-	);
+	).session(session);
 	return !!isSucceed;
 };
 
@@ -268,14 +275,6 @@ User.statics.updateAll = async function (userList: UserController[]) {
 			logger.error(`${result.reason}`);
 		}
 	});
-};
-
-User.statics.manageTransaction = async function (session?: ClientSession) {
-	if (!session) {
-		const mySession = await startSession();
-		return mySession;
-	}
-	await session.endSession();
 };
 
 export default model<IUser, IUserStatics>('User', User);

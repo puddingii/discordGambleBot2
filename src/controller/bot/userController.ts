@@ -54,10 +54,13 @@ export const giveMoney = async (
 
 	user.updateMoney(money * -1);
 	ptrUser.updateMoney(money);
-	await userManager.transactionUpdate([
-		{ type: 'm', userInfo: myInfo },
-		{ type: 'm', userInfo: ptrInfo },
-	]);
+	await dataManager.setTransaction();
+	const session = dataManager.getSession();
+	await session?.withTransaction(async () => {
+		await userManager.update({ type: 'm', userInfo: myInfo }, session);
+		await userManager.update({ type: 'm', userInfo: ptrInfo }, session);
+	});
+	dataManager.setTransaction(true);
 };
 
 /** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */
