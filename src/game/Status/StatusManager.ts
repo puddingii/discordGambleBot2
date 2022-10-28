@@ -1,8 +1,15 @@
+import { ClientSession } from 'mongoose';
 import dependency from '../../config/dependencyInjection';
 
 const {
 	cradle: { StatusModel },
 } = dependency;
+
+type UpdateTypeInfo = 't' | 'g';
+type UpdateParamInfo = {
+	type: UpdateTypeInfo;
+	updateParam: Partial<{ num: number }>;
+};
 
 export default class GlobalManager {
 	curTime: number;
@@ -11,6 +18,19 @@ export default class GlobalManager {
 	constructor({ grantMoney, curTime }: { grantMoney?: number; curTime?: number }) {
 		this.grantMoney = grantMoney ?? 0;
 		this.curTime = curTime ?? 0;
+	}
+
+	async update(updateInfo: UpdateParamInfo, session: ClientSession | null = null) {
+		const { type, updateParam } = updateInfo;
+		switch (type) {
+			case 't':
+				await this.updateCurTime(updateParam.num);
+				break;
+			case 'g':
+				await this.updateGrantMoney(updateParam.num, session);
+				break;
+			default:
+		}
 	}
 
 	/** 현재 시간 업데이트 */
@@ -24,7 +44,7 @@ export default class GlobalManager {
 	}
 
 	/** 보조금 업데이트 */
-	async updateGrantMoney(num?: number) {
+	async updateGrantMoney(num?: number, session: ClientSession | null = null) {
 		if (num === 0 || num) {
 			this.grantMoney = 0;
 		} else {
@@ -33,6 +53,6 @@ export default class GlobalManager {
 				this.grantMoney = 5_000_000;
 			}
 		}
-		await StatusModel.updateStatus({ user: { grantMoney: this.grantMoney } });
+		await StatusModel.updateStatus({ user: { grantMoney: this.grantMoney } }, session);
 	}
 }

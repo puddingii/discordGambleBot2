@@ -6,7 +6,6 @@ import {
 	HydratedDocument,
 	Document,
 	ClientSession,
-	startSession,
 } from 'mongoose';
 import StockModel, { IStock } from './Stock';
 import logger from '../config/logger';

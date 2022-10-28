@@ -24,6 +24,7 @@ describe('Status Model Test', function () {
 				const beforeStatus = await Status.getStatus(true);
 				await Status.updateStatus(
 					{ gamble: { curCondition: 3, conditionPeriod: 4 } },
+					null,
 					true,
 				);
 				const status = await Status.getStatus(true);

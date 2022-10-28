@@ -1,4 +1,12 @@
-import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
+import {
+	Schema,
+	Model,
+	model,
+	Types,
+	HydratedDocument,
+	Document,
+	ClientSession,
+} from 'mongoose';
 
 type UpdateStatusParam = {
 	gamble: Partial<{
@@ -35,7 +43,11 @@ interface IStatus extends Document, DoucmentResult<IStatus> {
 
 interface IStatusStatics extends Model<IStatus> {
 	getStatus(isTest?: boolean): Promise<HydratedDocument<IStatus, IStatusStatics>>;
-	updateStatus(statusInfo: Partial<UpdateStatusParam>, isTest?: boolean): Promise<void>;
+	updateStatus(
+		statusInfo: Partial<UpdateStatusParam>,
+		session?: ClientSession | null,
+		isTest?: boolean,
+	): Promise<void>;
 }
 
 const Status = new Schema<IStatus, IStatusStatics>({
@@ -80,6 +92,7 @@ Status.statics.getStatus = async function (isTest = false) {
 
 Status.statics.updateStatus = async function (
 	statusInfo: Partial<UpdateStatusParam>,
+	session: ClientSession | null = null,
 	isTest = false,
 ) {
 	if (Object.keys(statusInfo).length === 0) {
@@ -97,7 +110,9 @@ Status.statics.updateStatus = async function (
 		}
 	});
 
-	await this.findOneAndUpdate({ isTest }, { $set: updInfo }, { upsert: true });
+	await this.findOneAndUpdate({ isTest }, { $set: updInfo }, { upsert: true }).session(
+		session,
+	);
 };
 
 export default model<IStatus, IStatusStatics>('Status', Status);
