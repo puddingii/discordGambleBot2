@@ -15,7 +15,8 @@ export const getGrantMoney = () => {
 
 export const updateGrantMoney = async (value?: number) => {
 	const globalManager = dataManager.get('globalStatus');
-	await globalManager.update({ type: 'g', updateParam: { num: value } });
+	globalManager.updateGrantMoney(value);
+	await globalManager.update({ type: 'g' });
 };
 
 export const giveGrantMoney = async (user: User) => {
@@ -23,6 +24,7 @@ export const giveGrantMoney = async (user: User) => {
 	const userManager = dataManager.get('user');
 	const money = getGrantMoney();
 	user.updateMoney(money);
+	globalManager.updateGrantMoney(0);
 
 	await dataManager.setTransaction();
 	const session = dataManager.getSession();
@@ -31,14 +33,15 @@ export const giveGrantMoney = async (user: User) => {
 			{ type: 'm', userInfo: { discordId: user.getId() } },
 			session,
 		);
-		await globalManager.update({ type: 'g', updateParam: { num: 0 } });
+		await globalManager.update({ type: 'g' });
 	});
 	return money;
 };
 
 export const updateCurTime = async (value?: number) => {
 	const globalManager = dataManager.get('globalStatus');
-	await globalManager.updateCurTime(value);
+	globalManager.updateCurTime(value);
+	await globalManager.update({ type: 't' });
 };
 
 export default {
