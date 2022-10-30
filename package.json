@@ -5,7 +5,7 @@
 	"scripts": {
 		"start": "cross-env NODE_ENV=production node build/deploy-command.js && cross-env NODE_ENV=production node build/app.js",
 		"start:commandBuild": "cross-env NODE_ENV=production node build/deploy-command.js",
-		"build": "tsc",
+		"build": "tsc --build --clean && tsc",
 		"test": "cross-env NODE_ENV=production mocha",
 		"dev:app": "cross-env NODE_ENV=development ts-node src/deploy-command.ts && cross-env NODE_ENV=development ts-node src/app.ts",
 		"dev:deploy": "cross-env NODE_ENV=development ts-node src/deploy-command.ts",
