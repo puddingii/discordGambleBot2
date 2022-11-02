@@ -19,5 +19,6 @@ const startServer = async () => {
 
 	client.login(botToken);
 };
+// test
 
 startServer();
