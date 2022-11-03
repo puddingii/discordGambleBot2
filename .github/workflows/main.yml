@@ -10,14 +10,6 @@ env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/discordgamblebot
   VERSION: ${{ github.sha }}
   NAME: go_cicd
-  CLIENT_ID: 
-  GUILD_ID: 
-  MONGO_ID: 
-  MONGO_PW: 
-  ADMIN_ID: 
-  ADMIN_PW: 
-  STOCK_UPDATE_TIME: 
-  GAMBLE_UPDATE_TIME: 
 
 jobs:
   # 빌드 Job
