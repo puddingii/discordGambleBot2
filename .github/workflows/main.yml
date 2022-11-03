@@ -53,6 +53,16 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
+          secrets: |
+            "BOT_TOKEN=${{ secrets.BOT_TOKEN }}"
+            "CLIENT_ID=${{ secrets.CLIENT_ID }}"
+            "GUILD_ID=${{ secrets.GUILD_ID }}"
+            "MONGO_ID=${{ secrets.MONGO_ID }}"
+            "MONGO_PW=${{ secrets.MONGO_PW }}"
+            "ADMIN_ID=${{ secrets.ADMIN_ID }}"
+            "ADMIN_PW=${{ secrets.ADMIN_PW }}"
+            "STOCK_UPDATE_TIME=${{ secrets.STOCK_UPDATE_TIME }}"
+            "GAMBLE_UPDATE_TIME=${{ secrets.GAMBLE_UPDATE_TIME }}"
   # 배포 Job
   deploy:
     needs: build  # build 후에 실행되도록 정의
