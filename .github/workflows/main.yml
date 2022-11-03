@@ -53,16 +53,6 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
-          secrets: |
-            "BOT_TOKEN=${{ secrets.BOT_TOKEN }}"
-            "CLIENT_ID=${{ secrets.CLIENT_ID }}"
-            "GUILD_ID=${{ secrets.GUILD_ID }}"
-            "MONGO_ID=${{ secrets.MONGO_ID }}"
-            "MONGO_PW=${{ secrets.MONGO_PW }}"
-            "ADMIN_ID=${{ secrets.ADMIN_ID }}"
-            "ADMIN_PW=${{ secrets.ADMIN_PW }}"
-            "STOCK_UPDATE_TIME=${{ secrets.STOCK_UPDATE_TIME }}"
-            "GAMBLE_UPDATE_TIME=${{ secrets.GAMBLE_UPDATE_TIME }}"
   # 배포 Job
   deploy:
     needs: build  # build 후에 실행되도록 정의
@@ -79,4 +69,14 @@ jobs:
       - name: Docker run
         run: |
           docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d -p 80:3000 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d |
+          --env BOT_TOKEN=$BOT_TOKEN |
+          --env CLIENT_ID=$BOT_TOKEN |
+          --env GUILD_ID=$BOT_TOKEN |
+          --env MONGO_ID=$BOT_TOKEN |
+          --env MONGO_PW=$BOT_TOKEN |
+          --env ADMIN_ID=$BOT_TOKEN |
+          --env ADMIN_PW=$BOT_TOKEN |
+          --env STOCK_UPDATE_TIME=$BOT_TOKEN |
+          --env GAMBLE_UPDATE_TIME=$BOT_TOKEN |
+          -p 80:3000 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
