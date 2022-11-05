@@ -31,7 +31,7 @@ export default {
 		}
 		const notCheckCommandList = ['유저등록'];
 		if (!notCheckCommandList.includes(commandName)) {
-			const isExist = await isEnrolledUser(interaction);
+			const isExist = isEnrolledUser(interaction);
 			if (!isExist) {
 				await interaction.reply('유저정보가 없습니다. 유저등록부터 해주세요');
 				return;
