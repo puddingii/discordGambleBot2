@@ -25,6 +25,7 @@
 	},
 	// add your custom rules here
 	"rules": {
+		"no-restricted-syntax": "off",
 		"no-underscore-dangle": "off",
 		"no-undef": "off",
 		"prefer-destructuring": "off",

@@ -236,7 +236,6 @@ export const giveDividend = async (curTime: number) => {
 		const result = user.giveDividend();
 		return !!result.code;
 	});
-	// eslint-disable-next-line no-restricted-syntax
 	for await (const user of updUserList) {
 		await UserModel.updateMoney(user.getId(), user.money);
 	}

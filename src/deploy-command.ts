@@ -25,7 +25,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 		file => file.endsWith('.js') || file.endsWith('.ts'),
 	);
 
-	// eslint-disable-next-line no-restricted-syntax
 	for await (const file of commonCommandFiles) {
 		const { default: command } = await import(`./commands/${file}`);
 		if (command.data) {
@@ -35,14 +34,12 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 	/** Service Folder Init */
 	const detailFolders = commandFolder.filter(file => !file.includes('.'));
-	// eslint-disable-next-line no-restricted-syntax
 	for await (const folder of detailFolders) {
 		const detailFiles = fs.readdirSync(path.resolve(__dirname, `./commands/${folder}`));
 		const commandFiles = detailFiles.filter(
 			file => file.endsWith('.js') || file.endsWith('.ts'),
 		);
 
-		// eslint-disable-next-line no-restricted-syntax
 		for await (const file of commandFiles) {
 			const { default: command } = await import(`./commands/${folder}/${file}`);
 			if (command.data) {
