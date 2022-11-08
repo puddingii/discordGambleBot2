@@ -41,6 +41,7 @@ interface IUser extends Document, DoucmentResult<IUser> {
 
 interface IUserStatics extends Model<IUser> {
 	addNewUser(discordId: string, nickname: string): Promise<void>;
+	addNewStock(name: string): Promise<void>;
 	findByDiscordId(discordId: string): Promise<HydratedDocument<IUser>>;
 	updateMoney(
 		discordId: string,
@@ -61,6 +62,8 @@ interface IUserStatics extends Model<IUser> {
 		},
 		money?: number,
 	): Promise<boolean>;
+	/** 유저가 가지고있는 주식 삭제 */
+	deleteStockWithAllUser(name: string): Promise<void>;
 	updateAll(userList: UserController[]): Promise<void>;
 }
 
@@ -153,6 +156,20 @@ User.statics.addNewUser = async function (discordId: string, nickname: string) {
 	await this.create({ discordId, nickname, stockList, weaponList });
 };
 
+User.statics.addNewStock = async function (name: string) {
+	const stock = await StockModel.findOne({ name });
+	if (!stock) {
+		throw Error('해당하는 주식정보가 없습니다.');
+	}
+
+	await this.updateMany(
+		{ $nor: [{ 'stockList.stock': new Types.ObjectId(stock._id) }] },
+		{
+			$push: { stockList: { stock: new Types.ObjectId(stock._id) } },
+		},
+	);
+};
+
 /** 아이디로 유저정보 탐색 */
 User.statics.findByDiscordId = async function (discordId: string) {
 	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
@@ -203,6 +220,20 @@ User.statics.updateStockAndMoney = async function (
 	);
 
 	return !!userInfo;
+};
+
+User.statics.deleteStockWithAllUser = async function (name: string) {
+	const stock = await StockModel.findOne({ name });
+	if (!stock) {
+		throw Error('해당하는 주식정보가 없습니다.');
+	}
+
+	await this.updateMany(
+		{ 'stockList.stock': new Types.ObjectId(stock._id) },
+		{
+			$pull: { stockList: { stock: new Types.ObjectId(stock._id) } },
+		},
+	);
 };
 
 /** 무기 업데이트 */

@@ -1,7 +1,8 @@
 import { equal, fail, ok } from 'assert';
-import mongoose from 'mongoose';
+import mongoose, { startSession, Types } from 'mongoose';
 import Stock, { UpdatedStockInfo } from './Stock';
 import StockController, { StockConstructor } from '../game/Stock/Stock';
+import User from './User';
 // import CoinController from '../controller/Gamble/Coin';
 // FIXME 아직 Coin쪽은 미구현이라 나중에 구현되면 테스트코드도 바꿔줘야 함
 
@@ -16,7 +17,7 @@ const UNKNOWN_TEST_STOCK_INFO = 'TEST_STOCK2';
 
 const myStock = new StockController(TEST_STOCK_INFO);
 
-describe('User Model Test', function () {
+describe('Stock Model Test', function () {
 	before(async function () {
 		const mongoUri = `mongodb+srv://${process.env.MONGO_ID}:${process.env.MONGO_PW}@gamblebottest.krflbk1.mongodb.net/?retryWrites=true&w=majority`;
 		await mongoose.connect(mongoUri);
@@ -29,8 +30,21 @@ describe('User Model Test', function () {
 	describe('#addStock', function () {
 		it('Add Stock Correctly', async function () {
 			try {
-				const result = await Stock.addStock(myStock);
-				equal(result.code, 1);
+				const session = await startSession();
+				await session.withTransaction(async () => {
+					const stockResult = await Stock.addStock(myStock);
+					if (stockResult.code === 0) {
+						throw Error(stockResult?.message ?? 'error');
+					}
+					await User.addNewStock(myStock.name);
+				});
+				await session.endSession();
+
+				const stock = await Stock.findByName(myStock.name);
+				const userList = await User.find({
+					'stockList.stock': new Types.ObjectId(stock._id),
+				});
+				equal(userList.length > 0, true);
 			} catch (e) {
 				fail('DB Action Error...');
 			}
@@ -129,7 +143,7 @@ describe('User Model Test', function () {
 			dividend: 4,
 			ratio: {
 				max: TEST_STOCK_INFO.ratio.max,
-				min:TEST_STOCK_INFO.ratio.min,
+				min: TEST_STOCK_INFO.ratio.min,
 			},
 			name: TEST_STOCK_INFO.name,
 			type: TEST_STOCK_INFO.type,
@@ -202,10 +216,10 @@ describe('User Model Test', function () {
 		});
 	});
 
-	describe('#deleteOne', function () {
+	describe('#deleteStock', function () {
 		it('Delete Unknown Stock', async function () {
 			try {
-				await Stock.deleteOne({ name: UNKNOWN_TEST_STOCK_INFO });
+				await Stock.deleteStock(UNKNOWN_TEST_STOCK_INFO);
 				fail('s');
 			} catch (e) {
 				ok(true);
@@ -214,9 +228,17 @@ describe('User Model Test', function () {
 
 		it('Delete Stock Correctly', async function () {
 			try {
-				await Stock.deleteOne({ name: TEST_STOCK_INFO.name });
-				ok(true);
+				const session = await startSession();
+				let resultCnt = 0;
+				await session.withTransaction(async () => {
+					await User.deleteStockWithAllUser(TEST_STOCK_INFO.name);
+					const stockResult = await Stock.deleteStock(TEST_STOCK_INFO.name);
+					resultCnt = stockResult.cnt;
+				});
+				await session.endSession();
+				equal(resultCnt, 1);
 			} catch (e) {
+				console.log(e);
 				fail('DB Action Error...');
 			}
 		});

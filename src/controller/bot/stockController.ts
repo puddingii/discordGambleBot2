@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { startSession } from 'mongoose';
 import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
@@ -192,25 +193,34 @@ export const updateStock = async (isNew: boolean, param: StockParam | CoinParam)
 	if (isNew) {
 		const stock = param.type === 'stock' ? new Stock(param) : new Coin(param);
 		stockManager.addStock(stock);
-		await StockModel.addStock(stock);
-	} else {
-		const stock = stockManager.getStock(param.type, param.name);
-		if (!stock) {
-			throw Error(
-				`해당하는 이름의 ${param.type === 'stock' ? '주식' : '코인'}이 없습니다.`,
-			);
-		}
-
-		stock.comment = param.comment;
-		stock.value = param.value;
-		stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
-		stock.correctionCnt = param.correctionCnt;
-		if (stock instanceof Stock && param.type === 'stock') {
-			stock.conditionList = param.conditionList;
-			stock.dividend = param.dividend;
-		}
-		await StockModel.updateStock(param);
+		const session = await startSession();
+		await session.withTransaction(async () => {
+			const stockResult = await StockModel.addStock(stock);
+			if (stockResult.code === 0) {
+				throw Error(stockResult?.message ?? 'error');
+			}
+			await UserModel.addNewStock(stock.name);
+		});
+		await session.endSession();
+		return;
 	}
+
+	const stock = stockManager.getStock(param.type, param.name);
+	if (!stock) {
+		throw Error(
+			`해당하는 이름의 ${param.type === 'stock' ? '주식' : '코인'}이 없습니다.`,
+		);
+	}
+
+	stock.comment = param.comment;
+	stock.value = param.value;
+	stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
+	stock.correctionCnt = param.correctionCnt;
+	if (stock instanceof Stock && param.type === 'stock') {
+		stock.conditionList = param.conditionList;
+		stock.dividend = param.dividend;
+	}
+	await StockModel.updateStock(param);
 };
 
 /** 주식정보 갱신 및 배당금 지급 */
