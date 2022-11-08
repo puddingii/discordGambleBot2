@@ -60,7 +60,7 @@ export const giveMoney = async (
 		await userManager.update({ type: 'm', userInfo: myInfo }, session);
 		await userManager.update({ type: 'm', userInfo: ptrInfo }, session);
 	});
-	dataManager.setTransaction(true);
+	await dataManager.setTransaction(true);
 };
 
 /** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */

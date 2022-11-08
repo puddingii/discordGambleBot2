@@ -28,13 +28,14 @@ export const giveGrantMoney = async (user: User) => {
 
 	await dataManager.setTransaction();
 	const session = dataManager.getSession();
-	session?.withTransaction(async () => {
+	await session?.withTransaction(async () => {
 		await userManager.update(
 			{ type: 'm', userInfo: { discordId: user.getId() } },
 			session,
 		);
 		await globalManager.update({ type: 'g' });
 	});
+	await dataManager.setTransaction(true);
 	return money;
 };
 

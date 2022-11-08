@@ -50,7 +50,7 @@ export default class DataManager {
 
 	async setTransaction(isEnd = false) {
 		if (isEnd && this.transactionSession !== null) {
-			this.transactionSession.endSession();
+			await this.transactionSession.endSession();
 			this.transactionSession = null;
 			return;
 		}
