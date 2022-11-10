@@ -11,8 +11,17 @@ export default {
 	data: new SlashCommandBuilder()
 		.setName('무기강화')
 		.setDescription('무기를 강화함')
-		.addBooleanOption(option =>
-			option.setName('하락방지').setDescription('강화비용이 10배가 추가로 든다.'),
+		.addStringOption(option =>
+			option.setName('종류').setDescription('주식인지 코인인지').addChoices(
+				{
+					name: '무기',
+					value: 'sword',
+				},
+				// {
+				// 	name: '코인',
+				// 	value: 'coin',
+				// },
+			),
 		),
 	// .addBooleanOption(option =>
 	// 	option.setName('파괴방지').setDescription('강화비용이 20배가 추가로 든다'),
@@ -21,17 +30,17 @@ export default {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const isPreventFail = interaction.options.getBoolean('하락방지') ?? false;
+			const type = <'sword'>interaction.options.getString('하락방지') ?? 'sword';
 			// const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
 			const [successRatio] = Object.values(
-				weaponController.getNextRatio({ discordId, type: 'sword' }),
+				weaponController.getNextRatio({ discordId, type }),
 			).map(ratio => ratio * 100);
 			const { code, curPower, beforePower } = await weaponController.enhanceWeapon({
 				discordId,
-				type: 'sword',
+				type,
 				isPreventDestroy: false,
-				isPreventDown: isPreventFail,
+				isPreventDown: false,
 			});
 
 			let content = `${beforePower}강 ▶︎ ${curPower}강 (성공확률: ${_.round(
