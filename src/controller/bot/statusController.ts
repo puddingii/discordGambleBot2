@@ -39,7 +39,7 @@ export const giveGrantMoney = async (user: User) => {
 	return money;
 };
 
-export const updateCurTime = async (value?: number) => {
+export const updateCurTime = async (value: number) => {
 	const globalManager = dataManager.get('globalStatus');
 	globalManager.updateCurTime(value);
 	await globalManager.update({ type: 't' });

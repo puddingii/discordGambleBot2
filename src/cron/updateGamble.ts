@@ -37,12 +37,13 @@ try {
 			const dataManager = DataManager.getInstance();
 			/** 12시간마다 컨디션 조정 */
 			const globalManager = dataManager.get('globalStatus');
-			await stockController.updateCondition(globalManager.curTime);
-			await statusController.updateCurTime();
+			const { curTime } = globalManager;
+			await stockController.updateCondition(curTime);
+			await statusController.updateCurTime(curTime + 1);
 			await statusController.updateGrantMoney();
 
-			await stockController.updateStockRandom(globalManager.curTime);
-			await stockController.giveDividend(globalManager.curTime);
+			await stockController.updateStockRandom(curTime);
+			await stockController.giveDividend(curTime);
 
 			logger.info(`[CRON] ${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`);
 		} catch (err) {
