@@ -12,7 +12,7 @@ export default {
 		.setName('무기강화')
 		.setDescription('무기를 강화함')
 		.addBooleanOption(option =>
-			option.setName('하락방지').setDescription('강화비용0 10배가 추가로 든다.'),
+			option.setName('하락방지').setDescription('강화비용이 10배가 추가로 든다.'),
 		),
 	// .addBooleanOption(option =>
 	// 	option.setName('파괴방지').setDescription('강화비용이 20배가 추가로 든다'),

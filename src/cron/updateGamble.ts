@@ -38,7 +38,7 @@ try {
 			/** 12시간마다 컨디션 조정 */
 			const globalManager = dataManager.get('globalStatus');
 			await stockController.updateCondition(globalManager.curTime);
-			await statusController.updateCurTime();
+			await statusController.updateCurTime(1);
 			await statusController.updateGrantMoney();
 
 			await stockController.updateStockRandom(globalManager.curTime);

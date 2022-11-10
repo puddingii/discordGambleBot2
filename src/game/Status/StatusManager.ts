@@ -21,18 +21,14 @@ export default class GlobalManager {
 	}
 
 	/** 현재 시간 업데이트 */
-	updateCurTime(num?: number) {
-		if (num === 0 || num) {
-			this.curTime = num;
-		} else {
-			this.curTime += 1;
-		}
+	updateCurTime(num: number) {
+		this.curTime += num;
 	}
 
 	/** 보조금 업데이트 */
 	updateGrantMoney(num?: number) {
 		if (num === 0 || num) {
-			this.grantMoney = 0;
+			this.grantMoney = num;
 		} else {
 			this.grantMoney += 210 + this.grantMoney * 0.02;
 			if (this.grantMoney > 5_000_000) {

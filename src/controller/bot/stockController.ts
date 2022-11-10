@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
@@ -231,8 +230,7 @@ export const giveDividend = async (curTime: number) => {
 	}
 	const userManager = dataManager.get('user');
 	const userList = userManager.getUserList();
-	let updUserList: User[] = [];
-	updUserList = userList.filter(user => {
+	const updUserList = userList.filter(user => {
 		const result = user.giveDividend();
 		return !!result.code;
 	});

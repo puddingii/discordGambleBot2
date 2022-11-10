@@ -110,7 +110,7 @@ export const enhanceWeapon = async ({
 	}
 
 	const beforePower = myWeapon.curPower;
-	if (myWeapon.curPower >= 30) {
+	if (myWeapon.curPower >= weaponManager.getRatioList(type).length) {
 		throw Error('더이상 강화할 수 없습니다.');
 	}
 
