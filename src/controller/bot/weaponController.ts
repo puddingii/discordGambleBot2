@@ -110,6 +110,9 @@ export const enhanceWeapon = async ({
 	}
 
 	const beforePower = myWeapon.curPower;
+	const beforeFailCnt = myWeapon.failCnt;
+	const beforeDestoryCnt = myWeapon.destroyCnt;
+	const beforeSuccessCnt = myWeapon.successCnt;
 	if (myWeapon.curPower >= weaponManager.getRatioList(type).length) {
 		throw Error('더이상 강화할 수 없습니다.');
 	}
@@ -152,8 +155,24 @@ export const enhanceWeapon = async ({
 		myWeapon.successCnt++;
 		result = { code: 1, curPower: myWeapon.curPower, beforePower };
 	}
-	await userManager.update({ type: 'wm', userInfo, optionalInfo: myWeapon });
-	return result;
+
+	try {
+		await userManager.update({ type: 'wm', userInfo, optionalInfo: myWeapon });
+		return result;
+	} catch (e) {
+		let errorMessage = e;
+
+		myWeapon.curPower = beforePower;
+		myWeapon.successCnt = beforeSuccessCnt;
+		myWeapon.failCnt = beforeFailCnt;
+		myWeapon.destroyCnt = beforeDestoryCnt;
+		userInfo.updateMoney(cost);
+		if (typeof errorMessage !== 'string') {
+			errorMessage = '보조금 업데이트 실패';
+		}
+
+		throw Error(<string>errorMessage);
+	}
 };
 
 export default {
