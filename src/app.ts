@@ -1,9 +1,15 @@
 import { Client, GatewayIntentBits } from 'discord.js';
+import express from 'express';
 
 import loaders from './loaders/index';
-import key from './config/secretKey';
+import dependency from './config/dependencyInjection';
 
-const { botToken } = key;
+const {
+	cradle: {
+		logger,
+		secretKey: { expressPort, botToken },
+	},
+} = dependency;
 
 const startServer = async () => {
 	const client = new Client({
@@ -15,9 +21,16 @@ const startServer = async () => {
 		],
 	});
 
-	await loaders({ client });
+	const app = express();
+
+	await loaders({ client, app });
 
 	client.login(botToken);
+	app.listen(expressPort, () =>
+		logger.info(
+			`Connected the express server[My Server: http://localhost:${expressPort}]`,
+		),
+	);
 };
 // test
 

@@ -19,5 +19,6 @@ export default {
 	isDocker: process.env.IS_DOCKER ?? '',
 	/** 초 단위 */
 	gambleUpdateTime: parseInt(process.env.GAMBLE_UPDATE_TIME ?? '1800', 10),
-	userUpdateTime: parseInt(process.env.USER_UPDATE_TIME ?? '300', 10)
+	userUpdateTime: parseInt(process.env.USER_UPDATE_TIME ?? '300', 10),
+	expressPort: parseInt(process.env.EXPRESS_PORT ?? '', 10),
 };
