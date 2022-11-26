@@ -6,6 +6,7 @@ const envPath =
 dotenv.config({ path: path.resolve(__dirname, envPath) });
 
 export default {
+	/** bot key */
 	botToken: process.env.BOT_TOKEN ?? '',
 	nodeEnv: process.env.NODE_ENV ?? '',
 	mongoId: process.env.MONGO_ID ?? '',
@@ -15,10 +16,9 @@ export default {
 	adminId: process.env.ADMIN_ID ?? '',
 	adminPw: process.env.ADMIN_PW ?? '',
 	stockUpdateTime: parseInt(process.env.STOCK_UPDATE_TIME ?? '4', 10),
-	imgServer: process.env.IMG_SERVER ?? '',
-	isDocker: process.env.IS_DOCKER ?? '',
 	/** 초 단위 */
 	gambleUpdateTime: parseInt(process.env.GAMBLE_UPDATE_TIME ?? '1800', 10),
-	userUpdateTime: parseInt(process.env.USER_UPDATE_TIME ?? '300', 10),
+	/** express key */
 	expressPort: parseInt(process.env.EXPRESS_PORT ?? '', 10),
+	sessionKey: process.env.SESSION_KEY ?? '',
 };

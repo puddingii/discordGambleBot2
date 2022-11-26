@@ -9,3 +9,4 @@ yarn.lock
 imgs/*
 .vscode
 build
+*.code-workspace

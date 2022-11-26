@@ -4,7 +4,7 @@ import {
 	SelectMenuInteraction,
 } from 'discord.js';
 import userController from '../controller/bot/userController';
-import dependency from './dependencyInjection';
+import dependency from '../config/dependencyInjection';
 
 const {
 	cradle: { logger },
