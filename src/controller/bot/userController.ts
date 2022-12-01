@@ -160,6 +160,12 @@ export const updateMoney = async (discordId: string, value: number): Promise<Use
 	return userInfo;
 };
 
+export const generatePassword = async (discordId: string) => {
+	const userManager = dataManager.get('user');
+	const myPassword = await userManager.generatePassword(discordId);
+	return myPassword;
+};
+
 export default {
 	addUser,
 	adjustMoney,
@@ -168,5 +174,6 @@ export default {
 	giveMoney,
 	getRankingList,
 	getMyStockList,
+	generatePassword,
 	updateMoney,
 };

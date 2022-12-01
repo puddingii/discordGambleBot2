@@ -21,4 +21,5 @@ export default {
 	/** express key */
 	expressPort: parseInt(process.env.EXPRESS_PORT ?? '', 10),
 	sessionKey: process.env.SESSION_KEY ?? '',
+	passwordHashRound: parseInt(process.env.PASSWORD_HASH_ROUND ?? '', 10),
 };

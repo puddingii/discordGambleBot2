@@ -72,6 +72,12 @@ export default class UserManager {
 		await UserModel.addNewUser(userInfo.id, userInfo.nickname);
 	}
 
+	/** 유저 비밀번호 (재)생성 */
+	async generatePassword(discordId: string) {
+		const myPassword = await UserModel.generatePassword(discordId);
+		return myPassword;
+	}
+
 	/** 업데이트 */
 	async update(
 		updateInfo: UpdateParamInfo,
