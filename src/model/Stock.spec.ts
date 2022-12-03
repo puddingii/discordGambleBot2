@@ -41,10 +41,14 @@ describe('Stock Model Test', function () {
 				await session.endSession();
 
 				const stock = await Stock.findByName(myStock.name);
-				const userList = await User.find({
-					'stockList.stock': new Types.ObjectId(stock._id),
-				});
-				equal(userList.length > 0, true);
+				if (stock) {
+					const userList = await User.find({
+						'stockList.stock': new Types.ObjectId(stock._id),
+					});
+					equal(userList.length > 0, true);
+				} else {
+					throw Error('');
+				}
 			} catch (e) {
 				fail('DB Action Error...');
 			}
@@ -116,7 +120,11 @@ describe('Stock Model Test', function () {
 				myStock.value = 1234;
 				await Stock.updateStockList([myStock]);
 				const updatedStock = await Stock.findByName(myStock.name);
-				equal(updatedStock.value, 1234);
+				if (updatedStock) {
+					equal(updatedStock.value, 1234);
+				} else {
+					throw Error('');
+				}
 			} catch (e) {
 				fail('DB Action Error...');
 			}
@@ -128,7 +136,11 @@ describe('Stock Model Test', function () {
 				myStock.comment = 'WTF';
 				await Stock.updateStockList([myStock]);
 				const updatedStock = await Stock.findByName(myStock.name);
-				equal(updatedStock.comment, 'WTF');
+				if (updatedStock) {
+					equal(updatedStock.comment, 'WTF');
+				} else {
+					throw Error('');
+				}
 			} catch (e) {
 				fail('DB Action Error...');
 			}
@@ -164,7 +176,11 @@ describe('Stock Model Test', function () {
 				const updatedInfo = { ...defaultInfo };
 				await Stock.updateStock(updatedInfo);
 				const updatedStock = await Stock.findByName(myStock.name);
-				equal(updatedStock.comment, 'FTW');
+				if (updatedStock) {
+					equal(updatedStock.comment, 'FTW');
+				} else {
+					throw Error('');
+				}
 			} catch (e) {
 				fail('DB Action Error...');
 			}

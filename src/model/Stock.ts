@@ -1,4 +1,4 @@
-import { Schema, Model, model, Types, HydratedDocument, Document } from 'mongoose';
+import { Schema, Model, model, Types, Document } from 'mongoose';
 import dayjs from 'dayjs';
 
 import secretKey from '../config/secretKey';
@@ -47,14 +47,16 @@ export interface IStock extends Document, DoucmentResult<IStock> {
 	dividend: number;
 }
 
+export type IStockInfo = IStock & {
+	_id: Types.ObjectId;
+};
+
 export interface IStockStatics extends Model<IStock> {
 	/** Type에 맞는 주식정보 다 가져오기 */
-	findAllList(
-		type: 'stock' | 'coin' | 'all',
-	): Promise<HydratedDocument<IStock, IStockStatics>[]>;
+	findAllList(type: 'stock' | 'coin' | 'all'): Promise<IStockInfo[]>;
 
 	/** 주식이름으로 주식정보 찾아오기 */
-	findByName(name: string): Promise<HydratedDocument<IStock, IStockStatics>>;
+	findByName(name: string): Promise<IStockInfo | null>;
 
 	/** 주식추가 */
 	addStock(
