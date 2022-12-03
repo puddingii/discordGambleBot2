@@ -160,6 +160,7 @@ export const updateMoney = async (discordId: string, value: number): Promise<Use
 	return userInfo;
 };
 
+/** 패스워드 (재)생성 */
 export const generatePassword = async (discordId: string) => {
 	const userManager = dataManager.get('user');
 	const myPassword = await userManager.generatePassword(discordId);

@@ -1,10 +1,11 @@
-import { Express } from 'express';
+import { Express, urlencoded, json } from 'express';
 import morgan, { StreamOptions } from 'morgan';
-import passport from 'passport';
-import passportLocal from 'passport-local';
 import session from 'express-session';
+import cors from 'cors';
+import passport from 'passport';
 import dependency from '../config/dependencyInjection';
 import userRouter from '../routes/userRouter';
+import passportConfig from '../passport';
 
 const {
 	cradle: { logger, secretKey },
@@ -20,7 +21,8 @@ export default (app: Express) => {
 			stream,
 		}),
 	);
-
+	app.use(urlencoded({ extended: false }));
+	app.use(json());
 	app.use(
 		session({
 			secret: secretKey.sessionKey,
@@ -28,12 +30,12 @@ export default (app: Express) => {
 			saveUninitialized: true, // 세션이 필요하기전까지는 세션을 구동시키지 않는다.
 		}),
 	);
+	const allowList = [/localhost:3000/];
+	app.use(cors({ origin: allowList }));
 
-	app.use('./user', userRouter);
+	passportConfig();
+	app.use(passport.initialize());
+	app.use(passport.session());
 
-	const LocalStrategy = passportLocal.Strategy;
-
-	app.get('/hi', (req, res) => {
-		res.send('fff');
-	});
+	app.use('/user', userRouter);
 };
