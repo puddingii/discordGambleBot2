@@ -1,12 +1,4 @@
-import {
-	Schema,
-	Model,
-	model,
-	Types,
-	HydratedDocument,
-	Document,
-	ClientSession,
-} from 'mongoose';
+import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
 import pwGenerator from 'generate-password';
 import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
@@ -43,10 +35,18 @@ interface IUser extends Document, DoucmentResult<IUser> {
 	weaponList: Types.Array<WeaponInfo>;
 }
 
+export type IUserInfo = IUser & {
+	_id: Types.ObjectId;
+};
+
 interface IUserStatics extends Model<IUser> {
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	addNewStock(name: string): Promise<void>;
-	findByDiscordId(discordId: string): Promise<HydratedDocument<IUser>>;
+	checkPassword(
+		userInfo: Partial<{ discordId: string; nickname: string }>,
+		password: string,
+	): Promise<boolean>;
+	findByDiscordId(discordId: string): Promise<IUserInfo | null>;
 	generatePassword(discordId: string): Promise<string>;
 	updateMoney(
 		discordId: string,
@@ -192,6 +192,26 @@ User.statics.generatePassword = async function (discordId: string) {
 
 	await this.findOneAndUpdate({ discordId }, { $set: { password: encryptedPassword } });
 	return myPassword;
+};
+
+/** 비밀번호 체크 */
+User.statics.checkPassword = async function (
+	userInfo: Partial<{
+		discordId: string;
+		nickname: string;
+	}>,
+	password: string,
+) {
+	if (!userInfo.nickname && !userInfo.discordId) {
+		throw Error('사용자 정보를 하나 이상 입력해주세요');
+	}
+	const myInfo = await this.findOne(userInfo);
+	if (!myInfo || !myInfo.password) {
+		throw Error('회원정보가 없거나 패스워드를 발급받지 않았습니다.');
+	}
+	const isVaild = await bcrypt.compare(password, myInfo.password);
+
+	return isVaild;
 };
 
 /** 유저 머니 업데이트 */
