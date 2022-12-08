@@ -5,12 +5,22 @@ const envPath =
 	process.env.NODE_ENV === 'development' ? '../../.env.local' : '../../.env';
 dotenv.config({ path: path.resolve(__dirname, envPath) });
 
+const mongoUrl =
+	(process.env.NODE_ENV ?? '') === 'development'
+		? `mongodb+srv://${process.env.MONGO_ID ?? ''}:${
+				process.env.MONGO_PW ?? ''
+		  }@gamblebottest.krflbk1.mongodb.net/?retryWrites=true&w=majority`
+		: `mongodb+srv://${process.env.MONGO_ID ?? ''}:${
+				process.env.MONGO_PW ?? ''
+		  }@discordgamebot.azjqlii.mongodb.net/?retryWrites=true&w=majority`;
+
 export default {
 	/** bot key */
 	botToken: process.env.BOT_TOKEN ?? '',
 	nodeEnv: process.env.NODE_ENV ?? '',
 	mongoId: process.env.MONGO_ID ?? '',
 	mongoPw: process.env.MONGO_PW ?? '',
+	mongoUrl,
 	clientId: process.env.CLIENT_ID ?? '',
 	guildId: process.env.GUILD_ID ?? '',
 	adminId: process.env.ADMIN_ID ?? '',

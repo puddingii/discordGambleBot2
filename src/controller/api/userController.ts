@@ -7,15 +7,15 @@ const {
 } = dependency;
 
 export const postLogin = (req: Request, res: Response, next: NextFunction) => {
-	const { body, query } = req;
-	passport.authenticate('local', (authError, userInfo, { message }) => {
+	passport.authenticate('local', (authError, userInfo, obj) => {
+		const message = obj?.message ?? '';
 		if (authError) {
 			logger.error(authError);
 			return next(authError);
 		}
 		if (!userInfo) {
 			logger.warn(message);
-			return res.redirect('/admin/login');
+			return res.status(403).send('/admin/login');
 		}
 
 		return req.login(userInfo, loginError => {
@@ -23,7 +23,7 @@ export const postLogin = (req: Request, res: Response, next: NextFunction) => {
 				logger.error(loginError);
 				return next(loginError);
 			}
-			return res.redirect('/');
+			return res.status(200).json({ user: userInfo });
 		});
 	})(req, res, next);
 };
