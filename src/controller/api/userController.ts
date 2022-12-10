@@ -1,33 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
-import passport from 'passport';
-import dependency from '../../config/dependencyInjection';
+import { Request, Response } from 'express';
 
-const {
-	cradle: { logger },
-} = dependency;
-
-export const postLogin = (req: Request, res: Response, next: NextFunction) => {
-	passport.authenticate('local', (authError, userInfo, obj) => {
-		const message = obj?.message ?? '';
-		if (authError) {
-			logger.error(authError);
-			return next(authError);
-		}
-		if (!userInfo) {
-			logger.warn(message);
-			return res.status(403).send('/admin/login');
-		}
-
-		return req.login(userInfo, loginError => {
-			if (loginError) {
-				logger.error(loginError);
-				return next(loginError);
-			}
-			return res.status(200).json({ user: userInfo });
-		});
-	})(req, res, next);
+export const getUserInfo = (req: Request, res: Response) => {
+	const { user } = req;
+	return res.status(200).json(user);
 };
 
 export default {
-	postLogin,
+	getUserInfo,
 };

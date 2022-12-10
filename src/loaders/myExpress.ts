@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { default as connectMongo } from 'connect-mongodb-session';
 import dependency from '../config/dependencyInjection';
 import userRouter from '../routes/userRouter';
+import authRouter from '../routes/authRouter';
 import passportConfig from '../passport';
 
 const {
@@ -46,5 +47,6 @@ export default (app: Express) => {
 	app.use(passport.session());
 	passportConfig();
 
-	app.use('/user', userRouter);
+	app.use('/api/user', userRouter);
+	app.use('/api/auth', authRouter);
 };
