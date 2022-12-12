@@ -1,13 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 import dependency from '../../config/dependencyInjection';
+import { IUserInfo } from '../../model/User';
 
 const {
 	cradle: { logger },
 } = dependency;
 
 export const getLoginInfo = (req: Request, res: Response) => {
-	return res.status(200).json({ isLoggedIn: req.isAuthenticated() });
+	return res
+		.status(200)
+		.json({
+			isLoggedIn: req.isAuthenticated(),
+			nickname: (req.user as IUserInfo)?.nickname,
+		});
 };
 
 export const getUserInfo = (req: Request, res: Response) => {
