@@ -54,9 +54,10 @@ export const getFormattedRatioList = (
 			const destroy = _.round(list[j].destroyRatio * 100, 2);
 			const success = _.round(100 - destroy - fail, 2);
 			money *= list[j].moneyRatio;
-			value = `${value}\n${i * perCnt + j}~${
-				i * perCnt + j + 1
-			}: (${success}%/${fail}%/${destroy}%)-${setComma(money, true)}원`;
+			value = `${value}\n${j}~${j + 1}: (${success}%/${fail}%/${destroy}%)-${setComma(
+				money,
+				true,
+			)}원`;
 		}
 		resultList.push({ value, name: `${i * perCnt}~${(i + 1) * perCnt}강` });
 	}
