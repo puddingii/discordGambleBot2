@@ -3,15 +3,9 @@ import {
 	EmbedBuilder,
 	ChatInputCommandInteraction,
 } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
+import logger from '../../config/logger';
+import { setComma } from '../../config/util';
 import userController from '../../controller/bot/userController';
-
-const {
-	cradle: {
-		logger,
-		util: { setComma },
-	},
-} = dependency;
 
 export default {
 	data: new SlashCommandBuilder()

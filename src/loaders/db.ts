@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
-import dependencyInjection from '../config/dependencyInjection';
-
-const {
-	cradle: { secretKey, logger },
-} = dependencyInjection;
+import logger from '../config/logger';
+import secretKey from '../config/secretKey';
 
 export default async (): Promise<{ code: number; message?: string }> => {
 	try {

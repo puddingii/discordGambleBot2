@@ -1,10 +1,6 @@
 import { BaseInteraction } from 'discord.js';
-import dependency from '../config/dependencyInjection';
+import logger from '../config/logger';
 import { isEnrolledUser } from '../middlewares/bot';
-
-const {
-	cradle: { logger },
-} = dependency;
 
 export default {
 	name: 'interactionCreate',

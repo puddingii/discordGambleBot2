@@ -1,13 +1,7 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import dependency from '../../../config/dependencyInjection';
+import { setComma } from '../../../config/util';
 import userController from '../../../controller/bot/userController';
 import { getNewSelectMenu, getModal } from './common';
-
-const {
-	cradle: {
-		util: { setComma },
-	},
-} = dependency;
 
 export default {
 	select: {

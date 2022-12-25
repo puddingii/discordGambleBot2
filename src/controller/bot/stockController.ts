@@ -5,11 +5,8 @@ import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
 import Status from '../../model/Status';
-import dependency from '../../config/dependencyInjection';
-
-const {
-	cradle: { StockModel, UserModel },
-} = dependency;
+import StockModel from '../../model/Stock';
+import UserModel from '../../model/User';
 
 const dataManager = DataManager.getInstance();
 const stockManager = dataManager.get('stock');

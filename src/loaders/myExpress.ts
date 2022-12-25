@@ -6,14 +6,11 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 // eslint-disable-next-line import/no-named-default
 import { default as connectMongo } from 'connect-mongodb-session';
-import dependency from '../config/dependencyInjection';
 import userRouter from '../routes/userRouter';
 import authRouter from '../routes/authRouter';
 import passportConfig from '../passport';
-
-const {
-	cradle: { logger, secretKey },
-} = dependency;
+import logger from '../config/logger';
+import secretKey from '../config/secretKey';
 
 export default (app: Express) => {
 	const stream: StreamOptions = {

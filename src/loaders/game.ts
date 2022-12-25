@@ -1,5 +1,4 @@
 import { Types } from 'mongoose';
-import dependencyInjection from '../config/dependencyInjection';
 import DataManager from '../game/DataManager';
 import Stock from '../game/Stock/Stock';
 import Coin from '../game/Stock/Coin';
@@ -9,10 +8,9 @@ import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
 import WeaponManager from '../game/Weapon/WeaponManager';
 import GlobalManager from '../game/Status/StatusManager';
-
-const {
-	cradle: { UserModel, StockModel, StatusModel },
-} = dependencyInjection;
+import StatusModel from '../model/Status';
+import UserModel from '../model/User';
+import StockModel from '../model/Stock';
 
 const dataManager = DataManager.getInstance();
 

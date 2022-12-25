@@ -1,13 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
+import logger from '../../config/logger';
+import { setComma } from '../../config/util';
 import globalController from '../../controller/bot/statusController';
-
-const {
-	cradle: {
-		logger,
-		util: { setComma },
-	},
-} = dependency;
 
 export default {
 	data: new SlashCommandBuilder()

@@ -4,12 +4,8 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dayjs from 'dayjs';
-import dependency from '../../config/dependencyInjection';
 import weaponController from '../../controller/bot/weaponController';
-
-const {
-	cradle: { logger },
-} = dependency;
+import logger from '../../config/logger';
 
 export default {
 	data: new SlashCommandBuilder().setName('무기내역').setDescription('무기강화 내역'),

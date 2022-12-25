@@ -1,10 +1,6 @@
 import passport from 'passport';
 import passportLocal from 'passport-local';
-import dependency from '../config/dependencyInjection';
-
-const {
-	cradle: { UserModel },
-} = dependency;
+import UserModel from '../model/User';
 
 export default () => {
 	const LocalStrategy = passportLocal.Strategy;

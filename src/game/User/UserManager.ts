@@ -1,11 +1,7 @@
 import { ClientSession } from 'mongoose';
 import User from './User';
-import dependency from '../../config/dependencyInjection';
+import UserModel from '../../model/User';
 import Sword from '../Weapon/Sword';
-
-const {
-	cradle: { UserModel },
-} = dependency;
 
 /**
  * sm: 주식과돈

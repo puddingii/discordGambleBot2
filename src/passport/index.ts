@@ -1,11 +1,6 @@
 import passport from 'passport';
 import localStrategy from './localStrategy';
-import dependency from '../config/dependencyInjection';
-import { IUserInfo } from '../model/User';
-
-const {
-	cradle: { UserModel },
-} = dependency;
+import UserModel, { IUserInfo } from '../model/User';
 
 export default () => {
 	// 로그인 성공시 세션스토어에 저장

@@ -3,15 +3,9 @@ import dayjs from 'dayjs';
 import DataManager from '../game/DataManager';
 import stockController from '../controller/bot/stockController';
 import statusController from '../controller/bot/statusController';
-import dependencyInjection from '../config/dependencyInjection';
-
-const {
-	cradle: {
-		secretKey,
-		logger,
-		util: { convertSecond },
-	},
-} = dependencyInjection;
+import secretKey from '../config/secretKey';
+import logger from '../config/logger';
+import { convertSecond } from '../config/util';
 
 try {
 	const { type, value } = convertSecond(secretKey.gambleUpdateTime);
