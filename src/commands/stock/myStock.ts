@@ -5,12 +5,9 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import _ from 'lodash';
-import dependency from '../../config/dependencyInjection';
 import userController from '../../controller/bot/userController';
-
-const {
-	cradle: { logger, util },
-} = dependency;
+import logger from '../../config/logger';
+import util from '../../config/util';
 
 export default {
 	data: new SlashCommandBuilder().setName('내주식').setDescription('내 주식임'),

@@ -1,13 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
+import logger from '../../config/logger';
+import { setComma } from '../../config/util';
 import userController from '../../controller/bot/userController';
-
-const {
-	cradle: {
-		logger,
-		util: { setComma },
-	},
-} = dependency;
 
 export default {
 	data: new SlashCommandBuilder().setName('내돈').setDescription('가지고 있는 돈'),

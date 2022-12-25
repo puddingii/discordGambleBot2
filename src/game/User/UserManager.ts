@@ -1,11 +1,7 @@
 import { ClientSession } from 'mongoose';
 import User from './User';
-import dependency from '../../config/dependencyInjection';
+import UserModel from '../../model/User';
 import Sword from '../Weapon/Sword';
-
-const {
-	cradle: { UserModel },
-} = dependency;
 
 /**
  * sm: 주식과돈
@@ -70,6 +66,12 @@ export default class UserManager {
 		const user = new User(userInfo);
 		this.userList.push(user);
 		await UserModel.addNewUser(userInfo.id, userInfo.nickname);
+	}
+
+	/** 유저 비밀번호 (재)생성 */
+	async generatePassword(discordId: string) {
+		const myPassword = await UserModel.generatePassword(discordId);
+		return myPassword;
 	}
 
 	/** 업데이트 */

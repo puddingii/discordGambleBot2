@@ -3,12 +3,8 @@ import {
 	EmbedBuilder,
 	SlashCommandBuilder,
 } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
+import logger from '../../config/logger';
 import weaponController from '../../controller/bot/weaponController';
-
-const {
-	cradle: { logger },
-} = dependency;
 
 export default {
 	data: new SlashCommandBuilder().setName('무기확률').setDescription('무기확률표'),

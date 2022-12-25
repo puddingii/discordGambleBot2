@@ -4,11 +4,7 @@ import {
 	SelectMenuInteraction,
 } from 'discord.js';
 import userController from '../controller/bot/userController';
-import dependency from './dependencyInjection';
-
-const {
-	cradle: { logger },
-} = dependency;
+import logger from '../config/logger';
 
 export const isEnrolledUser = function (
 	interaction: CommandInteraction | ModalSubmitInteraction | SelectMenuInteraction,

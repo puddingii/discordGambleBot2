@@ -1,12 +1,4 @@
-import {
-	Schema,
-	Model,
-	model,
-	Types,
-	HydratedDocument,
-	Document,
-	ClientSession,
-} from 'mongoose';
+import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
 
 type UpdateStatusParam = {
 	gamble: Partial<{
@@ -41,8 +33,12 @@ interface IStatus extends Document, DoucmentResult<IStatus> {
 	};
 }
 
+export type IStatusInfo = IStatus & {
+	_id: Types.ObjectId;
+};
+
 interface IStatusStatics extends Model<IStatus> {
-	getStatus(isTest?: boolean): Promise<HydratedDocument<IStatus, IStatusStatics>>;
+	getStatus(isTest?: boolean): Promise<IStatusInfo>;
 	updateStatus(
 		statusInfo: Partial<UpdateStatusParam>,
 		session?: ClientSession | null,

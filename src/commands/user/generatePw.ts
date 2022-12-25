@@ -4,20 +4,19 @@ import userController from '../../controller/bot/userController';
 
 export default {
 	data: new SlashCommandBuilder()
-		.setName('유저등록')
-		.setDescription('봇 게임에 참여하기 위해 유저등록. 등록하기전에는 참여하지 못함')
-		.addStringOption(option =>
-			option.setName('유저닉네임').setDescription('닉네임').setRequired(true),
+		.setName('비밀번호발급')
+		.setDescription(
+			'웹으로 접속하기 위한 비밀번호 발급[기존 비밀번호가 있을시, 기존 비밀번호 제거후 재발급.]',
 		),
 	async execute(interaction: ChatInputCommandInteraction) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const nickname = interaction.options.getString('유저닉네임') ?? '';
 
-			await userController.addUser({ id: discordId, nickname });
+			const myPassword = await userController.generatePassword(discordId);
 			await interaction.reply({
-				content: '유저등록 완료! 이제부터 게임에 참여 가능합니다',
+				content: `비밀번호 (재)생성 완료 : ${myPassword}`,
+				ephemeral: true,
 			});
 		} catch (err) {
 			logger.error(err);

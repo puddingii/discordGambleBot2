@@ -3,11 +3,7 @@ import {
 	ChannelType,
 	ChatInputCommandInteraction,
 } from 'discord.js';
-import dependency from '../../config/dependencyInjection';
-
-const {
-	cradle: { logger },
-} = dependency;
+import logger from '../../config/logger';
 
 export default {
 	data: new SlashCommandBuilder()

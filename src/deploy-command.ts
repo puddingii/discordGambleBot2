@@ -4,11 +4,8 @@ import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import dependency from './config/dependencyInjection';
-
-const {
-	cradle: { logger, secretKey },
-} = dependency;
+import secretKey from './config/secretKey';
+import logger from './config/logger';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 

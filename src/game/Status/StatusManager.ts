@@ -1,9 +1,5 @@
 import { ClientSession } from 'mongoose';
-import dependency from '../../config/dependencyInjection';
-
-const {
-	cradle: { StatusModel },
-} = dependency;
+import StatusModel from '../../model/Status';
 
 type UpdateTypeInfo = 't' | 'g';
 type UpdateParamInfo = {

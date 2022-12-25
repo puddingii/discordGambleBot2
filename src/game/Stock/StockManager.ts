@@ -1,10 +1,6 @@
-import dependency from '../../config/dependencyInjection';
+import StatusModel from '../../model/Status';
 import Coin from './Coin';
 import Stock from './Stock';
-
-const {
-	cradle: { StatusModel },
-} = dependency;
 
 interface DataInfo {
 	coinList: Array<Coin>;
