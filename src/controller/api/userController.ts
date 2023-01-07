@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { IStock } from '../../model/Stock';
 import { IUserInfo } from '../../model/User';
 
-interface MyStockInfo {
+type MyStockInfo = {
 	stockList: Array<{
 		name: string;
 		cnt: number;
@@ -13,10 +13,11 @@ interface MyStockInfo {
 		stockType: string;
 		stockBeforeRatio: number;
 		profilMargin: number;
+		holdingRatio?: number;
 	}>;
 	totalMyValue: number;
 	totalStockValue: number;
-}
+};
 
 export const getUserInfo = (req: Request, res: Response) => {
 	const { user } = req;
@@ -47,6 +48,7 @@ export const getUserStockList = async (req: Request, res: Response) => {
 						stockBeforeRatio =
 							_.round((myStock.stock.value / beforeValue) * 100, 2) - 100;
 					}
+
 					acc.stockList.push({
 						name: myStock.stock.name,
 						cnt: myStock.cnt,
@@ -62,6 +64,11 @@ export const getUserStockList = async (req: Request, res: Response) => {
 			},
 			{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
 		);
+		myStockList.stockList = myStockList.stockList.map(stock => {
+			const holdingRatio =
+				_.round((stock.cnt * stock.myValue) / myStockList.totalMyValue) * 100;
+			return { ...stock, holdingRatio };
+		});
 		return res.status(200).json(myStockList);
 	} catch (e) {
 		return res.status(400);
