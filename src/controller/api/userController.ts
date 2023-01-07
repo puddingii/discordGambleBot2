@@ -65,8 +65,10 @@ export const getUserStockList = async (req: Request, res: Response) => {
 			{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
 		);
 		myStockList.stockList = myStockList.stockList.map(stock => {
-			const holdingRatio =
-				_.round((stock.cnt * stock.myValue) / myStockList.totalMyValue) * 100;
+			const holdingRatio = _.round(
+				((stock.cnt * stock.myValue) / myStockList.totalMyValue) * 100,
+				2,
+			);
 			return { ...stock, holdingRatio };
 		});
 		return res.status(200).json(myStockList);
@@ -77,4 +79,5 @@ export const getUserStockList = async (req: Request, res: Response) => {
 
 export default {
 	getUserInfo,
+	getUserStockList,
 };
