@@ -1,7 +1,9 @@
 import { Resolver, AwilixContainer } from 'awilix';
 import { Collection } from 'discord.js';
+import { Express } from 'express-serve-static-core';
+import { IUserInfo } from '../model/User';
 
-interface DependencyInjection extends DIFB.FilesDI {}
+// interface DependencyInjection extends DIFB.FilesDI {}
 
 declare module 'discord.js' {
 	export interface Client {
@@ -14,8 +16,13 @@ declare module 'discord.js' {
 	}
 }
 
-declare module 'awilix' {
-	export interface AwilixContainer {
-		cradle: DependencyInjection;
+// declare module 'awilix' {
+// 	export interface AwilixContainer {
+// 		cradle: DependencyInjection;
+// 	}
+// }
+declare module 'express-serve-static-core' {
+	interface Request {
+		user?: IUserInfo;
 	}
 }
