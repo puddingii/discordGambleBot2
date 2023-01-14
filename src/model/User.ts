@@ -103,7 +103,7 @@ const User = new Schema<IUser, IUserStatics>({
 			},
 			value: {
 				type: Number,
-				required: true,
+				default: 0,
 			},
 		},
 	],
