@@ -4,6 +4,8 @@ import session from 'express-session';
 import cors from 'cors';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+
 // eslint-disable-next-line import/no-named-default
 import { default as connectMongo } from 'connect-mongodb-session';
 import userRouter from '../routes/userRouter';
@@ -12,6 +14,7 @@ import stockRouter from '../routes/stockRouter';
 import passportConfig from '../passport';
 import logger from '../config/logger';
 import secretKey from '../config/secretKey';
+import swaggerFile from '../swagger/swagger-output.json';
 
 export default (app: Express) => {
 	const stream: StreamOptions = {
@@ -48,4 +51,5 @@ export default (app: Express) => {
 	app.use('/api/user', userRouter);
 	app.use('/api/auth', authRouter);
 	app.use('/api/stock', stockRouter);
+	app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 };
