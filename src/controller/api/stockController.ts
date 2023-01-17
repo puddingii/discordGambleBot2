@@ -2,12 +2,14 @@ import { Request, Response } from 'express';
 import stockModel from '../../model/Stock';
 
 export const getStockInfo = async (req: Request, res: Response) => {
-	/* #swagger.parameters['name'] = {
-        in: 'query',
-        description: '주식이름',
-        required: true,
-        type: 'string'
-} */
+	/*
+	#swagger.parameters['name'] = {
+		in: 'query',
+		description: '주식이름',
+		required: true,
+		type: 'string'
+	}
+	*/
 	const {
 		query: { name },
 	} = req;

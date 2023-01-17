@@ -10,11 +10,6 @@ export const getLoginInfo = (req: Request, res: Response) => {
 	});
 };
 
-export const getUserInfo = (req: Request, res: Response) => {
-	const { user } = req;
-	return res.status(200).json(user);
-};
-
 export const postLogin = (req: Request, res: Response, next: NextFunction) => {
 	passport.authenticate('local', (authError, userInfo, obj) => {
 		const message = obj?.message ?? '';

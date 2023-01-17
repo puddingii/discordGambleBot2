@@ -37,8 +37,8 @@ export const getUserInfo = (req: Request, res: Response) => {
 
 export const patchUserStock = async (req: Request, res: Response) => {
 	try {
-		const { user, body } = req;
-		const { cnt, stockName, type } = body as Partial<PatchStockBodyInfo>;
+		const { user } = req;
+		const { cnt, stockName, type } = req.body as Partial<PatchStockBodyInfo>;
 		if (!user) {
 			return res
 				.status(401)
@@ -92,36 +92,40 @@ export const getUserStockList = async (req: Request, res: Response) => {
 		if (!user) {
 			return res.status(401).json({ message: '유저DB Error. 운영자에게 문의주세요' });
 		}
-		const myStockList = (
-			user.stockList as { stock: IStock; cnt: number; value: number }[]
-		).reduce(
+		const myStockList = user.stockList.reduce(
 			(acc: MyStockInfo, myStock) => {
-				if (myStock.cnt > 0) {
-					const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
-					acc.totalAvgValue += myStock.cnt * myStock.value;
-					acc.totalCurrentValue += myStock.cnt * myStock.stock.value;
-					const beforeValue = myStock.stock.updHistory.at(-2)?.value ?? 0;
-					let stockBeforeRatio = 0;
-					if (beforeValue) {
-						stockBeforeRatio =
-							_.round((myStock.stock.value / beforeValue) * 100, 2) - 100;
-					}
+				let myRatio = 0;
+				const stockInfo = myStock.stock as IStock;
+				const { cnt, value: avgValue } = myStock;
 
-					acc.stockList.push({
-						name: myStock.stock.name,
-						cnt: myStock.cnt,
-						myValue: myStock.value,
-						myRatio,
-						stockValue: myStock.stock.value,
-						stockType: myStock.stock.type,
-						stockBeforeRatio,
-						profilMargin: myStock.cnt * (myStock.stock.value - myStock.value),
-					});
+				const beforeValue = stockInfo.updHistory.at(-2)?.value ?? 0;
+				const stockBeforeRatio = beforeValue
+					? _.round((stockInfo.value / beforeValue) * 100, 2) - 100
+					: 0;
+				if (cnt > 0) {
+					myRatio = _.round((stockInfo.value / avgValue) * 100 - 100, 2);
+					// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
+					acc.totalAvgValue += cnt * avgValue;
+					acc.totalCurrentValue += cnt * stockInfo.value;
 				}
+
+				// 내 주식 정보
+				acc.stockList.push({
+					name: stockInfo.name,
+					cnt: cnt,
+					myValue: avgValue,
+					myRatio,
+					stockValue: stockInfo.value,
+					stockType: stockInfo.type,
+					stockBeforeRatio,
+					profilMargin: cnt * (stockInfo.value - avgValue),
+				});
 				return acc;
 			},
 			{ stockList: [], totalAvgValue: 0, totalCurrentValue: 0 },
 		);
+
+		// 각각의 주식의 가치비중 계산
 		myStockList.stockList = myStockList.stockList.map(stock => {
 			const holdingRatio = _.round(
 				((stock.cnt * stock.myValue) / myStockList.totalAvgValue) * 100,
@@ -130,8 +134,12 @@ export const getUserStockList = async (req: Request, res: Response) => {
 			return { ...stock, holdingRatio };
 		});
 		return res.status(200).json(myStockList);
-	} catch (e) {
-		return res.status(400);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
 	}
 };
 
