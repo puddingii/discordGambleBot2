@@ -20,5 +20,5 @@ export default async ({
 	await gameLoader();
 	await botLoader(client);
 	cronLoader.loadCron();
-	expressLoader(app);
+	await expressLoader(app);
 };

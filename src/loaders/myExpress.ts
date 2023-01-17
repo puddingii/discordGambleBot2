@@ -5,6 +5,8 @@ import cors from 'cors';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
+import fs from 'fs/promises';
+import path from 'path';
 
 // eslint-disable-next-line import/no-named-default
 import { default as connectMongo } from 'connect-mongodb-session';
@@ -14,9 +16,8 @@ import stockRouter from '../routes/stockRouter';
 import passportConfig from '../passport';
 import logger from '../config/logger';
 import secretKey from '../config/secretKey';
-import swaggerFile from '../swagger/swagger-output.json';
 
-export default (app: Express) => {
+export default async (app: Express) => {
 	const stream: StreamOptions = {
 		// Use the http severity
 		write: message => logger.info(message),
@@ -51,5 +52,10 @@ export default (app: Express) => {
 	app.use('/api/user', userRouter);
 	app.use('/api/auth', authRouter);
 	app.use('/api/stock', stockRouter);
-	app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+	const swaggerFile = await fs.readFile(
+		path.resolve(__dirname, '../swagger/swagger-output.json'),
+		{ encoding: 'utf8' },
+	);
+	app.use('/doc', swaggerUi.serve, swaggerUi.setup(JSON.parse(swaggerFile)));
 };
