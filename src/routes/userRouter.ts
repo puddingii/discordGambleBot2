@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-	getUserInfo,
+	getUserProfileInfo,
 	getUserStockList,
 	patchUserStock,
 } from '../controller/api/userController';
@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.get('/stocklist', isLoggedIn, getUserStockList);
 router.patch('/stock', isLoggedIn, patchUserStock);
-router.get('/', isLoggedIn, getUserInfo);
+router.get('/', isLoggedIn, getUserProfileInfo);
 
 export default router;

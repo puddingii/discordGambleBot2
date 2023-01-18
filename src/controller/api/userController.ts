@@ -17,6 +17,7 @@ type MyStockInfo = {
 	}>;
 	totalAvgValue: number;
 	totalCurrentValue: number;
+	totalMyMoney: number;
 };
 
 type PatchStockBodyInfo = {
@@ -27,12 +28,46 @@ type PatchStockBodyInfo = {
 
 const dataManager = DataManager.getInstance();
 
-export const getUserInfo = (req: Request, res: Response) => {
-	const { user } = req;
-	if (!user) {
-		return res.status(401);
+export const getUserProfileInfo = async (req: Request, res: Response) => {
+	try {
+		const { user } = req;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+
+		const populatedUser = await user.populate('stockList.stock');
+		if (!user) {
+			return res.status(401).json({ message: '유저DB Error. 운영자에게 문의주세요' });
+		}
+
+		const totalStockValue = populatedUser.stockList.reduce((acc, myStock) => {
+			const stockInfo = myStock.stock as IStock;
+			const { cnt } = myStock;
+
+			if (cnt > 0) {
+				// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
+				acc += cnt * stockInfo.value;
+			}
+
+			return acc;
+		}, 0);
+		const statusManager = dataManager.get('globalStatus');
+
+		return res.status(200).json({
+			nickname: user.nickname,
+			totalStockValue,
+			myMoney: user.money,
+			grantMoney: statusManager.grantMoney,
+		});
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
 	}
-	return res.status(200).json(user);
 };
 
 export const patchUserStock = async (req: Request, res: Response) => {
@@ -102,7 +137,9 @@ export const getUserStockList = async (req: Request, res: Response) => {
 				const stockBeforeRatio = beforeValue
 					? _.round((stockInfo.value / beforeValue) * 100, 2) - 100
 					: 0;
+				let myValue = 0;
 				if (cnt > 0) {
+					myValue = avgValue;
 					myRatio = _.round((stockInfo.value / avgValue) * 100 - 100, 2);
 					// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
 					acc.totalAvgValue += cnt * avgValue;
@@ -113,7 +150,7 @@ export const getUserStockList = async (req: Request, res: Response) => {
 				acc.stockList.push({
 					name: stockInfo.name,
 					cnt: cnt,
-					myValue: avgValue,
+					myValue,
 					myRatio,
 					stockValue: stockInfo.value,
 					stockType: stockInfo.type,
@@ -122,7 +159,7 @@ export const getUserStockList = async (req: Request, res: Response) => {
 				});
 				return acc;
 			},
-			{ stockList: [], totalAvgValue: 0, totalCurrentValue: 0 },
+			{ stockList: [], totalAvgValue: 0, totalCurrentValue: 0, totalMyMoney: user.money },
 		);
 
 		// 각각의 주식의 가치비중 계산
@@ -144,6 +181,6 @@ export const getUserStockList = async (req: Request, res: Response) => {
 };
 
 export default {
-	getUserInfo,
+	getUserProfileInfo,
 	getUserStockList,
 };
