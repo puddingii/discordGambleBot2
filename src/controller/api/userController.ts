@@ -115,31 +115,27 @@ export const patchUserStock = async (req: Request, res: Response) => {
 	}
 };
 
-export const getUserStockList = async (req: Request, res: Response) => {
+export const getUserStockList = (req: Request, res: Response) => {
 	try {
-		let user = req.user;
+		const user = req.user;
 		if (!user) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		user = await user.populate('stockList.stock');
-		if (!user) {
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ discordId: user.discordId });
+		if (!userInfo) {
 			return res.status(401).json({ message: '유저DB Error. 운영자에게 문의주세요' });
 		}
-		const myStockList = user.stockList.reduce(
+
+		const myStockList = userInfo.stockList.reduce(
 			(acc: MyStockInfo, myStock) => {
 				let myRatio = 0;
-				const stockInfo = myStock.stock as IStock;
+				const stockInfo = myStock.stock;
 				const { cnt, value: avgValue } = myStock;
 
-				const beforeValue = stockInfo.updHistory.at(-2)?.value ?? 0;
-				const stockBeforeRatio = beforeValue
-					? _.round((stockInfo.value / beforeValue) * 100, 2) - 100
-					: 0;
-				let myValue = 0;
 				if (cnt > 0) {
-					myValue = avgValue;
 					myRatio = _.round((stockInfo.value / avgValue) * 100 - 100, 2);
 					// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
 					acc.totalAvgValue += cnt * avgValue;
@@ -150,11 +146,11 @@ export const getUserStockList = async (req: Request, res: Response) => {
 				acc.stockList.push({
 					name: stockInfo.name,
 					cnt: cnt,
-					myValue,
+					myValue: avgValue ?? 0,
 					myRatio,
 					stockValue: stockInfo.value,
 					stockType: stockInfo.type,
-					stockBeforeRatio,
+					stockBeforeRatio: _.round(stockInfo.beforeHistoryRatio * 100, 2),
 					profilMargin: cnt * (stockInfo.value - avgValue),
 				});
 				return acc;
