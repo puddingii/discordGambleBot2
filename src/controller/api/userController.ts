@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
 import DataManager from '../../game/DataManager';
-import { IStock } from '../../model/Stock';
 
 type MyStockInfo = {
 	stockList: Array<{
@@ -28,7 +27,7 @@ type PatchStockBodyInfo = {
 
 const dataManager = DataManager.getInstance();
 
-export const getUserProfileInfo = async (req: Request, res: Response) => {
+export const getUserProfileInfo = (req: Request, res: Response) => {
 	try {
 		const { user } = req;
 		if (!user) {
@@ -37,13 +36,14 @@ export const getUserProfileInfo = async (req: Request, res: Response) => {
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
-		const populatedUser = await user.populate('stockList.stock');
-		if (!user) {
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ discordId: user.discordId });
+		if (!userInfo) {
 			return res.status(401).json({ message: '유저DB Error. 운영자에게 문의주세요' });
 		}
 
-		const totalStockValue = populatedUser.stockList.reduce((acc, myStock) => {
-			const stockInfo = myStock.stock as IStock;
+		const totalStockValue = userInfo.stockList.reduce((acc, myStock) => {
+			const stockInfo = myStock.stock;
 			const { cnt } = myStock;
 
 			if (cnt > 0) {
@@ -84,7 +84,7 @@ export const patchUserStock = async (req: Request, res: Response) => {
 		}
 		const userManager = dataManager.get('user');
 		const stockManager = dataManager.get('stock');
-		const userInfo = dataManager.get('user').getUser({ discordId: user.discordId });
+		const userInfo = userManager.getUser({ discordId: user.discordId });
 		if (!userInfo) {
 			throw Error('유저정보가 없습니다');
 		}
@@ -176,7 +176,60 @@ export const getUserStockList = (req: Request, res: Response) => {
 	}
 };
 
+export const getUserList = (req: Request, res: Response) => {
+	try {
+		const userManager = dataManager.get('user');
+		const userList = userManager.getUserList();
+		return res.status(200).json(userList);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
+export const patchGrantMoney = async (req: Request, res: Response) => {
+	try {
+		const { user } = req;
+		const globalManager = dataManager.get('globalStatus');
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ discordId: user?.discordId });
+		if (!userInfo || !user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+
+		const money = globalManager.grantMoney;
+		userInfo.updateMoney(money);
+		globalManager.updateGrantMoney(0);
+
+		await dataManager.setTransaction();
+		const session = dataManager.getSession();
+		await session?.withTransaction(async () => {
+			await userManager.update(
+				{ type: 'm', userInfo: { discordId: user.discordId } },
+				session,
+			);
+			await globalManager.update({ type: 'g' });
+		});
+		await dataManager.setTransaction(true);
+		return res.status(200).json({ value: money });
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
 export default {
 	getUserProfileInfo,
 	getUserStockList,
+	getUserList,
+	patchUserStock,
+	patchGrantMoney,
 };

@@ -13,14 +13,9 @@ export default {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			// User가 가지고 있는 주식과 현금을 합친 돈이 젤 적은사람
-			const nowMinUser = userController.getMinUser();
+			const user = userController.getUser({ discordId });
 
-			if (nowMinUser.getId() !== discordId) {
-				throw Error('꼴찌도 아닌 놈이 받을려해! 갈!!!!!!!!');
-			}
-
-			const money = await globalController.giveGrantMoney(nowMinUser);
+			const money = await globalController.giveGrantMoney(user);
 
 			await interaction.reply({
 				content: `${setComma(money, true)}원을 받았습니다.`,
