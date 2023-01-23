@@ -25,6 +25,12 @@ type PatchStockBodyInfo = {
 	stockName: string;
 };
 
+type PatchGiveMoneyBodyInfo = {
+	myNickname: string;
+	ptrNickname: string;
+	money: number;
+};
+
 const dataManager = DataManager.getInstance();
 
 export const getUserProfileInfo = (req: Request, res: Response) => {
@@ -94,7 +100,7 @@ export const patchUserStock = async (req: Request, res: Response) => {
 			throw Error('주식/코인정보가 없습니다');
 		}
 
-		const reCnt = type === 's' ? -1 * Number(cnt) : Number(cnt);
+		const reCnt = type === 's' ? -1 * cnt : cnt;
 		const stockResult = userInfo.updateStock(stockInfo, reCnt, false);
 		await userManager.update({
 			type: 'sm',
@@ -176,11 +182,11 @@ export const getUserStockList = (req: Request, res: Response) => {
 	}
 };
 
-export const getUserList = (req: Request, res: Response) => {
+export const getNicknameList = (req: Request, res: Response) => {
 	try {
 		const userManager = dataManager.get('user');
 		const userList = userManager.getUserList();
-		return res.status(200).json(userList);
+		return res.status(200).json(userList.map(user => user.nickname));
 	} catch (err) {
 		let message = err;
 		if (err instanceof Error) {
@@ -226,10 +232,58 @@ export const patchGrantMoney = async (req: Request, res: Response) => {
 	}
 };
 
+export const patchGiveMoney = async (req: Request, res: Response) => {
+	try {
+		const { user } = req;
+		const { myNickname, ptrNickname, money } =
+			req.body as Partial<PatchGiveMoneyBodyInfo>;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+
+		if (!myNickname || !ptrNickname || !money) {
+			throw Error('처리에 필요한 데이터가 부족합니다.');
+		}
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ nickname: myNickname });
+		const ptrUserInfo = userManager.getUser({ nickname: ptrNickname });
+		if (!userInfo || !ptrUserInfo) {
+			throw Error('유저정보가 없습니다.');
+		}
+
+		userInfo.updateMoney(money * -1);
+		ptrUserInfo.updateMoney(money);
+		await dataManager.setTransaction();
+		const session = dataManager.getSession();
+		await session?.withTransaction(async () => {
+			await userManager.update(
+				{ type: 'm', userInfo: { nickname: myNickname } },
+				session,
+			);
+			await userManager.update(
+				{ type: 'm', userInfo: { nickname: ptrNickname } },
+				session,
+			);
+		});
+		await dataManager.setTransaction(true);
+
+		return res.status(200).json(null);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
 export default {
 	getUserProfileInfo,
 	getUserStockList,
-	getUserList,
+	getNicknameList,
 	patchUserStock,
 	patchGrantMoney,
+	patchGiveMoney,
 };
