@@ -19,12 +19,13 @@ export interface IWeapon extends Document, DoucmentResult<IWeapon> {
 	ratioList: Types.Array<{ failRatio: number; destroyRatio: number }>;
 }
 
-export type IStockInfo = IWeapon & {
+export type IWeaponInfo = IWeapon & {
 	_id: Types.ObjectId;
 };
 
 export interface IWeaponStatics extends Model<IWeapon> {
-	s(s: number): string;
+	/** 모든 무기정보 가져오기 */
+	findAllList(): Promise<Array<IWeaponInfo>>;
 }
 
 const Weapon = new Schema<IWeapon, IWeaponStatics>({
@@ -63,8 +64,9 @@ const Weapon = new Schema<IWeapon, IWeaponStatics>({
 	],
 });
 
-Weapon.statics.s = function (name: string, limitedCnt: number) {
-	console.log('?');
+Weapon.statics.findAllList = async function () {
+	const stockList = await this.find({});
+	return stockList ?? [];
 };
 
 export default model<IWeapon, IWeaponStatics>('Weapon', Weapon);

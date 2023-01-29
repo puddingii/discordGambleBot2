@@ -6,9 +6,10 @@ import logger from '../config/logger';
 import secretKey from '../config/secretKey';
 import UserController from '../game/User/User';
 import SwordController from '../game/Weapon/Sword';
+import WeaponModel, { IWeapon } from './Weapon';
 
-interface WeaponInfo {
-	type: 'sword' | 'pickaxe';
+type WeaponInfo = {
+	weapon: Types.ObjectId | IWeapon;
 	destroyCnt: number;
 	failCnt: number;
 	successCnt: number;
@@ -16,7 +17,13 @@ interface WeaponInfo {
 	bonusPower: number;
 	hitRatio: number;
 	missRatio: number;
-}
+};
+
+type StockInfo = {
+	stock: Types.ObjectId | IStock;
+	cnt: number;
+	value: number;
+};
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -27,11 +34,7 @@ interface IUser extends Document, DoucmentResult<IUser> {
 	password: string;
 	nickname: string;
 	money: number;
-	stockList: Types.Array<{
-		stock: Types.ObjectId | IStock;
-		cnt: number;
-		value: number;
-	}>;
+	stockList: Types.Array<StockInfo>;
 	weaponList: Types.Array<WeaponInfo>;
 }
 
@@ -96,6 +99,7 @@ const User = new Schema<IUser, IUserStatics>({
 			stock: {
 				type: Schema.Types.ObjectId,
 				ref: 'Stock',
+				required: true,
 			},
 			cnt: {
 				type: Number,
@@ -109,9 +113,9 @@ const User = new Schema<IUser, IUserStatics>({
 	],
 	weaponList: [
 		{
-			/** 타입 weapon or pickaxe */
-			type: {
-				type: String,
+			weapon: {
+				type: Schema.Types.ObjectId,
+				ref: 'Weapon',
 				required: true,
 			},
 			/** 터진수 */
@@ -159,8 +163,9 @@ User.statics.addNewUser = async function (discordId: string, nickname: string) {
 	const stockList = (await StockModel.findAllList('all')).map(stock => {
 		return { stock: new Types.ObjectId(stock._id), cnt: 0, value: 0 };
 	});
-
-	const weaponList = [{ type: 'sword' }];
+	const weaponList = (await WeaponModel.findAllList()).map(weapon => {
+		return { weapon: new Types.ObjectId(weapon._id) };
+	});
 
 	await this.create({ discordId, nickname, stockList, weaponList });
 };
@@ -280,6 +285,11 @@ User.statics.updateWeaponAndMoney = async function (
 	updWeaponInfo: SwordController,
 	money?: number,
 ) {
+	const weapon = await WeaponModel.findOne({ type: updWeaponInfo.type });
+	if (!weapon) {
+		throw Error('해당하는 무기정보가 없습니다.');
+	}
+
 	const setInfo: { [key: string]: number } = {
 		'weaponList.$.bonusPower': updWeaponInfo.bonusPower,
 		'weaponList.$.curPower': updWeaponInfo.curPower,
@@ -293,41 +303,38 @@ User.statics.updateWeaponAndMoney = async function (
 		setInfo.money = money;
 	}
 	const userInfo = await this.findOneAndUpdate(
-		{ discordId, 'weaponList.type': updWeaponInfo.type },
+		{ discordId, 'weaponList.weapon': new Types.ObjectId(weapon._id) },
 		{ $set: setInfo },
 		{ new: true },
 	);
 
-	if (userInfo) {
-		return true;
-	}
-
-	return false;
+	return !!userInfo;
 };
 
 User.statics.updateAll = async function (userList: UserController[]) {
 	const stockAllList = await StockModel.findAllList('all');
+	const weaponAllList = await WeaponModel.findAllList();
 	const updPromiseList = userList.map(updUser => {
-		const weaponList = updUser.weaponList.map(user => ({
-			type: user.type,
-			curPower: user.curPower,
-			failCnt: user.failCnt,
-			successCnt: user.successCnt,
-			destroyCnt: user.destroyCnt,
-			bonusPower: user.bonusPower,
-			hitRatio: user.hitRatio,
-			missRatio: user.missRatio,
-		}));
-		const stockList = updUser.stockList.reduce(
-			(acc: Array<{ stock: IStock; cnt: number; value: number }>, stockInfo) => {
-				const myStock = stockAllList.find(stock => stock.name === stockInfo.stock.name);
-				if (myStock) {
-					acc.push({ stock: myStock, cnt: stockInfo.cnt, value: stockInfo.value });
-				}
-				return acc;
-			},
-			[],
-		);
+		const weaponList = updUser.weaponList.reduce((acc: Array<WeaponInfo>, weaponInfo) => {
+			const myWeapon = weaponAllList.find(weapon => weapon.type === weaponInfo.type);
+			myWeapon &&
+				acc.push({
+					weapon: myWeapon,
+					bonusPower: weaponInfo.bonusPower,
+					curPower: weaponInfo.curPower,
+					destroyCnt: weaponInfo.destroyCnt,
+					failCnt: weaponInfo.failCnt,
+					hitRatio: weaponInfo.hitRatio,
+					missRatio: weaponInfo.missRatio,
+					successCnt: weaponInfo.successCnt,
+				});
+			return acc;
+		}, []);
+		const stockList = updUser.stockList.reduce((acc: Array<StockInfo>, stockInfo) => {
+			const myStock = stockAllList.find(stock => stock.name === stockInfo.stock.name);
+			myStock && acc.push({ stock: myStock, cnt: stockInfo.cnt, value: stockInfo.value });
+			return acc;
+		}, []);
 		return this.findOneAndUpdate(
 			{ discordId: updUser.getId() },
 			{
