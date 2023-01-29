@@ -31,6 +31,12 @@ type PatchGiveMoneyBodyInfo = {
 	money: number;
 };
 
+type PatchWeaponBodyInfo = {
+	type: 'sword' | 'pickaxe';
+	isPreventDestroy: boolean;
+	isPreventDown: boolean;
+};
+
 const dataManager = DataManager.getInstance();
 
 export const getUserProfileInfo = (req: Request, res: Response) => {
@@ -270,6 +276,45 @@ export const patchGiveMoney = async (req: Request, res: Response) => {
 		await dataManager.setTransaction(true);
 
 		return res.status(200).json(null);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
+export const patchWeapon = async (req: Request, res: Response) => {
+	try {
+		const { user } = req;
+		const { type, isPreventDestroy, isPreventDown } =
+			req.body as Partial<PatchWeaponBodyInfo>;
+		req.body as Partial<PatchGiveMoneyBodyInfo>;
+		const globalManager = dataManager.get('globalStatus');
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ discordId: user?.discordId });
+		if (!userInfo || !user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+
+		const money = globalManager.grantMoney;
+		userInfo.updateMoney(money);
+		globalManager.updateGrantMoney(0);
+
+		await dataManager.setTransaction();
+		const session = dataManager.getSession();
+		await session?.withTransaction(async () => {
+			await userManager.update(
+				{ type: 'm', userInfo: { discordId: user.discordId } },
+				session,
+			);
+			await globalManager.update({ type: 'g' });
+		});
+		await dataManager.setTransaction(true);
+		return res.status(200).json({ value: money });
 	} catch (err) {
 		let message = err;
 		if (err instanceof Error) {
