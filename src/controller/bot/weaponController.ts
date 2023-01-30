@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { getRandomNumber, setComma } from '../../config/util';
 import DataManager from '../../game/DataManager';
-import Sword from '../../game/Weapon/Sword';
 
 const dataManager = DataManager.getInstance();
 
@@ -29,7 +28,7 @@ export const getMyWeapon = ({
 /** 타입에 해당하는 무기정보 class 리턴 */
 export const getWeaponInfo = (type: 'sword') => {
 	const weaponManager = dataManager.get('weapon');
-	return weaponManager.getDefaultValue(type);
+	return weaponManager.getBaseMoney(type);
 };
 
 /** perCnt를 기준으로 나눠서 Ratio 설명표를 리턴함 */
@@ -38,8 +37,7 @@ export const getFormattedRatioList = (
 	perCnt: number,
 ): FormattedRatioList => {
 	const weaponManager = dataManager.get('weapon');
-	const { ratioList: list, value } = weaponManager.getInfo(type);
-	let money = value;
+	const { ratioList: list, getCost } = weaponManager.getInfo(type);
 	const resultList: FormattedRatioList = [];
 	for (let i = 0; i < Math.floor(list.length / perCnt); i++) {
 		let value = '';
@@ -47,7 +45,7 @@ export const getFormattedRatioList = (
 			const fail = _.round(list[j].failRatio * 100, 2);
 			const destroy = _.round(list[j].destroyRatio * 100, 2);
 			const success = _.round(100 - destroy - fail, 2);
-			money *= list[j].moneyRatio;
+			const money = getCost(j);
 			value = `${value}\n${j}~${j + 1}: (${success}%/${fail}%/${destroy}%)-${setComma(
 				money,
 				true,
@@ -88,20 +86,14 @@ export const enhanceWeapon = async ({
 }): Promise<EnhanceWeaponType> => {
 	const userManager = dataManager.get('user');
 	const weaponManager = dataManager.get('weapon');
+	const { ratioList, getCost } = weaponManager.getInfo(type);
 	const userInfo = userManager.getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
-	let myWeapon = userInfo.weaponList.find(weapon => weapon.type === type);
+	const myWeapon = userInfo.weaponList.find(weapon => weapon.weapon.type === type);
 	if (!myWeapon) {
-		switch (type) {
-			case 'sword':
-				myWeapon = new Sword();
-				break;
-			default:
-				myWeapon = new Sword();
-		}
-		userInfo.weaponList.push(myWeapon);
+		throw Error('무기정보가 없습니다.');
 	}
 
 	const beforePower = myWeapon.curPower;
@@ -110,19 +102,14 @@ export const enhanceWeapon = async ({
 	}
 
 	// 강화비용 계산
-	let cost = weaponManager
-		.getRatioList(type)
-		.slice(0, myWeapon.curPower + 1)
-		.reduce((acc, cur) => {
-			return acc * cur.moneyRatio;
-		}, weaponManager.getDefaultValue(type));
+	let cost = getCost(myWeapon.curPower);
 	cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
 
 	userInfo.updateMoney(-1 * cost, 'weapon');
 
 	const MAX_NUMBER = 1000;
 	const randomNum = getRandomNumber(MAX_NUMBER, 1);
-	const { failRatio, destroyRatio } = weaponManager.getRatioList(type)[myWeapon.curPower];
+	const { failRatio, destroyRatio } = ratioList[myWeapon.curPower];
 	let result: EnhanceWeaponType;
 	// 실패
 	if (failRatio * MAX_NUMBER >= randomNum) {

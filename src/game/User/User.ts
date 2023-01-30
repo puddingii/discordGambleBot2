@@ -1,25 +1,38 @@
 import Stock from '../Stock/Stock';
 import Coin from '../Stock/Coin';
-import Weapon from '../Weapon/Sword';
+import Sword from '../Weapon/Sword';
 
 /** Class Constructor Param Type */
+
+/** 유저가 가지고 있는 주식정보 타입 */
+export type UserStockInfo = {
+	stock: Stock | Coin;
+	cnt: number;
+	value: number;
+};
+
+/** 유저가 가지고 있는 무기정보 */
+export type UserWeaponInfo = {
+	weapon: Sword;
+	destroyCnt: number;
+	failCnt: number;
+	successCnt: number;
+	curPower: number;
+	bonusPower: number;
+	hitRatio: number;
+	missRatio: number;
+};
+
 interface UserInfo {
 	id: string;
 	nickname: string;
 	money: number;
-	stockList: Array<{ stock: Stock | Coin; cnt: number; value: number }>;
-	weaponList: Array<Weapon>;
+	stockList: Array<UserStockInfo>;
+	weaponList: Array<UserWeaponInfo>;
 }
 
 type UserConstructor = Pick<UserInfo, 'id' | 'nickname'> &
 	Omit<Partial<UserInfo>, 'id' | 'nickname'>;
-
-/** 유저가 가지고 있는 주식정보 타입 */
-interface UserStockInfo {
-	stock: Stock | Coin;
-	cnt: number;
-	value: number;
-}
 
 /** 유저가 가지고 있는 Stock 업데이트 할 때 사용하는 함수리턴 타입 */
 type UpdateStockReturnType = { cnt: number; value: number; money: number };
@@ -45,13 +58,13 @@ export default class User {
 	}
 
 	/** 가지고 있는 name에 해당하는 주식 가져오기 */
-	getStock(name: string): UserStockInfo | undefined {
+	getStock(name: string) {
 		return this.stockList.find(stockInfo => stockInfo.stock.name === name);
 	}
 
 	/** 가지고 있는 무기 가져오기 */
 	getWeapon(type: string) {
-		return this.weaponList.find(weaponInfo => weaponInfo.type === type);
+		return this.weaponList.find(weaponInfo => weaponInfo.weapon.type === type);
 	}
 
 	/** 가지고 있는 주식들 배당금 지급 */

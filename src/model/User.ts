@@ -4,8 +4,7 @@ import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
 import logger from '../config/logger';
 import secretKey from '../config/secretKey';
-import UserController from '../game/User/User';
-import SwordController from '../game/Weapon/Sword';
+import UserController, { UserWeaponInfo } from '../game/User/User';
 import WeaponModel, { IWeapon } from './Weapon';
 
 type WeaponInfo = {
@@ -58,7 +57,7 @@ interface IUserStatics extends Model<IUser> {
 	): Promise<boolean>;
 	updateWeaponAndMoney(
 		discordId: string,
-		updWeaponInfo: SwordController,
+		updWeaponInfo: UserWeaponInfo,
 		money?: number,
 	): Promise<boolean>;
 	updateStockAndMoney(
@@ -282,10 +281,10 @@ User.statics.deleteStockWithAllUser = async function (name: string) {
 /** 무기 업데이트 */
 User.statics.updateWeaponAndMoney = async function (
 	discordId: string,
-	updWeaponInfo: SwordController,
+	updWeaponInfo: UserWeaponInfo,
 	money?: number,
 ) {
-	const weapon = await WeaponModel.findOne({ type: updWeaponInfo.type });
+	const weapon = await WeaponModel.findOne({ type: updWeaponInfo.weapon.type });
 	if (!weapon) {
 		throw Error('해당하는 무기정보가 없습니다.');
 	}
@@ -316,7 +315,9 @@ User.statics.updateAll = async function (userList: UserController[]) {
 	const weaponAllList = await WeaponModel.findAllList();
 	const updPromiseList = userList.map(updUser => {
 		const weaponList = updUser.weaponList.reduce((acc: Array<WeaponInfo>, weaponInfo) => {
-			const myWeapon = weaponAllList.find(weapon => weapon.type === weaponInfo.type);
+			const myWeapon = weaponAllList.find(
+				weapon => weapon.type === weaponInfo.weapon.type,
+			);
 			myWeapon &&
 				acc.push({
 					weapon: myWeapon,

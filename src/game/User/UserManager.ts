@@ -1,7 +1,6 @@
 import { ClientSession } from 'mongoose';
-import User from './User';
+import User, { UserWeaponInfo } from './User';
 import UserModel from '../../model/User';
-import Sword from '../Weapon/Sword';
 
 /**
  * sm: 주식과돈
@@ -16,7 +15,7 @@ type StockOptionalType = { name: string; cnt: number; value: number };
 type UpdateParamInfo = {
 	type: UpdateTypeInfo;
 	userInfo: Partial<{ discordId: string; nickname: string }>;
-	optionalInfo?: Sword | StockOptionalType;
+	optionalInfo?: UserWeaponInfo | StockOptionalType;
 };
 
 export default class UserManager {
@@ -95,21 +94,24 @@ export default class UserManager {
 				result = optionalInfo
 					? await UserModel.updateWeaponAndMoney(
 							myInfo.getId(),
-							<Sword>optionalInfo,
+							optionalInfo as UserWeaponInfo,
 							myInfo.money,
 					  )
 					: false;
 				break;
 			case 'w':
 				result = optionalInfo
-					? await UserModel.updateWeaponAndMoney(myInfo.getId(), <Sword>optionalInfo)
+					? await UserModel.updateWeaponAndMoney(
+							myInfo.getId(),
+							optionalInfo as UserWeaponInfo,
+					  )
 					: false;
 				break;
 			case 'sm':
 				result = optionalInfo
 					? await UserModel.updateStockAndMoney(
 							myInfo.getId(),
-							<StockOptionalType>optionalInfo,
+							optionalInfo as StockOptionalType,
 							myInfo.money,
 					  )
 					: false;

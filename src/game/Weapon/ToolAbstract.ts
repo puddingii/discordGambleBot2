@@ -1,25 +1,59 @@
 type ToolInfo = {
-	destroyCnt: number;
-	failCnt: number;
-	successCnt: number;
-	curPower: number;
-	type: string;
+	type: 'sword';
+	comment: string;
+	powerMultiple: number;
+	enhanceCost: number;
+	baseMoney: number;
+	ratioList: Array<{ failRatio: number; destroyRatio: number }>;
+	maxPower: number;
 };
 
-export type ToolConstructor = Omit<Partial<ToolInfo>, 'type'> & Pick<ToolInfo, 'type'>;
+export type ToolConstructor = Omit<ToolInfo, 'comment'> &
+	Pick<Partial<ToolInfo>, 'comment'>;
 
 export default abstract class ToolAbstract {
-	curPower: ToolInfo['curPower'];
-	destroyCnt: ToolInfo['destroyCnt'];
-	failCnt: ToolInfo['failCnt'];
-	successCnt: ToolInfo['successCnt'];
+	baseMoney: ToolInfo['baseMoney'];
+	comment: ToolInfo['comment'];
+	enhanceCost: ToolInfo['enhanceCost'];
+	maxPower: ToolInfo['maxPower'];
+
+	powerMultiple: ToolInfo['powerMultiple'];
+	ratioList: ToolInfo['ratioList'];
 	type: ToolInfo['type'];
 
-	constructor({ destroyCnt, failCnt, successCnt, curPower, type }: ToolConstructor) {
+	constructor({
+		powerMultiple,
+		enhanceCost,
+		baseMoney,
+		comment,
+		type,
+		ratioList,
+		maxPower,
+	}: ToolConstructor) {
 		this.type = type;
-		this.destroyCnt = destroyCnt ?? 0;
-		this.failCnt = failCnt ?? 0;
-		this.successCnt = successCnt ?? 0;
-		this.curPower = curPower ?? 0;
+		this.powerMultiple = powerMultiple;
+		this.enhanceCost = enhanceCost;
+		this.baseMoney = baseMoney;
+		this.comment = comment ?? '';
+		this.ratioList = ratioList;
+		this.maxPower = maxPower;
+	}
+
+	getCost(exponent: number) {
+		if (exponent < 0) {
+			throw Error('0이하의 값은 입력할 수 없습니다.');
+		}
+		return this.baseMoney ** (exponent - 10) + 1;
+	}
+
+	getPower(power: number) {
+		if (power < 0) {
+			throw Error('0이하의 값은 입력할 수 없습니다.');
+		}
+		return power * this.powerMultiple;
+	}
+
+	isOverMaxPower(power: number) {
+		return this.maxPower <= power;
 	}
 }

@@ -14,9 +14,11 @@ export interface IWeapon extends Document, DoucmentResult<IWeapon> {
 	/** 강화비용 */
 	enhanceCost: number;
 	/** 강화비용 지수함수의 밑 */
-	moneyBase: number;
+	baseMoney: number;
 	/** 강화확률 리스트 */
 	ratioList: Types.Array<{ failRatio: number; destroyRatio: number }>;
+	/** 강화 맥스치 */
+	maxPower: number;
 }
 
 export type IWeaponInfo = IWeapon & {
@@ -38,6 +40,10 @@ const Weapon = new Schema<IWeapon, IWeaponStatics>({
 		type: String,
 		default: '',
 	},
+	maxPower: {
+		type: Number,
+		default: 30,
+	},
 	powerMultiple: {
 		type: Number,
 		default: 1,
@@ -46,7 +52,7 @@ const Weapon = new Schema<IWeapon, IWeaponStatics>({
 		type: Number,
 		required: true,
 	},
-	moneyBase: {
+	baseMoney: {
 		type: Number,
 		default: 1.2,
 	},
