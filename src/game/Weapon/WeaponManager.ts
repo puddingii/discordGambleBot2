@@ -1,14 +1,14 @@
 import Sword from './Sword';
 
-type WeaponInfo = {
-	sword: Sword;
+type DataInfo = {
+	weaponList: Array<Sword>;
 };
 
 export default class WeaponManager {
-	weaponInfo: WeaponInfo;
+	weaponList: DataInfo['weaponList'];
 
-	constructor(weaponInfo: WeaponInfo) {
-		this.weaponInfo = weaponInfo;
+	constructor(dataInfo: DataInfo) {
+		this.weaponList = dataInfo.weaponList;
 	}
 
 	getBaseMoney(type: 'sword') {
@@ -17,7 +17,7 @@ export default class WeaponManager {
 	}
 
 	getInfo(type: 'sword') {
-		const weapon = this.weaponInfo[type];
+		const weapon = this.weaponList.find(w => w.type === type);
 		if (!weapon) {
 			throw Error('해당하는 무기가 없습니다.');
 		}
