@@ -8,7 +8,7 @@ export default {
 		.setName('무기강화')
 		.setDescription('무기를 강화함')
 		.addStringOption(option =>
-			option.setName('종류').setDescription('주식인지 코인인지').addChoices(
+			option.setName('종류').setDescription('강화할 무기').addChoices(
 				{
 					name: '무기',
 					value: 'sword',
@@ -26,7 +26,7 @@ export default {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const type = <'sword'>interaction.options.getString('하락방지') ?? 'sword';
+			const type = <'sword'>interaction.options.getString('종류') ?? 'sword';
 			// const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
 			const [successRatio] = Object.values(
