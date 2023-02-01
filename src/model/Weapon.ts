@@ -86,7 +86,7 @@ Weapon.statics.addWeapon = async function (weaponInfo: SwordClass) {
 		comment: weaponInfo.comment,
 		powerMultiple: weaponInfo.powerMultiple,
 		enhanceCost: weaponInfo.enhanceCost,
-		moneyBase: weaponInfo.moneyBase,
+		baseMoney: weaponInfo.baseMoney,
 		ratioList: weaponInfo.ratioList,
 	});
 	return { code: 1 };

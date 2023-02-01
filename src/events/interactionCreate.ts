@@ -25,7 +25,7 @@ export default {
 		if (!command) {
 			return;
 		}
-		const notCheckCommandList = ['유저등록'];
+		const notCheckCommandList = ['유저등록', '어드민'];
 		if (!notCheckCommandList.includes(commandName)) {
 			const isExist = isEnrolledUser(interaction);
 			if (!isExist) {
