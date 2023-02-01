@@ -1,4 +1,5 @@
 import { Schema, Model, model, Types, Document } from 'mongoose';
+import SwordClass from '../game/Weapon/Sword';
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -71,8 +72,24 @@ const Weapon = new Schema<IWeapon, IWeaponStatics>({
 });
 
 Weapon.statics.findAllList = async function () {
-	const stockList = await this.find({});
-	return stockList ?? [];
+	const weaponList = await this.find({});
+	return weaponList ?? [];
+};
+
+Weapon.statics.addWeapon = async function (weaponInfo: SwordClass) {
+	const isExist = await this.exists({ type: weaponInfo.type });
+	if (isExist) {
+		return { code: 0, message: '같은 이름이 있습니다.' };
+	}
+	await this.create({
+		type: weaponInfo.type,
+		comment: weaponInfo.comment,
+		powerMultiple: weaponInfo.powerMultiple,
+		enhanceCost: weaponInfo.enhanceCost,
+		moneyBase: weaponInfo.moneyBase,
+		ratioList: weaponInfo.ratioList,
+	});
+	return { code: 1 };
 };
 
 export default model<IWeapon, IWeaponStatics>('Weapon', Weapon);

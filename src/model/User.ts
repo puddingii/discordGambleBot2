@@ -44,6 +44,7 @@ export type IUserInfo = IUser & {
 interface IUserStatics extends Model<IUser> {
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	addNewStock(name: string): Promise<void>;
+	addNewWeapon(type: string): Promise<void>;
 	checkPassword(
 		userInfo: Partial<{ discordId: string; nickname: string }>,
 		password: string,
@@ -179,6 +180,20 @@ User.statics.addNewStock = async function (name: string) {
 		{ $nor: [{ 'stockList.stock': new Types.ObjectId(stock._id) }] },
 		{
 			$push: { stockList: { stock: new Types.ObjectId(stock._id) } },
+		},
+	);
+};
+
+User.statics.addNewWeapon = async function (type: string) {
+	const weapon = await WeaponModel.findOne({ type });
+	if (!weapon) {
+		throw Error('해당하는 주식정보가 없습니다.');
+	}
+
+	await this.updateMany(
+		{ $nor: [{ 'weaponList.weapon': new Types.ObjectId(weapon._id) }] },
+		{
+			$push: { weaponList: { weapon: new Types.ObjectId(weapon._id) } },
 		},
 	);
 };
