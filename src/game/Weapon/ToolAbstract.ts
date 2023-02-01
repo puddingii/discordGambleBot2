@@ -43,7 +43,7 @@ export default abstract class ToolAbstract {
 		if (exponent < 0) {
 			throw Error('0이하의 값은 입력할 수 없습니다.');
 		}
-		return this.baseMoney ** (exponent - 10) + 1;
+		return (this.baseMoney ** (exponent - 10) + 1) * this.enhanceCost;
 	}
 
 	getPower(power: number) {

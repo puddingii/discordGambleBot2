@@ -26,11 +26,11 @@ export default class WeaponManager {
 
 	/** 다음 강화할 때 확률 */
 	getNextRatio({ type, curPower }: { type: 'sword'; curPower: number }) {
-		const { ratioList, isOverMaxPower } = this.getInfo(type);
-		if (isOverMaxPower(curPower)) {
+		const myWeapon = this.getInfo(type);
+		if (myWeapon.isOverMaxPower(curPower)) {
 			throw Error('더이상 강화할 수 없습니다.');
 		}
-		const ratio = ratioList[curPower];
+		const ratio = myWeapon.ratioList[curPower];
 		return {
 			success: 1 - (ratio.destroyRatio + ratio.failRatio),
 			fail: ratio.failRatio,

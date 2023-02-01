@@ -37,7 +37,8 @@ export const getFormattedRatioList = (
 	perCnt: number,
 ): FormattedRatioList => {
 	const weaponManager = dataManager.get('weapon');
-	const { ratioList: list, getCost } = weaponManager.getInfo(type);
+	const myWeapon = weaponManager.getInfo(type);
+	const list = myWeapon.ratioList;
 	const resultList: FormattedRatioList = [];
 	for (let i = 0; i < Math.floor(list.length / perCnt); i++) {
 		let value = '';
@@ -45,7 +46,7 @@ export const getFormattedRatioList = (
 			const fail = _.round(list[j].failRatio * 100, 2);
 			const destroy = _.round(list[j].destroyRatio * 100, 2);
 			const success = _.round(100 - destroy - fail, 2);
-			const money = getCost(j);
+			const money = myWeapon.getCost(j);
 			value = `${value}\n${j}~${j + 1}: (${success}%/${fail}%/${destroy}%)-${setComma(
 				money,
 				true,
@@ -86,7 +87,7 @@ export const enhanceWeapon = async ({
 }): Promise<EnhanceWeaponType> => {
 	const userManager = dataManager.get('user');
 	const weaponManager = dataManager.get('weapon');
-	const { ratioList, getCost } = weaponManager.getInfo(type);
+	const weaponInfo = weaponManager.getInfo(type);
 	const userInfo = userManager.getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
@@ -102,14 +103,14 @@ export const enhanceWeapon = async ({
 	}
 
 	// 강화비용 계산
-	let cost = getCost(myWeapon.curPower);
+	let cost = weaponInfo.getCost(myWeapon.curPower);
 	cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
 
 	userInfo.updateMoney(-1 * cost, 'weapon');
 
 	const MAX_NUMBER = 1000;
 	const randomNum = getRandomNumber(MAX_NUMBER, 1);
-	const { failRatio, destroyRatio } = ratioList[myWeapon.curPower];
+	const { failRatio, destroyRatio } = weaponInfo.ratioList[myWeapon.curPower];
 	let result: EnhanceWeaponType;
 	// 실패
 	if (failRatio * MAX_NUMBER >= randomNum) {
