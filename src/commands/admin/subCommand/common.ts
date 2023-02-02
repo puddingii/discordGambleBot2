@@ -33,6 +33,21 @@ export const getNewSelectMenu = () => {
 					value: 'selectStock',
 				},
 				{
+					label: '무기추가',
+					description: '무기추가',
+					value: 'showAddWeaponModal',
+				},
+				{
+					label: '무기정보업데이트',
+					description: '무기정보 강제 업데이트',
+					value: 'selectWeapon',
+				},
+				{
+					label: '봇상태 변경',
+					description: '봇상태 변경',
+					value: 'selectBotStatus',
+				},
+				{
 					label: '게임상태업데이트',
 					description: '게임상태 강제 업데이트',
 					value: 'showGameStatusModal',

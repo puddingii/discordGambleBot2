@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import weaponController from '../../controller/bot/weaponController';
 import logger from '../../config/logger';
 
+// FIXME 여기도 바꿔야함
 export default {
 	data: new SlashCommandBuilder().setName('무기내역').setDescription('무기강화 내역'),
 	async execute(interaction: ChatInputCommandInteraction) {

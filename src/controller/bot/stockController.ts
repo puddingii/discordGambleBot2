@@ -141,8 +141,8 @@ export const getChartData = async ({
 	const stockCnt = stockInfo.length;
 
 	let beforeHistory = 0;
-	const xDataList = [];
-	const yDataList = [];
+	const xDataList: Array<string> = [];
+	const yDataList: Array<Array<number> | number> = [];
 	for (let i = 0; i < stockCnt; i += stickPerCnt) {
 		const stickData = stockInfo.slice(i, i + stickPerCnt);
 		const stickLastIdx = stickData.length - 1;

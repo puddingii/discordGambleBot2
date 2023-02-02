@@ -8,21 +8,27 @@ import {
 } from 'discord.js';
 import stockAdmin from './subCommand/stockAdmin';
 import userAdmin from './subCommand/userAdmin';
+import weaponAdmin from './subCommand/weaponAdmin';
 import gameStatusAdmin from './subCommand/gameStatusAdmin';
 import { getNewSelectMenu } from './subCommand/common';
-import stockController from '../../controller/bot/stockController';
 import logger from '../../config/logger';
 import secretKey from '../../config/secretKey';
+import client from '../../app';
 
 const {
 	modalSubmit: { updateStock },
-	select: { showStockModal },
+	select: { showStockModal, showStockList },
 } = stockAdmin;
 
 const {
 	modalSubmit: { giveMoney },
 	select: { showGiveMoneyModal },
 } = userAdmin;
+
+const {
+	modalSubmit: { updateWeapon },
+	select: { showWeaponModal, showWeaponList },
+} = weaponAdmin;
 
 const {
 	modalSubmit: { updateStatus },
@@ -77,11 +83,6 @@ export default {
 	) {
 		try {
 			const command = selectedList[0].split('-');
-			const stockList = stockController.getAllStock('all').map(stock => ({
-				label: stock.name,
-				value: `updateStock-${stock.name}`,
-				description: stock.type,
-			}));
 
 			switch (command[0]) {
 				case 'showAddStockModal': // 주식종류 추가하는 모달창 띄우기
@@ -91,24 +92,60 @@ export default {
 					await showStockModal(interaction, command[1]);
 					break;
 				case 'selectStock': // 주식 업데이트에서 누른 주식
-					await interaction.reply({
-						content: '어드민전용-업데이트할 주식',
-						components: [
-							new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-								new SelectMenuBuilder()
-									.setCustomId('어드민')
-									.setPlaceholder('주식 리스트')
-									.addOptions(stockList),
-							),
-						],
-						ephemeral: true,
-					});
+					await showStockList(interaction);
+					break;
+				case 'showAddWeaponModal': // 무기 추가하는 모달창 띄우기
+					await showWeaponModal(interaction);
+					break;
+				case 'updateWeapon': // 무기 업데이트
+					await showWeaponModal(interaction, command[1]);
+					break;
+				case 'selectWeapon': // 무기 업데이트에서 누른 무기
+					await showWeaponList(interaction);
 					break;
 				case 'showGiveMoneyModal':
 					await showGiveMoneyModal(interaction);
 					break;
 				case 'showGameStatusModal':
 					await showGameStatusModal(interaction);
+					break;
+				case 'selectBotStatus':
+					await interaction.reply({
+						content: '어드민전용-봇상태 업데이트',
+						components: [
+							new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+								new SelectMenuBuilder()
+									.setCustomId('어드민')
+									.setPlaceholder('주식 리스트')
+									.addOptions([
+										{
+											label: 'good',
+											value: 'updateBotStatus-online',
+											description: '정상작동',
+										},
+										{
+											label: 'stop',
+											value: 'updateBotStatus-idle',
+											description: '일시정지',
+										},
+										{
+											label: 'bad',
+											value: 'updateBotStatus-dnd',
+											description: '긴급정지',
+										},
+									]),
+							),
+						],
+						ephemeral: true,
+					});
+					break;
+				case 'updateBotStatus':
+					client.user?.setStatus(<'online' | 'idle' | 'dnd'>command[1]);
+					await interaction.reply({
+						content: '변경 완료',
+						components: [getNewSelectMenu()],
+						ephemeral: true,
+					});
 					break;
 				default:
 					break;
@@ -143,6 +180,12 @@ export default {
 					break;
 				case 'updateStatus':
 					await updateStatus(interaction);
+					break;
+				case 'addWeapon':
+					await updateWeapon(interaction, true);
+					break;
+				case 'updateWeapon':
+					await updateWeapon(interaction);
 					break;
 				default:
 			}

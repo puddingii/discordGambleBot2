@@ -5,16 +5,17 @@ import secretKey from './config/secretKey';
 
 import loaders from './loaders/index';
 
-const startServer = async () => {
-	const client = new Client({
-		intents: [
-			GatewayIntentBits.Guilds,
-			GatewayIntentBits.GuildMembers,
-			GatewayIntentBits.GuildMessages,
-			GatewayIntentBits.GuildPresences,
-		],
-	});
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildPresences,
+	],
+	presence: { status: 'dnd' },
+});
 
+const startServer = async () => {
 	const app = express();
 
 	await loaders({ client, app });
@@ -28,3 +29,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export default client;

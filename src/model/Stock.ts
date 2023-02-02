@@ -160,7 +160,10 @@ Stock.statics.addStock = async function (stockInfo: CoinClass | StockClass) {
 	if (isExist) {
 		return { code: 0, message: '같은 이름이 있습니다.' };
 	}
-	await this.create(stockInfo);
+	const stock = await this.create(stockInfo);
+	await stock.update({
+		$push: { updHistory: { value: stockInfo.value, date: dayjs().toDate().toString() } },
+	});
 	return { code: 1 };
 };
 

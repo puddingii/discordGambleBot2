@@ -1,7 +1,10 @@
 import _ from 'lodash';
+import { startSession } from 'mongoose';
 import { getRandomNumber, setComma } from '../../config/util';
 import DataManager from '../../game/DataManager';
-import Sword from '../../game/Weapon/Sword';
+import Weapon, { WeaponConstructor } from '../../game/Weapon/Weapon';
+import WeaponModel from '../../model/Weapon';
+import UserModel from '../../model/User';
 
 const dataManager = DataManager.getInstance();
 
@@ -15,31 +18,69 @@ type EnhanceWeaponType = {
 type FormattedRatioList = Array<{ value: string; name: string }>;
 
 /** 내 무기들 가져오기 */
-export const getMyWeapon = ({
-	discordId,
-	type,
-}: {
-	discordId: string;
-	type: 'sword';
-}) => {
+export const getMyWeapon = ({ discordId, type }: { discordId: string; type: string }) => {
 	const userManager = dataManager.get('user');
 	return userManager.getMyWeapon({ discordId, type });
 };
 
-/** 타입에 해당하는 무기정보 class 리턴 */
-export const getWeaponInfo = (type: 'sword') => {
+/** 무기 가져오기 */
+export const getWeapon = (type: string) => {
 	const weaponManager = dataManager.get('weapon');
-	return weaponManager.getDefaultValue(type);
+	return weaponManager.getInfo(type);
+};
+
+/** 무기 업데이트 + 새로만들기 */
+export const updateWeapon = async (isNew: boolean, param: WeaponConstructor) => {
+	const weaponManager = dataManager.get('weapon');
+	if (isNew) {
+		const weapon = new Weapon(param);
+		weaponManager.addWeapon(weapon);
+		const session = await startSession();
+		await session.withTransaction(async () => {
+			const weaponResult = await WeaponModel.addWeapon(weapon);
+			if (weaponResult.code === 0) {
+				throw Error(weaponResult?.message ?? 'error');
+			}
+			await UserModel.addNewWeapon(weapon.type);
+		});
+		await session.endSession();
+		return;
+	}
+
+	const weapon = weaponManager.getInfo(param.type);
+	if (!weapon) {
+		throw Error(`해당하는 type의 무기가 없습니다.`);
+	}
+
+	weapon.comment = param.comment;
+	weapon.baseMoney = param.baseMoney;
+	weapon.enhanceCost = param.enhanceCost;
+	weapon.maxPower = param.maxPower;
+	weapon.powerMultiple = param.powerMultiple;
+	weapon.ratioList = param.ratioList;
+	await WeaponModel.updateWeapon(param);
+};
+
+/** 모든 무기 다 가져오기 */
+export const getAllWeapon = () => {
+	const weaponManager = dataManager.get('weapon');
+	return weaponManager.weaponList;
+};
+
+/** 타입에 해당하는 무기정보 class 리턴 */
+export const getWeaponInfo = (type: string) => {
+	const weaponManager = dataManager.get('weapon');
+	return weaponManager.getBaseMoney(type);
 };
 
 /** perCnt를 기준으로 나눠서 Ratio 설명표를 리턴함 */
 export const getFormattedRatioList = (
-	type: 'sword',
+	type: string,
 	perCnt: number,
 ): FormattedRatioList => {
 	const weaponManager = dataManager.get('weapon');
-	const { ratioList: list, value } = weaponManager.getInfo(type);
-	let money = value;
+	const myWeapon = weaponManager.getInfo(type);
+	const list = myWeapon.ratioList;
 	const resultList: FormattedRatioList = [];
 	for (let i = 0; i < Math.floor(list.length / perCnt); i++) {
 		let value = '';
@@ -47,10 +88,11 @@ export const getFormattedRatioList = (
 			const fail = _.round(list[j].failRatio * 100, 2);
 			const destroy = _.round(list[j].destroyRatio * 100, 2);
 			const success = _.round(100 - destroy - fail, 2);
-			money *= list[j].moneyRatio;
-			value = `${value}\n${i * perCnt + j}~${
-				i * perCnt + j + 1
-			}: (${success}%/${fail}%/${destroy}%)-${setComma(money, true)}원`;
+			const money = myWeapon.getCost(j);
+			value = `${value}\n${j}~${j + 1}: (${success}%/${fail}%/${destroy}%)-${setComma(
+				money,
+				true,
+			)}원`;
 		}
 		resultList.push({ value, name: `${i * perCnt}~${(i + 1) * perCnt}강` });
 	}
@@ -63,7 +105,7 @@ export const getNextRatio = ({
 	type,
 	discordId,
 }: {
-	type: 'sword';
+	type: string;
 	discordId: string;
 }) => {
 	const userWeapon = getMyWeapon({ discordId, type });
@@ -81,26 +123,20 @@ export const enhanceWeapon = async ({
 	isPreventDown = false,
 }: {
 	discordId: string;
-	type: 'sword';
+	type: string;
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
 }): Promise<EnhanceWeaponType> => {
 	const userManager = dataManager.get('user');
 	const weaponManager = dataManager.get('weapon');
+	const weaponInfo = weaponManager.getInfo(type);
 	const userInfo = userManager.getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
-	let myWeapon = userInfo.weaponList.find(weapon => weapon.type === type);
+	const myWeapon = userInfo.weaponList.find(weapon => weapon.weapon.type === type);
 	if (!myWeapon) {
-		switch (type) {
-			case 'sword':
-				myWeapon = new Sword();
-				break;
-			default:
-				myWeapon = new Sword();
-		}
-		userInfo.weaponList.push(myWeapon);
+		throw Error('무기정보가 없습니다.');
 	}
 
 	const beforePower = myWeapon.curPower;
@@ -109,19 +145,14 @@ export const enhanceWeapon = async ({
 	}
 
 	// 강화비용 계산
-	let cost = weaponManager
-		.getRatioList(type)
-		.slice(0, myWeapon.curPower + 1)
-		.reduce((acc, cur) => {
-			return acc * cur.moneyRatio;
-		}, weaponManager.getDefaultValue(type));
+	let cost = weaponInfo.getCost(myWeapon.curPower);
 	cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
 
 	userInfo.updateMoney(-1 * cost, 'weapon');
 
 	const MAX_NUMBER = 1000;
 	const randomNum = getRandomNumber(MAX_NUMBER, 1);
-	const { failRatio, destroyRatio } = weaponManager.getRatioList(type)[myWeapon.curPower];
+	const { failRatio, destroyRatio } = weaponInfo.ratioList[myWeapon.curPower];
 	let result: EnhanceWeaponType;
 	// 실패
 	if (failRatio * MAX_NUMBER >= randomNum) {
@@ -155,4 +186,7 @@ export default {
 	getFormattedRatioList,
 	getNextRatio,
 	getMyWeapon,
+	getWeapon,
+	updateWeapon,
+	getAllWeapon,
 };

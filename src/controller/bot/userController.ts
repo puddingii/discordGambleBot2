@@ -141,7 +141,6 @@ export const getRankingList = () => {
 		return {
 			name: user.nickname,
 			money,
-			sword: user.getWeapon('sword')?.curPower ?? 0,
 		};
 	});
 

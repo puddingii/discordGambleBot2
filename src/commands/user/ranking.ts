@@ -21,12 +21,14 @@ export default {
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
-			const rankingList = userController.getRankingList();
+			const rankingList = userController
+				.getRankingList()
+				.sort((a, b) => b.money - a.money);
 
 			rankingList.forEach(user => {
 				embedBox.addFields({
 					name: `${user.name}`,
-					value: `총 재산: ${setComma(user.money, true)}원\n무기: ${user.sword}강`,
+					value: `총 재산: ${setComma(user.money, true)}원`,
 					inline: true,
 				});
 			});
