@@ -13,7 +13,7 @@ export type ToolConstructor = Omit<ToolInfo, 'comment'> &
 
 export default abstract class ToolAbstract {
 	baseMoney: ToolInfo['baseMoney'];
-	comment: ToolInfo['comment'];
+	comment?: ToolInfo['comment'];
 	enhanceCost: ToolInfo['enhanceCost'];
 	maxPower: ToolInfo['maxPower'];
 

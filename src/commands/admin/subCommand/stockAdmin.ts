@@ -1,4 +1,9 @@
-import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ModalSubmitInteraction,
+	SelectMenuBuilder,
+	SelectMenuInteraction,
+} from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../game/Stock/Stock';
 import Coin from '../../../game/Stock/Coin';
@@ -114,10 +119,32 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 	});
 };
 
+const showStockList = async (interaction: SelectMenuInteraction) => {
+	await interaction.reply({
+		content: '어드민전용-업데이트할 주식',
+		components: [
+			new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+				new SelectMenuBuilder()
+					.setCustomId('어드민')
+					.setPlaceholder('주식 리스트')
+					.addOptions(
+						stockController.getAllStock('all').map(stock => ({
+							label: stock.name,
+							value: `updateStock-${stock.name}`,
+							description: stock.type,
+						})),
+					),
+			),
+		],
+		ephemeral: true,
+	});
+};
+
 export default {
 	/** selectbox interaction function */
 	select: {
 		showStockModal,
+		showStockList,
 	},
 	/** modal interaction function */
 	modalSubmit: {

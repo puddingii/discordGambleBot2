@@ -1,4 +1,5 @@
 import { BaseInteraction } from 'discord.js';
+import client from '../app';
 import logger from '../config/logger';
 import { isEnrolledUser } from '../middlewares/bot';
 
@@ -32,6 +33,10 @@ export default {
 				await interaction.reply('유저정보가 없습니다. 유저등록부터 해주세요');
 				return;
 			}
+		}
+		if (commandName !== '어드민' && client.user?.presence.status !== 'online') {
+			await interaction.reply('봇 셋팅중... 잠시후에 시도해주세요');
+			return;
 		}
 
 		try {

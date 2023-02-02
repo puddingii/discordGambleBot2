@@ -11,6 +11,16 @@ export default class WeaponManager {
 		this.weaponList = dataInfo.weaponList;
 	}
 
+	/** 주식 추가 */
+	addWeapon<T extends Sword>(weapon: T) {
+		const list = this.weaponList;
+		const isExistStock = list.find(weaponInfo => weaponInfo.type === weapon.type);
+		if (isExistStock) {
+			throw Error('이미 있는 무기입니다.');
+		}
+		list.push(weapon);
+	}
+
 	getBaseMoney(type: 'sword') {
 		const weapon = this.getInfo(type);
 		return weapon.baseMoney;

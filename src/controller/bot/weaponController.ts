@@ -1,6 +1,10 @@
 import _ from 'lodash';
+import { startSession } from 'mongoose';
 import { getRandomNumber, setComma } from '../../config/util';
 import DataManager from '../../game/DataManager';
+import Sword, { SwordConstructor } from '../../game/Weapon/Sword';
+import WeaponModel from '../../model/Weapon';
+import UserModel from '../../model/User';
 
 const dataManager = DataManager.getInstance();
 
@@ -23,6 +27,50 @@ export const getMyWeapon = ({
 }) => {
 	const userManager = dataManager.get('user');
 	return userManager.getMyWeapon({ discordId, type });
+};
+
+/** 무기 가져오기 */
+export const getWeapon = (type: 'sword') => {
+	const weaponManager = dataManager.get('weapon');
+	return weaponManager.getInfo(type);
+};
+
+/** 무기 업데이트 + 새로만들기 */
+export const updateWeapon = async (isNew: boolean, param: SwordConstructor) => {
+	const weaponManager = dataManager.get('weapon');
+	if (isNew) {
+		const weapon = new Sword(param);
+		weaponManager.addWeapon(weapon);
+		const session = await startSession();
+		await session.withTransaction(async () => {
+			const weaponResult = await WeaponModel.addWeapon(weapon);
+			if (weaponResult.code === 0) {
+				throw Error(weaponResult?.message ?? 'error');
+			}
+			await UserModel.addNewWeapon(weapon.type);
+		});
+		await session.endSession();
+		return;
+	}
+
+	const weapon = weaponManager.getInfo(param.type);
+	if (!weapon) {
+		throw Error(`해당하는 type의 무기가 없습니다.`);
+	}
+
+	weapon.comment = param.comment;
+	weapon.baseMoney = param.baseMoney;
+	weapon.enhanceCost = param.enhanceCost;
+	weapon.maxPower = param.maxPower;
+	weapon.powerMultiple = param.powerMultiple;
+	weapon.ratioList = param.ratioList;
+	await WeaponModel.updateWeapon(param);
+};
+
+/** 모든 무기 다 가져오기 */
+export const getAllWeapon = () => {
+	const weaponManager = dataManager.get('weapon');
+	return weaponManager.weaponList;
 };
 
 /** 타입에 해당하는 무기정보 class 리턴 */
@@ -144,4 +192,7 @@ export default {
 	getFormattedRatioList,
 	getNextRatio,
 	getMyWeapon,
+	getWeapon,
+	updateWeapon,
+	getAllWeapon,
 };

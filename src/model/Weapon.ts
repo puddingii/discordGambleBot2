@@ -1,5 +1,5 @@
 import { Schema, Model, model, Types, Document } from 'mongoose';
-import SwordClass from '../game/Weapon/Sword';
+import SwordClass, { SwordConstructor } from '../game/Weapon/Sword';
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -29,6 +29,10 @@ export type IWeaponInfo = IWeapon & {
 export interface IWeaponStatics extends Model<IWeapon> {
 	/** 모든 무기정보 가져오기 */
 	findAllList(): Promise<Array<IWeaponInfo>>;
+	/** 무기추가 */
+	addWeapon(weapon: SwordClass): Promise<{ code: number; message?: string }>;
+	/** 무기 단일 업데이트(주식 히스토리 미누적) */
+	updateWeapon(updatedWeaponInfo: SwordConstructor): Promise<void>;
 }
 
 const Weapon = new Schema<IWeapon, IWeaponStatics>({
@@ -90,6 +94,20 @@ Weapon.statics.addWeapon = async function (weaponInfo: SwordClass) {
 		ratioList: weaponInfo.ratioList,
 	});
 	return { code: 1 };
+};
+
+Weapon.statics.updateWeapon = async function (updatedWeaponInfo: SwordConstructor) {
+	await this.findOneAndUpdate(
+		{ type: updatedWeaponInfo.type },
+		{
+			comment: updatedWeaponInfo.comment,
+			baseMoney: updatedWeaponInfo.baseMoney,
+			enhanceCost: updatedWeaponInfo.enhanceCost,
+			maxPower: updatedWeaponInfo.maxPower,
+			powerMultiple: updatedWeaponInfo.powerMultiple,
+			ratioList: updatedWeaponInfo.ratioList,
+		},
+	);
 };
 
 export default model<IWeapon, IWeaponStatics>('Weapon', Weapon);
