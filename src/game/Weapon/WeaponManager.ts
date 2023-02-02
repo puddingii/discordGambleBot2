@@ -1,7 +1,7 @@
-import Sword from './Sword';
+import Weapon from './Weapon';
 
 type DataInfo = {
-	weaponList: Array<Sword>;
+	weaponList: Array<Weapon>;
 };
 
 export default class WeaponManager {
@@ -12,7 +12,7 @@ export default class WeaponManager {
 	}
 
 	/** 주식 추가 */
-	addWeapon<T extends Sword>(weapon: T) {
+	addWeapon(weapon: Weapon) {
 		const list = this.weaponList;
 		const isExistStock = list.find(weaponInfo => weaponInfo.type === weapon.type);
 		if (isExistStock) {
@@ -21,12 +21,12 @@ export default class WeaponManager {
 		list.push(weapon);
 	}
 
-	getBaseMoney(type: 'sword') {
+	getBaseMoney(type: string) {
 		const weapon = this.getInfo(type);
 		return weapon.baseMoney;
 	}
 
-	getInfo(type: 'sword') {
+	getInfo(type: string) {
 		const weapon = this.weaponList.find(w => w.type === type);
 		if (!weapon) {
 			throw Error('해당하는 무기가 없습니다.');
@@ -35,7 +35,7 @@ export default class WeaponManager {
 	}
 
 	/** 다음 강화할 때 확률 */
-	getNextRatio({ type, curPower }: { type: 'sword'; curPower: number }) {
+	getNextRatio({ type, curPower }: { type: string; curPower: number }) {
 		const myWeapon = this.getInfo(type);
 		if (myWeapon.isOverMaxPower(curPower)) {
 			throw Error('더이상 강화할 수 없습니다.');
@@ -48,7 +48,7 @@ export default class WeaponManager {
 		};
 	}
 
-	getRatioList(type: 'sword') {
+	getRatioList(type: string) {
 		const weapon = this.getInfo(type);
 		return weapon.ratioList;
 	}

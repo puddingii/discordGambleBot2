@@ -28,7 +28,7 @@ export default class UserManager {
 	}
 
 	/** 내가 가지고 있는 무기 반환 */
-	getMyWeapon({ discordId, type }: { discordId: string; type: 'sword' }) {
+	getMyWeapon({ discordId, type }: { discordId: string; type: string }) {
 		const user = this.getUser({ discordId });
 		if (!user) {
 			throw Error('유저정보를 찾을 수 없습니다.');

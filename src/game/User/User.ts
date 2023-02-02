@@ -1,6 +1,6 @@
 import Stock from '../Stock/Stock';
 import Coin from '../Stock/Coin';
-import Sword from '../Weapon/Sword';
+import Weapon from '../Weapon/Weapon';
 
 /** Class Constructor Param Type */
 
@@ -13,7 +13,7 @@ export type UserStockInfo = {
 
 /** 유저가 가지고 있는 무기정보 */
 export type UserWeaponInfo = {
-	weapon: Sword;
+	weapon: Weapon;
 	destroyCnt: number;
 	failCnt: number;
 	successCnt: number;

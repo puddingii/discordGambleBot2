@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { startSession } from 'mongoose';
 import { getRandomNumber, setComma } from '../../config/util';
 import DataManager from '../../game/DataManager';
-import Sword, { SwordConstructor } from '../../game/Weapon/Sword';
+import Weapon, { WeaponConstructor } from '../../game/Weapon/Weapon';
 import WeaponModel from '../../model/Weapon';
 import UserModel from '../../model/User';
 
@@ -18,28 +18,22 @@ type EnhanceWeaponType = {
 type FormattedRatioList = Array<{ value: string; name: string }>;
 
 /** 내 무기들 가져오기 */
-export const getMyWeapon = ({
-	discordId,
-	type,
-}: {
-	discordId: string;
-	type: 'sword';
-}) => {
+export const getMyWeapon = ({ discordId, type }: { discordId: string; type: string }) => {
 	const userManager = dataManager.get('user');
 	return userManager.getMyWeapon({ discordId, type });
 };
 
 /** 무기 가져오기 */
-export const getWeapon = (type: 'sword') => {
+export const getWeapon = (type: string) => {
 	const weaponManager = dataManager.get('weapon');
 	return weaponManager.getInfo(type);
 };
 
 /** 무기 업데이트 + 새로만들기 */
-export const updateWeapon = async (isNew: boolean, param: SwordConstructor) => {
+export const updateWeapon = async (isNew: boolean, param: WeaponConstructor) => {
 	const weaponManager = dataManager.get('weapon');
 	if (isNew) {
-		const weapon = new Sword(param);
+		const weapon = new Weapon(param);
 		weaponManager.addWeapon(weapon);
 		const session = await startSession();
 		await session.withTransaction(async () => {
@@ -74,14 +68,14 @@ export const getAllWeapon = () => {
 };
 
 /** 타입에 해당하는 무기정보 class 리턴 */
-export const getWeaponInfo = (type: 'sword') => {
+export const getWeaponInfo = (type: string) => {
 	const weaponManager = dataManager.get('weapon');
 	return weaponManager.getBaseMoney(type);
 };
 
 /** perCnt를 기준으로 나눠서 Ratio 설명표를 리턴함 */
 export const getFormattedRatioList = (
-	type: 'sword',
+	type: string,
 	perCnt: number,
 ): FormattedRatioList => {
 	const weaponManager = dataManager.get('weapon');
@@ -111,7 +105,7 @@ export const getNextRatio = ({
 	type,
 	discordId,
 }: {
-	type: 'sword';
+	type: string;
 	discordId: string;
 }) => {
 	const userWeapon = getMyWeapon({ discordId, type });
@@ -129,7 +123,7 @@ export const enhanceWeapon = async ({
 	isPreventDown = false,
 }: {
 	discordId: string;
-	type: 'sword';
+	type: string;
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
 }): Promise<EnhanceWeaponType> => {

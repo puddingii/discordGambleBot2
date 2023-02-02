@@ -3,7 +3,7 @@ import DataManager from '../game/DataManager';
 import Stock from '../game/Stock/Stock';
 import Coin from '../game/Stock/Coin';
 import User, { UserStockInfo, UserWeaponInfo } from '../game/User/User';
-import Sword from '../game/Weapon/Sword';
+import Weapon from '../game/Weapon/Weapon';
 import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
 import WeaponManager from '../game/Weapon/WeaponManager';
@@ -53,31 +53,15 @@ export default async () => {
 	const weaponAllList = (await WeaponModel.findAllList()).map(weapon => {
 		const { type, comment, powerMultiple, enhanceCost, baseMoney, ratioList, maxPower } =
 			weapon._doc;
-		let myWeapon;
-		switch (type) {
-			case 'sword':
-				myWeapon = new Sword({
-					type,
-					comment,
-					powerMultiple,
-					enhanceCost,
-					baseMoney,
-					ratioList,
-					maxPower,
-				});
-				break;
-			default:
-				/** FIXME 나중에 수정 */
-				myWeapon = new Sword({
-					type: 'sword',
-					comment,
-					powerMultiple,
-					enhanceCost,
-					baseMoney,
-					ratioList,
-					maxPower,
-				});
-		}
+		const myWeapon = new Weapon({
+			type,
+			comment,
+			powerMultiple,
+			enhanceCost,
+			baseMoney,
+			ratioList,
+			maxPower,
+		});
 		return myWeapon;
 	});
 

@@ -6,6 +6,7 @@ import {
 import logger from '../../config/logger';
 import weaponController from '../../controller/bot/weaponController';
 
+// FIXME 여기도 바꿔야함
 export default {
 	data: new SlashCommandBuilder().setName('무기확률').setDescription('무기확률표'),
 	async execute(interaction: ChatInputCommandInteraction) {

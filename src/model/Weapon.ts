@@ -1,5 +1,5 @@
 import { Schema, Model, model, Types, Document } from 'mongoose';
-import SwordClass, { SwordConstructor } from '../game/Weapon/Sword';
+import WeaponClass, { WeaponConstructor } from '../game/Weapon/Weapon';
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -30,9 +30,9 @@ export interface IWeaponStatics extends Model<IWeapon> {
 	/** 모든 무기정보 가져오기 */
 	findAllList(): Promise<Array<IWeaponInfo>>;
 	/** 무기추가 */
-	addWeapon(weapon: SwordClass): Promise<{ code: number; message?: string }>;
+	addWeapon(weapon: WeaponClass): Promise<{ code: number; message?: string }>;
 	/** 무기 단일 업데이트(주식 히스토리 미누적) */
-	updateWeapon(updatedWeaponInfo: SwordConstructor): Promise<void>;
+	updateWeapon(updatedWeaponInfo: WeaponConstructor): Promise<void>;
 }
 
 const Weapon = new Schema<IWeapon, IWeaponStatics>({
@@ -80,7 +80,7 @@ Weapon.statics.findAllList = async function () {
 	return weaponList ?? [];
 };
 
-Weapon.statics.addWeapon = async function (weaponInfo: SwordClass) {
+Weapon.statics.addWeapon = async function (weaponInfo: WeaponClass) {
 	const isExist = await this.exists({ type: weaponInfo.type });
 	if (isExist) {
 		return { code: 0, message: '같은 이름이 있습니다.' };
@@ -96,7 +96,7 @@ Weapon.statics.addWeapon = async function (weaponInfo: SwordClass) {
 	return { code: 1 };
 };
 
-Weapon.statics.updateWeapon = async function (updatedWeaponInfo: SwordConstructor) {
+Weapon.statics.updateWeapon = async function (updatedWeaponInfo: WeaponConstructor) {
 	await this.findOneAndUpdate(
 		{ type: updatedWeaponInfo.type },
 		{

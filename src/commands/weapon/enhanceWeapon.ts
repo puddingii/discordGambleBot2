@@ -3,6 +3,7 @@ import _ from 'lodash';
 import logger from '../../config/logger';
 import weaponController from '../../controller/bot/weaponController';
 
+// FIXME 나중에 셀렉터로 바꿔야함
 export default {
 	data: new SlashCommandBuilder()
 		.setName('무기강화')

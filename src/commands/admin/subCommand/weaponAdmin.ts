@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import weaponController from '../../../controller/bot/weaponController';
-import { SwordConstructor } from '../../../game/Weapon/Sword';
+import { WeaponConstructor } from '../../../game/Weapon/Weapon';
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -25,7 +25,7 @@ const showWeaponModal = async (
 		title: '무기 추가/업데이트',
 	};
 	const inputBoxInfo: InputBoxInfo = {
-		weaponType: { label: '무기종류(sword)' },
+		weaponType: { label: '무기종류' },
 		powerMultipleAndMax: {
 			label: '배율 (강화수 * 배율 = 힘)(기본1)/강화 맥스치==ratio길이',
 		},
@@ -34,7 +34,7 @@ const showWeaponModal = async (
 		comment: { label: '설명', style: 'PARAGRAPH' },
 	};
 
-	if (weaponType === 'sword') {
+	if (weaponType) {
 		const weapon = weaponController.getWeapon(weaponType);
 		inputBoxInfo.weaponType.value = `${weapon.type}`;
 		inputBoxInfo.powerMultipleAndMax.value = `${weapon.powerMultiple}/${weapon.maxPower}`;
@@ -74,12 +74,8 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 		);
 	}
 
-	if (weaponType !== 'sword') {
-		throw Error('무기타입이 잘못됨.');
-	}
-
 	let content = '';
-	const defaultClassParam: SwordConstructor = {
+	const defaultClassParam: WeaponConstructor = {
 		type: weaponType,
 		powerMultiple,
 		enhanceCost,

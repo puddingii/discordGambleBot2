@@ -1,5 +1,5 @@
-type ToolInfo = {
-	type: 'sword';
+type WeaponInfo = {
+	type: string;
 	comment: string;
 	powerMultiple: number;
 	enhanceCost: number;
@@ -8,18 +8,18 @@ type ToolInfo = {
 	maxPower: number;
 };
 
-export type ToolConstructor = Omit<ToolInfo, 'comment'> &
-	Pick<Partial<ToolInfo>, 'comment'>;
+export type WeaponConstructor = Omit<WeaponInfo, 'comment'> &
+	Pick<Partial<WeaponInfo>, 'comment'>;
 
-export default abstract class ToolAbstract {
-	baseMoney: ToolInfo['baseMoney'];
-	comment?: ToolInfo['comment'];
-	enhanceCost: ToolInfo['enhanceCost'];
-	maxPower: ToolInfo['maxPower'];
+export default class Weapon {
+	baseMoney: WeaponInfo['baseMoney'];
+	comment?: WeaponInfo['comment'];
+	enhanceCost: WeaponInfo['enhanceCost'];
+	maxPower: WeaponInfo['maxPower'];
 
-	powerMultiple: ToolInfo['powerMultiple'];
-	ratioList: ToolInfo['ratioList'];
-	type: ToolInfo['type'];
+	powerMultiple: WeaponInfo['powerMultiple'];
+	ratioList: WeaponInfo['ratioList'];
+	type: WeaponInfo['type'];
 
 	constructor({
 		powerMultiple,
@@ -29,7 +29,7 @@ export default abstract class ToolAbstract {
 		type,
 		ratioList,
 		maxPower,
-	}: ToolConstructor) {
+	}: WeaponConstructor) {
 		this.type = type;
 		this.powerMultiple = powerMultiple;
 		this.enhanceCost = enhanceCost;
