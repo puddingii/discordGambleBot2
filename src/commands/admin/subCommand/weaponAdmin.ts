@@ -25,7 +25,7 @@ const showWeaponModal = async (
 		title: '무기 추가/업데이트',
 	};
 	const inputBoxInfo: InputBoxInfo = {
-		weaponType: { label: '무기종류' },
+		weaponType: { label: '무기종류/표시할 이름' },
 		powerMultipleAndMax: {
 			label: '배율 (강화수 * 배율 = 힘)(기본1)/강화 맥스치==ratio길이',
 		},
@@ -36,7 +36,7 @@ const showWeaponModal = async (
 
 	if (weaponType) {
 		const weapon = weaponController.getWeapon(weaponType);
-		inputBoxInfo.weaponType.value = `${weapon.type}`;
+		inputBoxInfo.weaponType.value = `${weapon.type}/${weapon.name}`;
 		inputBoxInfo.powerMultipleAndMax.value = `${weapon.powerMultiple}/${weapon.maxPower}`;
 		inputBoxInfo.cost.value = `${weapon.enhanceCost}/${weapon.baseMoney}`;
 		inputBoxInfo.ratioList.value = `${weapon.ratioList
@@ -50,7 +50,9 @@ const showWeaponModal = async (
 };
 
 const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean) => {
-	const weaponType = interaction.fields.getTextInputValue('weaponType');
+	const [weaponType, name] = interaction.fields
+		.getTextInputValue('weaponType')
+		.split('/');
 	const [powerMultiple, maxPower] = interaction.fields
 		.getTextInputValue('powerMultipleAndMax')
 		.split('/')
@@ -77,6 +79,7 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 	let content = '';
 	const defaultClassParam: WeaponConstructor = {
 		type: weaponType,
+		name,
 		powerMultiple,
 		enhanceCost,
 		baseMoney,

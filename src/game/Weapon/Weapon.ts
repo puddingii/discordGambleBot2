@@ -1,5 +1,6 @@
 type WeaponInfo = {
 	type: string;
+	name: string;
 	comment: string;
 	powerMultiple: number;
 	enhanceCost: number;
@@ -17,6 +18,7 @@ export default class Weapon {
 	enhanceCost: WeaponInfo['enhanceCost'];
 	maxPower: WeaponInfo['maxPower'];
 
+	name: WeaponInfo['name'];
 	powerMultiple: WeaponInfo['powerMultiple'];
 	ratioList: WeaponInfo['ratioList'];
 	type: WeaponInfo['type'];
@@ -27,10 +29,12 @@ export default class Weapon {
 		baseMoney,
 		comment,
 		type,
+		name,
 		ratioList,
 		maxPower,
 	}: WeaponConstructor) {
 		this.type = type;
+		this.name = name;
 		this.powerMultiple = powerMultiple;
 		this.enhanceCost = enhanceCost;
 		this.baseMoney = baseMoney;

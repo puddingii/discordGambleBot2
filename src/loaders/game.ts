@@ -51,10 +51,19 @@ export default async () => {
 	);
 
 	const weaponAllList = (await WeaponModel.findAllList()).map(weapon => {
-		const { type, comment, powerMultiple, enhanceCost, baseMoney, ratioList, maxPower } =
-			weapon._doc;
+		const {
+			type,
+			name,
+			comment,
+			powerMultiple,
+			enhanceCost,
+			baseMoney,
+			ratioList,
+			maxPower,
+		} = weapon._doc;
 		const myWeapon = new Weapon({
 			type,
+			name,
 			comment,
 			powerMultiple,
 			enhanceCost,

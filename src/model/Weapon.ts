@@ -8,6 +8,8 @@ interface DoucmentResult<T> {
 export interface IWeapon extends Document, DoucmentResult<IWeapon> {
 	/** sword, pickaxe */
 	type: string;
+	/** name */
+	name: string;
 	/** 설명 */
 	comment: string;
 	/** 무기의 힘 배율 (강화수 * 배율 = 힘) */
@@ -39,6 +41,10 @@ const Weapon = new Schema<IWeapon, IWeaponStatics>({
 	type: {
 		type: String,
 		unique: true,
+		required: true,
+	},
+	name: {
+		type: String,
 		required: true,
 	},
 	comment: {
@@ -87,6 +93,7 @@ Weapon.statics.addWeapon = async function (weaponInfo: WeaponClass) {
 	}
 	await this.create({
 		type: weaponInfo.type,
+		name: weaponInfo.name,
 		comment: weaponInfo.comment,
 		powerMultiple: weaponInfo.powerMultiple,
 		enhanceCost: weaponInfo.enhanceCost,
@@ -101,6 +108,7 @@ Weapon.statics.updateWeapon = async function (updatedWeaponInfo: WeaponConstruct
 		{ type: updatedWeaponInfo.type },
 		{
 			comment: updatedWeaponInfo.comment,
+			name: updatedWeaponInfo.name,
 			baseMoney: updatedWeaponInfo.baseMoney,
 			enhanceCost: updatedWeaponInfo.enhanceCost,
 			maxPower: updatedWeaponInfo.maxPower,
