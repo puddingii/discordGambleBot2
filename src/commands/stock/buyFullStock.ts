@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import logger from '../../config/logger';
-import stockController from '../../controller/bot/stockController';
+import userController from '../../controller/bot/userController';
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름') ?? '';
 
-			await stockController.buySellStock({
+			await userController.buySellStock({
 				discordId,
 				stockName: name,
 				cnt: 1,

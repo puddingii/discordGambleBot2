@@ -8,15 +8,9 @@ import UserModel from '../../model/User';
 
 const dataManager = DataManager.getInstance();
 
-type EnhanceWeaponType = {
-	/** 1: 성공, 2: 실패, 3: 터짐 */
-	code: 1 | 2 | 3;
-	curPower: number;
-	beforePower: number;
-};
-
 type FormattedRatioList = Array<{ value: string; name: string }>;
 
+/** 무기종류 추가 */
 export const addWeapon = async (param: WeaponConstructor) => {
 	const weaponManager = dataManager.get('weapon');
 	const weapon = weaponManager.addWeapon(param);
@@ -110,56 +104,8 @@ export const getNextRatio = ({
 	return weaponManager.getNextRatio({ type }, curPower);
 };
 
-/** 무기강화 */
-export const enhanceWeapon = async ({
-	discordId,
-	type,
-	isPreventDestroy = false,
-	isPreventDown = false,
-}: {
-	discordId: string;
-	type: string;
-	isPreventDestroy: boolean;
-	isPreventDown: boolean;
-}): Promise<EnhanceWeaponType> => {
-	const userManager = dataManager.get('user');
-	const weaponManager = dataManager.get('weapon');
-	const weaponInfo = weaponManager.getInfo({ type });
-	const userInfo = userManager.getUser({ discordId });
-	if (!userInfo) {
-		throw Error('유저정보가 없습니다');
-	}
-
-	const myWeapon = userInfo.weaponList.find(weapon => weapon.weapon.type === type);
-	if (!myWeapon) {
-		throw Error('무기정보가 없습니다.');
-	}
-
-	const beforePower = myWeapon.curPower;
-
-	/** 강화진행 */
-	const enhanceResult = weaponManager.enhanceWeapon(weaponInfo, beforePower, {
-		isPreventDestroy,
-		isPreventDown,
-	});
-	const code = enhanceResult.code ?? 2;
-	delete enhanceResult.code;
-	userManager.updateWeapon(myWeapon, enhanceResult);
-
-	// 강화비용 계산
-	const cost = weaponInfo.getCost(beforePower, {
-		isPreventDestroy,
-		isPreventDown,
-	});
-	userInfo.updateMoney(-1 * cost, 'weapon');
-
-	await userManager.update({ type: 'wm', userInfo, optionalInfo: myWeapon });
-	return { code, curPower: enhanceResult.curPower, beforePower };
-};
-
 export default {
 	addWeapon,
-	enhanceWeapon,
 	getFormattedRatioList,
 	getNextRatio,
 	getMyWeapon,

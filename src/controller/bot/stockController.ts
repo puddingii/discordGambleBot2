@@ -39,43 +39,6 @@ export interface CoinParam extends DefaultStockParam {
 	type: 'coin';
 }
 
-/** 주식사기 */
-export const buySellStock = async ({
-	discordId,
-	stockName,
-	cnt,
-	isFull,
-}: {
-	discordId: string;
-	stockName: string;
-	cnt: number;
-	isFull: boolean;
-}): Promise<{ cnt: number; value: number; money: number }> => {
-	const userManager = dataManager.get('user');
-	const stockManager = dataManager.get('stock');
-	const userInfo = dataManager.get('user').getUser({ discordId });
-	if (!userInfo) {
-		throw Error('유저정보가 없습니다');
-	}
-
-	const stockInfo = stockManager.getStock('', stockName);
-	if (!stockInfo) {
-		throw Error('주식/코인정보가 없습니다');
-	}
-
-	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
-	await userManager.update({
-		type: 'sm',
-		userInfo,
-		optionalInfo: {
-			name: stockInfo.name,
-			cnt: stockResult.cnt,
-			value: stockResult.value,
-		},
-	});
-	return stockResult;
-};
-
 /** 주식정보 가져오기 */
 export const getStock = (type: 'coin' | 'stock' | '', name: string) => {
 	const stockManager = dataManager.get('stock');
@@ -254,7 +217,6 @@ export const updateCondition = async (curTime: number) => {
 };
 
 export default {
-	buySellStock,
 	getAllStock,
 	getStock,
 	getChartData,

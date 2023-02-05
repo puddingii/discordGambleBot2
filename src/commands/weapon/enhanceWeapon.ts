@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import _ from 'lodash';
 import logger from '../../config/logger';
 import weaponController from '../../controller/bot/weaponController';
+import userController from '../../controller/bot/userController';
 
 // FIXME 나중에 셀렉터로 바꿔야함
 export default {
@@ -33,7 +34,7 @@ export default {
 			const [successRatio] = Object.values(
 				weaponController.getNextRatio({ discordId, type }),
 			).map(ratio => ratio * 100);
-			const { code, curPower, beforePower } = await weaponController.enhanceWeapon({
+			const { code, curPower, beforePower } = await userController.enhanceWeapon({
 				discordId,
 				type,
 				isPreventDestroy: false,
