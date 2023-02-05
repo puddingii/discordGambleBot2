@@ -1,8 +1,23 @@
-import Weapon from './Weapon';
+import { getRandomNumber } from '../../config/util';
+import { UserWeaponInfo } from '../User/User';
+import Weapon, { WeaponConstructor } from './Weapon';
 
 type DataInfo = {
 	weaponList: Array<Weapon>;
 };
+
+type IEnhanceWeaponResult = {
+	/** 1: 성공, 2: 실패, 3: 터짐 */
+	code?: 1 | 2 | 3;
+	curPower: number;
+} & Partial<Omit<UserWeaponInfo, 'weapon'>>;
+
+type WeaponParam = Partial<{
+	weapon: Weapon;
+	type: string;
+}>;
+
+type ValueOf<T> = T[keyof T];
 
 export default class WeaponManager {
 	weaponList: DataInfo['weaponList'];
@@ -12,35 +27,79 @@ export default class WeaponManager {
 	}
 
 	/** 주식 추가 */
-	addWeapon(weapon: Weapon) {
-		const list = this.weaponList;
-		const isExistStock = list.find(weaponInfo => weaponInfo.type === weapon.type);
+	addWeapon(weaponParam: WeaponConstructor) {
+		const isExistStock = this.weaponList.find(
+			weaponInfo => weaponInfo.type === weaponParam.type,
+		);
 		if (isExistStock) {
 			throw Error('이미 있는 무기입니다.');
 		}
-		list.push(weapon);
-	}
-
-	getBaseMoney(type: string) {
-		const weapon = this.getInfo(type);
-		return weapon.baseMoney;
-	}
-
-	getInfo(type: string) {
-		const weapon = this.weaponList.find(w => w.type === type);
-		if (!weapon) {
-			throw Error('해당하는 무기가 없습니다.');
-		}
+		const weapon = new Weapon(weaponParam);
+		this.weaponList.push(weapon);
 		return weapon;
 	}
 
-	/** 다음 강화할 때 확률 */
-	getNextRatio({ type, curPower }: { type: string; curPower: number }) {
-		const myWeapon = this.getInfo(type);
-		if (myWeapon.isOverMaxPower(curPower)) {
+	/** 무기강화 */
+	enhanceWeapon(
+		weaponParam: WeaponParam,
+		curPower: number,
+		option?: Partial<{ isPreventDestroy: boolean; isPreventDown: boolean }>,
+	): IEnhanceWeaponResult {
+		const weaponInfo = this.getInfo(weaponParam);
+		if (!weaponInfo.isValidPower(curPower + 1)) {
 			throw Error('더이상 강화할 수 없습니다.');
 		}
-		const ratio = myWeapon.ratioList[curPower];
+
+		const MAX_NUMBER = 1000;
+		const randomNum = getRandomNumber(MAX_NUMBER, 1);
+		const { failRatio, destroyRatio } = weaponInfo.ratioList[curPower];
+		// 실패
+		if (failRatio * MAX_NUMBER >= randomNum) {
+			if (option && !option.isPreventDown && curPower > 0) {
+				curPower -= 1;
+			}
+			return { code: 2, curPower, failCnt: 1 };
+		}
+		// 터짐
+		if (
+			(failRatio + destroyRatio) * MAX_NUMBER >= randomNum &&
+			option &&
+			!option.isPreventDestroy
+		) {
+			return { code: 3, curPower: 0, destroyCnt: 1 };
+		}
+
+		// 성공
+		return {
+			code: 1,
+			curPower: curPower + 1,
+			successCnt: 1,
+		};
+	}
+
+	getBaseMoney(weaponParam: WeaponParam) {
+		const weapon = this.getInfo(weaponParam);
+		return weapon.baseMoney;
+	}
+
+	getInfo({ type, weapon }: WeaponParam) {
+		if (weapon) {
+			return weapon;
+		}
+		const weaponInfo = this.weaponList.find(w => w.type === type);
+		if (!weaponInfo) {
+			throw Error('해당하는 무기가 없습니다.');
+		}
+		return weaponInfo;
+	}
+
+	/** 다음 강화할 때 확률 */
+	getNextRatio(weaponParam: WeaponParam, curPower: number) {
+		const weaponInfo = this.getInfo(weaponParam);
+		if (!weaponInfo.isValidPower(curPower + 1)) {
+			throw Error('더이상 강화할 수 없습니다.');
+		}
+		const ratio = weaponInfo.ratioList[curPower];
 		return {
 			success: 1 - (ratio.destroyRatio + ratio.failRatio),
 			fail: ratio.failRatio,
@@ -48,8 +107,19 @@ export default class WeaponManager {
 		};
 	}
 
-	getRatioList(type: string) {
-		const weapon = this.getInfo(type);
+	getRatioList(weaponParam: WeaponParam) {
+		const weapon = this.getInfo(weaponParam);
 		return weapon.ratioList;
+	}
+
+	updateWeapon(weaponParam: WeaponParam, updatedWeaponInfo: Partial<WeaponConstructor>) {
+		const weaponInfo = this.getInfo(weaponParam);
+		(Object.keys(updatedWeaponInfo) as Array<keyof typeof updatedWeaponInfo>).forEach(
+			info => {
+				if (info !== 'type' && info !== 'name') {
+					(<ValueOf<Weapon>>weaponInfo[info]) = updatedWeaponInfo[info];
+				}
+			},
+		);
 	}
 }

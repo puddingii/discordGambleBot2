@@ -32,7 +32,7 @@ type PatchGiveMoneyBodyInfo = {
 };
 
 type PatchWeaponBodyInfo = {
-	type: 'sword' | 'pickaxe';
+	type: string;
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
 };
@@ -290,7 +290,6 @@ export const patchWeapon = async (req: Request, res: Response) => {
 		const { user } = req;
 		const { type, isPreventDestroy, isPreventDown } =
 			req.body as Partial<PatchWeaponBodyInfo>;
-		req.body as Partial<PatchGiveMoneyBodyInfo>;
 		const globalManager = dataManager.get('globalStatus');
 		const userManager = dataManager.get('user');
 		const userInfo = userManager.getUser({ discordId: user?.discordId });

@@ -17,6 +17,8 @@ type UpdateParamInfo = {
 	userInfo: Partial<{ discordId: string; nickname: string }>;
 	optionalInfo?: UserWeaponInfo | StockOptionalType;
 };
+type UpdateWeaponInfo = Omit<UserWeaponInfo, 'weapon'>;
+type ValueOf<T> = T[keyof T];
 
 export default class UserManager {
 	userList: Array<User>;
@@ -54,6 +56,19 @@ export default class UserManager {
 	/** 유저리스트 가져오기 */
 	getUserList(): Array<User> {
 		return this.userList;
+	}
+
+	/** 유저 무기관련 업데이트 */
+	updateWeapon(userWeapon: UserWeaponInfo, updatedWeaponInfo: Partial<UpdateWeaponInfo>) {
+		(Object.keys(updatedWeaponInfo) as Array<keyof typeof updatedWeaponInfo>).forEach(
+			info => {
+				if (info === 'curPower') {
+					userWeapon[info] = <ValueOf<UpdateWeaponInfo>>updatedWeaponInfo[info];
+				} else {
+					userWeapon[info] += <ValueOf<UpdateWeaponInfo>>updatedWeaponInfo[info];
+				}
+			},
+		);
 	}
 
 	/** 유저등록 */

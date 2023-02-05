@@ -43,21 +43,30 @@ export default class Weapon {
 		this.maxPower = maxPower;
 	}
 
-	getCost(exponent: number) {
-		if (exponent < 0) {
-			throw Error('0이하의 값은 입력할 수 없습니다.');
+	getCost(
+		exponent: number,
+		option?: { isPreventDown?: boolean; isPreventDestroy?: boolean },
+	) {
+		if (exponent < 0 && exponent >= this.maxPower) {
+			throw Error('0미만 및 강화 최대치 이상의 비용은 책정할 수 없습니다');
 		}
-		return (this.baseMoney ** (exponent - 10) + 1) * this.enhanceCost;
+		let cost = (this.baseMoney ** (exponent - 10) + 1) * this.enhanceCost;
+		if (option) {
+			const { isPreventDestroy, isPreventDown } = option;
+			cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
+		}
+
+		return cost;
 	}
 
 	getPower(power: number) {
-		if (power < 0) {
-			throw Error('0이하의 값은 입력할 수 없습니다.');
+		if (power < 0 && power > this.maxPower) {
+			throw Error('0미만 및 강화 최대치 초과의 힘은 책정할 수 없습니다');
 		}
 		return power * this.powerMultiple;
 	}
 
-	isOverMaxPower(power: number) {
-		return this.maxPower <= power;
+	isValidPower(power: number) {
+		return power <= this.maxPower && power >= 0;
 	}
 }

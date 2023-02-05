@@ -88,7 +88,11 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 		comment,
 	};
 
-	await weaponController.updateWeapon(isNew ?? false, defaultClassParam);
+	if (isNew) {
+		await weaponController.addWeapon(defaultClassParam);
+	} else {
+		await weaponController.updateWeapon(defaultClassParam);
+	}
 	content = isNew ? '무기추가 완료' : '무기 업데이트 완료';
 
 	await interaction.reply({
