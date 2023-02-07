@@ -1,22 +1,6 @@
-import { ClientSession } from 'mongoose';
 import User, { UserWeaponInfo } from './User';
 import UserModel from '../../model/User';
 
-/**
- * sm: 주식과돈
- * wm: 무기와돈
- * mm: 다른사용자에게 돈 줄때 Transaction이용
- * m: 돈
- * s: 주식
- * w: 무기
- */
-type UpdateTypeInfo = 'sm' | 'wm' | 'm' | 's' | 'w';
-type StockOptionalType = { name: string; cnt: number; value: number };
-type UpdateParamInfo = {
-	type: UpdateTypeInfo;
-	userInfo: Partial<{ discordId: string; nickname: string }>;
-	optionalInfo?: UserWeaponInfo | StockOptionalType;
-};
 type UpdateWeaponInfo = Omit<UserWeaponInfo, 'weapon'>;
 type ValueOf<T> = T[keyof T];
 
@@ -86,54 +70,5 @@ export default class UserManager {
 	async generatePassword(discordId: string) {
 		const myPassword = await UserModel.generatePassword(discordId);
 		return myPassword;
-	}
-
-	/** 업데이트 */
-	async update(
-		updateInfo: UpdateParamInfo,
-		session: ClientSession | null = null,
-	): Promise<boolean> {
-		const { type, userInfo, optionalInfo } = updateInfo;
-		const myInfo = this.getUser(userInfo);
-
-		if (!myInfo) {
-			return false;
-		}
-
-		let result = false;
-		switch (type) {
-			case 'm':
-				result = await UserModel.updateMoney(myInfo.getId(), myInfo.money, session);
-				break;
-			case 'wm':
-				result = optionalInfo
-					? await UserModel.updateWeaponAndMoney(
-							myInfo.getId(),
-							optionalInfo as UserWeaponInfo,
-							myInfo.money,
-					  )
-					: false;
-				break;
-			case 'w':
-				result = optionalInfo
-					? await UserModel.updateWeaponAndMoney(
-							myInfo.getId(),
-							optionalInfo as UserWeaponInfo,
-					  )
-					: false;
-				break;
-			case 'sm':
-				result = optionalInfo
-					? await UserModel.updateStockAndMoney(
-							myInfo.getId(),
-							optionalInfo as StockOptionalType,
-							myInfo.money,
-					  )
-					: false;
-				break;
-			default:
-		}
-
-		return result;
 	}
 }

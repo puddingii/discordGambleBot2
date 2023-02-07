@@ -1,4 +1,6 @@
 import DataManager from '../../game/DataManager';
+import UserModel from '../../model/User';
+import StatusModel from '../../model/Status';
 import User from '../../game/User/User';
 
 const dataManager = DataManager.getInstance();
@@ -16,12 +18,11 @@ export const getGrantMoney = () => {
 export const updateGrantMoney = async (value?: number) => {
 	const globalManager = dataManager.get('globalStatus');
 	globalManager.updateGrantMoney(value);
-	await globalManager.update({ type: 'g' });
+	await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
 };
 
 export const giveGrantMoney = async (user: User) => {
 	const globalManager = dataManager.get('globalStatus');
-	const userManager = dataManager.get('user');
 	const money = getGrantMoney();
 	user.updateMoney(money);
 	globalManager.updateGrantMoney(0);
@@ -29,11 +30,8 @@ export const giveGrantMoney = async (user: User) => {
 	await dataManager.setTransaction();
 	const session = dataManager.getSession();
 	await session?.withTransaction(async () => {
-		await userManager.update(
-			{ type: 'm', userInfo: { discordId: user.getId() } },
-			session,
-		);
-		await globalManager.update({ type: 'g' });
+		await UserModel.updateMoney(user.getId(), user.money, session);
+		await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
 	});
 	await dataManager.setTransaction(true);
 	return money;
@@ -42,7 +40,7 @@ export const giveGrantMoney = async (user: User) => {
 export const updateCurTime = async (value: number) => {
 	const globalManager = dataManager.get('globalStatus');
 	globalManager.updateCurTime(value);
-	await globalManager.update({ type: 't' });
+	await StatusModel.updateStatus({ gamble: { curTime: globalManager.curTime } });
 };
 
 export default {

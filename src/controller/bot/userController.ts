@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import User from '../../game/User/User';
+import UserModel from '../../model/User';
 import DataManager from '../../game/DataManager';
 
 const dataManager = DataManager.getInstance();
@@ -43,7 +44,7 @@ export const adjustMoney = async (
 		throw Error('유저정보가 없습니다.');
 	}
 	user.updateMoney(money);
-	await userManager.update({ type: 'm', userInfo: { discordId: user.getId() } });
+	await UserModel.updateMoney(user.getId(), user.money);
 };
 
 /** 주식사기 */
@@ -58,7 +59,6 @@ export const buySellStock = async ({
 	cnt: number;
 	isFull: boolean;
 }): Promise<{ cnt: number; value: number; money: number }> => {
-	const userManager = dataManager.get('user');
 	const stockManager = dataManager.get('stock');
 	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
@@ -71,15 +71,15 @@ export const buySellStock = async ({
 	}
 
 	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
-	await userManager.update({
-		type: 'sm',
-		userInfo,
-		optionalInfo: {
+	await UserModel.updateStockAndMoney(
+		userInfo.getId(),
+		{
 			name: stockInfo.name,
 			cnt: stockResult.cnt,
 			value: stockResult.value,
 		},
-	});
+		userInfo.money,
+	);
 	return stockResult;
 };
 
@@ -126,7 +126,7 @@ export const enhanceWeapon = async ({
 	});
 	userInfo.updateMoney(-1 * cost, 'weapon');
 
-	await userManager.update({ type: 'wm', userInfo, optionalInfo: myWeapon });
+	await UserModel.updateWeaponAndMoney(userInfo.getId(), myWeapon, userInfo.money);
 	return { code, curPower: enhanceResult.curPower, beforePower };
 };
 
@@ -148,8 +148,8 @@ export const giveMoney = async (
 	await dataManager.setTransaction();
 	const session = dataManager.getSession();
 	await session?.withTransaction(async () => {
-		await userManager.update({ type: 'm', userInfo: myInfo }, session);
-		await userManager.update({ type: 'm', userInfo: ptrInfo }, session);
+		await UserModel.updateMoney(user.getId(), user.money, session);
+		await UserModel.updateMoney(ptrUser.getId(), ptrUser.money, session);
 	});
 	await dataManager.setTransaction(true);
 };
@@ -240,13 +240,12 @@ export const getRankingList = () => {
 
 /** 돈 갱신 */
 export const updateMoney = async (discordId: string, value: number): Promise<User> => {
-	const userManager = dataManager.get('user');
 	const userInfo = dataManager.get('user').getUser({ discordId });
 	if (!userInfo) {
 		throw Error('유저정보가 없습니다');
 	}
 	userInfo.updateMoney(value);
-	await userManager.update({ type: 'm', userInfo });
+	await UserModel.updateMoney(userInfo.getId(), userInfo.money);
 	return userInfo;
 };
 

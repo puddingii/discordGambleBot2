@@ -1,12 +1,3 @@
-import { ClientSession } from 'mongoose';
-import StatusModel from '../../model/Status';
-
-type UpdateTypeInfo = 't' | 'g';
-type UpdateParamInfo = {
-	type: UpdateTypeInfo;
-	// updateParam: Partial<{ num: number }>;
-};
-
 export default class GlobalManager {
 	curTime: number;
 	grantMoney: number;
@@ -30,22 +21,6 @@ export default class GlobalManager {
 		this.grantMoney += 210 + this.grantMoney * 0.02;
 		if (this.grantMoney > 5_000_000) {
 			this.grantMoney = 5_000_000;
-		}
-	}
-
-	async update(updateInfo: UpdateParamInfo, session: ClientSession | null = null) {
-		const { type } = updateInfo;
-		switch (type) {
-			case 't':
-				await StatusModel.updateStatus({ gamble: { curTime: this.curTime } });
-				break;
-			case 'g':
-				await StatusModel.updateStatus(
-					{ user: { grantMoney: this.grantMoney } },
-					session,
-				);
-				break;
-			default:
 		}
 	}
 }

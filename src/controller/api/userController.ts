@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
 import UserModel from '../../model/User';
+import StatusModel from '../../model/Status';
 import DataManager from '../../game/DataManager';
 
 type MyStockInfo = {
@@ -257,11 +258,8 @@ export const patchGrantMoney = async (req: Request, res: Response) => {
 		await dataManager.setTransaction();
 		const session = dataManager.getSession();
 		await session?.withTransaction(async () => {
-			await userManager.update(
-				{ type: 'm', userInfo: { discordId: user.discordId } },
-				session,
-			);
-			await globalManager.update({ type: 'g' });
+			await UserModel.updateMoney(userInfo.getId(), userInfo.money, session);
+			await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
 		});
 		await dataManager.setTransaction(true);
 		return res.status(200).json({ value: money });
@@ -300,14 +298,8 @@ export const patchGiveMoney = async (req: Request, res: Response) => {
 		await dataManager.setTransaction();
 		const session = dataManager.getSession();
 		await session?.withTransaction(async () => {
-			await userManager.update(
-				{ type: 'm', userInfo: { nickname: myNickname } },
-				session,
-			);
-			await userManager.update(
-				{ type: 'm', userInfo: { nickname: ptrNickname } },
-				session,
-			);
+			await UserModel.updateMoney(userInfo.getId(), userInfo.money, session);
+			await UserModel.updateMoney(ptrUserInfo.getId(), ptrUserInfo.money, session);
 		});
 		await dataManager.setTransaction(true);
 
