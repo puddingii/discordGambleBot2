@@ -3,6 +3,7 @@ import {
 	getNicknameList,
 	getUserProfileInfo,
 	getUserStockList,
+	getWeaponList,
 	patchGiveMoney,
 	patchGrantMoney,
 	patchUserStock,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.get('/stocklist', isLoggedIn, getUserStockList);
 router.get('/nicklist', isLoggedIn, getNicknameList);
+router.get('/weaponList', isLoggedIn, getWeaponList);
 router.patch('/give/money', isLoggedIn, patchGiveMoney);
 router.patch('/stock', isLoggedIn, patchUserStock);
 router.patch('/grantmoney', isLoggedIn, patchGrantMoney);

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
+import UserModel from '../../model/User';
 import DataManager from '../../game/DataManager';
 
 type MyStockInfo = {
@@ -82,51 +83,6 @@ export const getUserProfileInfo = (req: Request, res: Response) => {
 	}
 };
 
-export const patchUserStock = async (req: Request, res: Response) => {
-	try {
-		const { user } = req;
-		const { cnt, stockName, type } = req.body as Partial<PatchStockBodyInfo>;
-		if (!user) {
-			return res
-				.status(401)
-				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
-		}
-		if (!cnt || !stockName || !type) {
-			throw Error('데이터 오류');
-		}
-		const userManager = dataManager.get('user');
-		const stockManager = dataManager.get('stock');
-		const userInfo = userManager.getUser({ discordId: user.discordId });
-		if (!userInfo) {
-			throw Error('유저정보가 없습니다');
-		}
-
-		const stockInfo = stockManager.getStock('', stockName);
-		if (!stockInfo) {
-			throw Error('주식/코인정보가 없습니다');
-		}
-
-		const reCnt = type === 's' ? -1 * cnt : cnt;
-		const stockResult = userInfo.updateStock(stockInfo, reCnt, false);
-		await userManager.update({
-			type: 'sm',
-			userInfo,
-			optionalInfo: {
-				name: stockInfo.name,
-				cnt: stockResult.cnt,
-				value: stockResult.value,
-			},
-		});
-		return res.status(200).json({ cnt: stockResult.cnt, value: stockResult.value });
-	} catch (err) {
-		let message = err;
-		if (err instanceof Error) {
-			message = err.message;
-		}
-		return res.status(400).json({ message });
-	}
-};
-
 export const getUserStockList = (req: Request, res: Response) => {
 	try {
 		const user = req.user;
@@ -188,11 +144,91 @@ export const getUserStockList = (req: Request, res: Response) => {
 	}
 };
 
+export const getWeaponList = (req: Request, res: Response) => {
+	try {
+		const user = req.user;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+		const userManager = dataManager.get('user');
+		const userInfo = userManager.getUser({ discordId: user.discordId });
+		if (!userInfo) {
+			return res.status(401).json({ message: '유저DB Error. 운영자에게 문의주세요' });
+		}
+
+		const myWeaponList = userInfo.weaponList.map(weapon => ({
+			bonusPower: weapon.bonusPower,
+			curPower: weapon.curPower,
+			destroyCnt: weapon.destroyCnt,
+			failCnt: weapon.failCnt,
+			hitRatio: weapon.hitRatio,
+			missRatio: weapon.missRatio,
+			successCnt: weapon.successCnt,
+			name: weapon.weapon.name,
+		}));
+
+		return res.status(200).json(myWeaponList);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
 export const getNicknameList = (req: Request, res: Response) => {
 	try {
 		const userManager = dataManager.get('user');
 		const userList = userManager.getUserList();
 		return res.status(200).json(userList.map(user => user.nickname));
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+};
+
+export const patchUserStock = async (req: Request, res: Response) => {
+	try {
+		const { user } = req;
+		const { cnt, stockName, type } = req.body as Partial<PatchStockBodyInfo>;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+		if (!cnt || !stockName || !type) {
+			throw Error('데이터 오류');
+		}
+		const userManager = dataManager.get('user');
+		const stockManager = dataManager.get('stock');
+		const userInfo = userManager.getUser({ discordId: user.discordId });
+		if (!userInfo) {
+			throw Error('유저정보가 없습니다');
+		}
+
+		const stockInfo = stockManager.getStock('', stockName);
+		if (!stockInfo) {
+			throw Error('주식/코인정보가 없습니다');
+		}
+
+		const reCnt = type === 's' ? -1 * cnt : cnt;
+		const stockResult = userInfo.updateStock(stockInfo, reCnt, false);
+		await UserModel.updateStockAndMoney(
+			userInfo.getId(),
+			{
+				name: stockInfo.name,
+				cnt: stockResult.cnt,
+				value: stockResult.value,
+			},
+			userInfo.money,
+		);
+		return res.status(200).json({ cnt: stockResult.cnt, value: stockResult.value });
 	} catch (err) {
 		let message = err;
 		if (err instanceof Error) {
@@ -288,32 +324,47 @@ export const patchGiveMoney = async (req: Request, res: Response) => {
 export const patchWeapon = async (req: Request, res: Response) => {
 	try {
 		const { user } = req;
-		const { type, isPreventDestroy, isPreventDown } =
-			req.body as Partial<PatchWeaponBodyInfo>;
-		const globalManager = dataManager.get('globalStatus');
-		const userManager = dataManager.get('user');
-		const userInfo = userManager.getUser({ discordId: user?.discordId });
-		if (!userInfo || !user) {
+		if (!user) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
-		const money = globalManager.grantMoney;
-		userInfo.updateMoney(money);
-		globalManager.updateGrantMoney(0);
+		const { type, isPreventDestroy, isPreventDown } =
+			req.body as Partial<PatchWeaponBodyInfo>;
+		const userManager = dataManager.get('user');
+		const weaponManager = dataManager.get('weapon');
+		const weaponInfo = weaponManager.getInfo({ type });
+		const userInfo = userManager.getUser({ discordId: user.discordId });
+		if (!userInfo) {
+			throw Error('유저정보가 없습니다');
+		}
 
-		await dataManager.setTransaction();
-		const session = dataManager.getSession();
-		await session?.withTransaction(async () => {
-			await userManager.update(
-				{ type: 'm', userInfo: { discordId: user.discordId } },
-				session,
-			);
-			await globalManager.update({ type: 'g' });
+		const myWeapon = userInfo.weaponList.find(weapon => weapon.weapon.type === type);
+		if (!myWeapon) {
+			throw Error('무기정보가 없습니다.');
+		}
+
+		const beforePower = myWeapon.curPower;
+
+		/** 강화진행 */
+		const enhanceResult = weaponManager.enhanceWeapon(weaponInfo, beforePower, {
+			isPreventDestroy,
+			isPreventDown,
 		});
-		await dataManager.setTransaction(true);
-		return res.status(200).json({ value: money });
+		const code = enhanceResult.code ?? 2;
+		delete enhanceResult.code;
+		userManager.updateWeapon(myWeapon, enhanceResult);
+
+		// 강화비용 계산
+		const cost = weaponInfo.getCost(beforePower, {
+			isPreventDestroy,
+			isPreventDown,
+		});
+		userInfo.updateMoney(-1 * cost, 'weapon');
+
+		await UserModel.updateWeaponAndMoney(userInfo.getId(), myWeapon, userInfo.money);
+		return res.status(200).json({ code, curPower: enhanceResult.curPower, beforePower });
 	} catch (err) {
 		let message = err;
 		if (err instanceof Error) {
@@ -327,7 +378,9 @@ export default {
 	getUserProfileInfo,
 	getUserStockList,
 	getNicknameList,
+	getWeaponList,
 	patchUserStock,
 	patchGrantMoney,
 	patchGiveMoney,
+	patchWeapon,
 };
