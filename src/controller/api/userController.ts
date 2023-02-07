@@ -168,6 +168,8 @@ export const getWeaponList = (req: Request, res: Response) => {
 			missRatio: weapon.missRatio,
 			successCnt: weapon.successCnt,
 			name: weapon.weapon.name,
+			type: weapon.weapon.type,
+			comment: weapon.weapon.comment,
 		}));
 
 		return res.status(200).json(myWeaponList);

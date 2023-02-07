@@ -13,6 +13,7 @@ import { default as connectMongo } from 'connect-mongodb-session';
 import userRouter from '../routes/userRouter';
 import authRouter from '../routes/authRouter';
 import stockRouter from '../routes/stockRouter';
+import weaponRouter from '../routes/weaponRouter';
 import passportConfig from '../passport';
 import logger from '../config/logger';
 import secretKey from '../config/secretKey';
@@ -52,6 +53,7 @@ export default async (app: Express) => {
 	app.use('/api/user', userRouter);
 	app.use('/api/auth', authRouter);
 	app.use('/api/stock', stockRouter);
+	app.use('/api/weapon', weaponRouter);
 
 	const swaggerFile = await fs.readFile(
 		path.resolve(__dirname, '../swagger/swagger-output.json'),
