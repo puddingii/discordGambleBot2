@@ -9,18 +9,34 @@ import WeaponModel, { IWeapon } from './Weapon';
 
 type WeaponInfo = {
 	weapon: Types.ObjectId | IWeapon;
+	/** 터진수 */
 	destroyCnt: number;
+	/** 실패수 */
 	failCnt: number;
+	/** 성공수 */
 	successCnt: number;
+	/** 현재 강화된 정도(파워는 강화된 수 * 3) */
 	curPower: number;
+	/** 추가 파워 */
 	bonusPower: number;
+	/** 최대 적중률은 300% */
 	hitRatio: number;
+	/** 최대 회피율은 70% */
 	missRatio: number;
 };
 
 type StockInfo = {
 	stock: Types.ObjectId | IStock;
+	/** 가지고 있는 갯수 */
 	cnt: number;
+	/** 내 평균 포지션 */
+	value: number;
+};
+
+type GiftInfo = {
+	/** 선물 타입 */
+	type: string;
+	/** 가치나 카운트 */
 	value: number;
 };
 
@@ -29,12 +45,20 @@ interface DoucmentResult<T> {
 }
 
 interface IUser extends Document, DoucmentResult<IUser> {
+	/** 디스코드 아이디 */
 	discordId: string;
+	/** 웹 접속용 패스워드 */
 	password: string;
+	/** 내 닉네임 */
 	nickname: string;
+	/** 가지고 있는 돈 */
 	money: number;
+	/** 가지고 있는 주식 리스트 */
 	stockList: Types.Array<StockInfo>;
+	/** 가지고 있는 무기 리스트 */
 	weaponList: Types.Array<WeaponInfo>;
+	/** 선물 받은 리스트 */
+	giftList: Types.Array<GiftInfo>;
 }
 
 export type IUserInfo = IUser & {
@@ -42,25 +66,36 @@ export type IUserInfo = IUser & {
 };
 
 interface IUserStatics extends Model<IUser> {
+	/** 새로운 유저 추가 */
 	addNewUser(discordId: string, nickname: string): Promise<void>;
+	/** 새로운 주식 추가 */
 	addNewStock(name: string): Promise<void>;
+	/** 새로운 무기 추가 */
 	addNewWeapon(type: string): Promise<void>;
+	/** 선물 추가 */
+	addGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
+	/** 웹 패스워드 검증 */
 	checkPassword(
 		userInfo: Partial<{ discordId: string; nickname: string }>,
 		password: string,
 	): Promise<boolean>;
+	/** 디스코드 아이디로 유저정보 가져오기 */
 	findByDiscordId(discordId: string): Promise<IUserInfo | null>;
+	/** 웹 패스워드 발급 */
 	generatePassword(discordId: string): Promise<string>;
+	/** 유저 돈 업데이트 */
 	updateMoney(
 		discordId: string,
 		money: number,
 		session?: ClientSession | null,
 	): Promise<boolean>;
+	/** 무기와 돈 같이 업데이트 */
 	updateWeaponAndMoney(
 		discordId: string,
 		updWeaponInfo: UserWeaponInfo,
 		money?: number,
 	): Promise<boolean>;
+	/** 주식과 돈 같이 업데이트 */
 	updateStockAndMoney(
 		discordId: string,
 		updStockInfo: {
@@ -72,6 +107,11 @@ interface IUserStatics extends Model<IUser> {
 	): Promise<boolean>;
 	/** 유저가 가지고있는 주식 삭제 */
 	deleteStockWithAllUser(name: string): Promise<void>;
+	/** 유저가 가지고 있는 type이 같은 선물들 모두 삭제 */
+	deleteAllGift(discordId: string, type: string): Promise<void>;
+	/** 유저가 가지고 있는 type과 value가 같은 선물 단일삭제 */
+	deleteGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
+	/** 유저리스트의 유저들 모두 갱신 */
 	updateAll(userList: UserController[]): Promise<void>;
 }
 
@@ -118,42 +158,47 @@ const User = new Schema<IUser, IUserStatics>({
 				ref: 'Weapon',
 				required: true,
 			},
-			/** 터진수 */
 			destroyCnt: {
 				type: Number,
 				default: 0,
 			},
-			/** 실패수 */
 			failCnt: {
 				type: Number,
 				default: 0,
 			},
-			/** 성공수 */
 			successCnt: {
 				type: Number,
 				default: 0,
 			},
-			/** 현재 강화된 정도(파워는 강화된 수 * 3) */
 			curPower: {
 				type: Number,
 				default: 0,
 			},
-			/** 추가 파워 */
 			bonusPower: {
 				type: Number,
 				default: 0,
 			},
-			/** 최대 적중률은 300% */
 			hitRatio: {
 				type: Number,
 				default: 1,
 				max: 3,
 			},
-			/** 최대 회피율은 70% */
 			missRatio: {
 				type: Number,
 				default: 0,
 				max: 0.7,
+			},
+		},
+	],
+	giftList: [
+		{
+			type: {
+				type: String,
+				required: true,
+			},
+			value: {
+				type: Number,
+				default: 0,
 			},
 		},
 	],
@@ -288,7 +333,7 @@ User.statics.deleteStockWithAllUser = async function (name: string) {
 	await this.updateMany(
 		{ 'stockList.stock': new Types.ObjectId(stock._id) },
 		{
-			$pull: { stockList: { stock: new Types.ObjectId(stock._id) } },
+			$pullAll: { stockList: { stock: new Types.ObjectId(stock._id) } },
 		},
 	);
 };
@@ -366,6 +411,23 @@ User.statics.updateAll = async function (userList: UserController[]) {
 			logger.error(`${result.reason}`);
 		}
 	});
+};
+
+User.statics.addGift = async function (discordId: string, giftInfo: GiftInfo) {
+	await this.findOneAndUpdate(
+		{ discordId },
+		{
+			$push: { giftList: giftInfo },
+		},
+	);
+};
+
+User.statics.deleteGift = async function (discordId: string, giftInfo: GiftInfo) {
+	await this.findOneAndUpdate({ discordId }, { $pull: { giftList: giftInfo } });
+};
+
+User.statics.deleteAllGift = async function (discordId: string, type: string) {
+	await this.findOneAndUpdate({ discordId }, { $pullAll: { giftList: { type } } });
 };
 
 export default model<IUser, IUserStatics>('User', User);
