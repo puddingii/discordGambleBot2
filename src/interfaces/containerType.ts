@@ -12,4 +12,5 @@ export default {
 
 	/** Service */
 	UserService: Symbol.for('UserService'),
+	StockService: Symbol.for('StockService'),
 };

@@ -1,31 +1,20 @@
 import _ from 'lodash';
+import {
+	IStockAbstract,
+	TStockAbstractConstructor,
+	TStockInfo,
+} from '../../interfaces/game/stock';
 
-interface StockAbstractInfo {
-	ratio: { min: number; max: number };
-	name: string;
-	value: number;
-	type: 'stock' | 'coin';
-	updateTime: number;
-	correctionCnt: number;
-	comment: string;
-}
-
-export type StockAbstractConstructor = Omit<
-	StockAbstractInfo,
-	'correctionCnt' | 'comment'
-> &
-	Pick<Partial<StockAbstractInfo>, 'correctionCnt' | 'comment'>;
-
-export default abstract class StockAbstract {
-	private _ratio: StockAbstractInfo['ratio'];
-	beforeHistoryRatio: number;
-	comment: StockAbstractInfo['comment'];
-	correctionCnt: StockAbstractInfo['correctionCnt'];
+export default abstract class StockAbstract implements IStockAbstract {
+	private _ratio: TStockInfo['ratio'];
+	beforeHistoryRatio: TStockInfo['beforeHistoryRatio'];
+	comment: TStockInfo['comment'];
+	correctionCnt: TStockInfo['correctionCnt'];
 	correctionHistory: { value: number; ratio: number }[];
-	name: StockAbstractInfo['name'];
-	type: StockAbstractInfo['type'];
-	updateTime: StockAbstractInfo['updateTime'];
-	value: StockAbstractInfo['value'];
+	name: TStockInfo['name'];
+	type: TStockInfo['type'];
+	updateTime: TStockInfo['updateTime'];
+	value: TStockInfo['value'];
 
 	constructor({
 		ratio,
@@ -35,7 +24,7 @@ export default abstract class StockAbstract {
 		updateTime,
 		correctionCnt,
 		comment,
-	}: StockAbstractConstructor) {
+	}: TStockAbstractConstructor) {
 		this._ratio = ratio;
 		this.name = name;
 		this.value = value;
@@ -47,13 +36,11 @@ export default abstract class StockAbstract {
 		this.beforeHistoryRatio = 0;
 	}
 
-	/** 조정을 위한 히스토리 쌓기	*/
 	addCorrectionHistory(value: number, ratio: number) {
 		this.correctionHistory.push({ value, ratio });
 	}
 
-	/** (조정주기 * 0.05) 이상의 변동률이 있을때 ((조정주기 - 1) * 0.05)만큼 -+해준다. */
-	calcCorrect(): number {
+	getCorrect(): number {
 		if (this.correctionHistory.length < this.correctionCnt) {
 			return 0;
 		}
@@ -69,7 +56,6 @@ export default abstract class StockAbstract {
 		return ratio;
 	}
 
-	/** ratio에서 참고하여 min <= x <= max 범위의 랜덤 x값을 산출한다. */
 	getRandomRatio() {
 		const curRatio = this._ratio;
 		const volatility = curRatio.max - curRatio.min;
@@ -78,26 +64,19 @@ export default abstract class StockAbstract {
 		return updPercent;
 	}
 
-	/** ratio의 min, max 가져오기 */
 	getRatio() {
 		return this._ratio;
 	}
 
-	/** 업데이트 할 시간인지 */
 	isUpdateTime(curTime: number) {
 		return curTime % this.updateTime !== 0;
 	}
 
-	/** 조정히스토리 지우기 */
 	removeAllCorrectionHistory() {
 		this.correctionHistory = [];
 	}
 
-	/**
-	 * 나중에 관리자가 확률 조정할 때 쓰일 예정
-	 * @param {{ min: number, max: number }} ratio
-	 */
-	setRatio(ratio: StockAbstractConstructor['ratio']) {
+	setRatio(ratio: TStockInfo['ratio']) {
 		// if (Math.abs(ratio.min) > 0.02 || Math.abs(ratio.max) > 0.02) {
 		// 	throw new Error('Set Ratio Error. Minimum/Maximum size is too big.');
 		// }
