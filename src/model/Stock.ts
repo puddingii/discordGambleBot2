@@ -2,7 +2,6 @@ import { Schema, Model, model, Types, Document } from 'mongoose';
 import dayjs from 'dayjs';
 
 import secretKey from '../config/secretKey';
-import logger from '../config/logger';
 
 import CoinClass from '../game/Stock/Coin';
 import StockClass from '../game/Stock/Stock';
@@ -189,7 +188,7 @@ Stock.statics.updateStockList = async function (updateList: (CoinClass | StockCl
 
 	resultList.forEach(result => {
 		if (result.status !== 'fulfilled') {
-			logger.error(`${result.reason}`);
+			throw Error(`${result.reason}`);
 		}
 	});
 };
