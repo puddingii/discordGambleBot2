@@ -1,4 +1,3 @@
-import { Resolver, AwilixContainer } from 'awilix';
 import { Collection } from 'discord.js';
 import { Express } from 'express-serve-static-core';
 import { IUserInfo } from '../model/User';

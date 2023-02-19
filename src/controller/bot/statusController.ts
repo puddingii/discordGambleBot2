@@ -30,7 +30,7 @@ export const giveGrantMoney = async (user: User) => {
 	await dataManager.setTransaction();
 	const session = dataManager.getSession();
 	await session?.withTransaction(async () => {
-		await UserModel.updateMoney(user.getId(), user.money, session);
+		await UserModel.updateMoney({ discordId: user.getId() }, user.money, session);
 		await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
 	});
 	await dataManager.setTransaction(true);

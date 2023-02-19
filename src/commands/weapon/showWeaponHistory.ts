@@ -5,7 +5,11 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import weaponController from '../../controller/bot/weaponController';
-import logger from '../../config/logger';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 // FIXME 여기도 바꿔야함
 export default {
@@ -37,7 +41,7 @@ export default {
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

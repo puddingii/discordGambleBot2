@@ -260,7 +260,11 @@ export const patchGrantMoney = async (req: Request, res: Response) => {
 		await dataManager.setTransaction();
 		const session = dataManager.getSession();
 		await session?.withTransaction(async () => {
-			await UserModel.updateMoney(userInfo.getId(), userInfo.money, session);
+			await UserModel.updateMoney(
+				{ discordId: userInfo.getId() },
+				userInfo.money,
+				session,
+			);
 			await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
 		});
 		await dataManager.setTransaction(true);
@@ -300,8 +304,16 @@ export const patchGiveMoney = async (req: Request, res: Response) => {
 		await dataManager.setTransaction();
 		const session = dataManager.getSession();
 		await session?.withTransaction(async () => {
-			await UserModel.updateMoney(userInfo.getId(), userInfo.money, session);
-			await UserModel.updateMoney(ptrUserInfo.getId(), ptrUserInfo.money, session);
+			await UserModel.updateMoney(
+				{ discordId: userInfo.getId() },
+				userInfo.money,
+				session,
+			);
+			await UserModel.updateMoney(
+				{ discordId: ptrUserInfo.getId() },
+				ptrUserInfo.money,
+				session,
+			);
 		});
 		await dataManager.setTransaction(true);
 

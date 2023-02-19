@@ -1,8 +1,12 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import _ from 'lodash';
-import logger from '../../config/logger';
 import weaponController from '../../controller/bot/weaponController';
 import userController from '../../controller/bot/userController';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 // FIXME 나중에 셀렉터로 바꿔야함
 export default {
@@ -58,7 +62,7 @@ export default {
 
 			await interaction.reply({ content });
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

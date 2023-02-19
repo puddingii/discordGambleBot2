@@ -1,6 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import logger from '../../config/logger';
 import userController from '../../controller/bot/userController';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -19,7 +23,7 @@ export default {
 				ephemeral: true,
 			});
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

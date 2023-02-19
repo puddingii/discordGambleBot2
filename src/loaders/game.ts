@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import DataManager from '../game/DataManager';
 import Stock from '../game/Stock/Stock';
 import Coin from '../game/Stock/Coin';
-import User, { UserStockInfo, UserWeaponInfo } from '../game/User/User';
+import User from '../game/User/User';
 import Weapon from '../game/Weapon/Weapon';
 import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
@@ -12,6 +12,7 @@ import StatusModel from '../model/Status';
 import UserModel from '../model/User';
 import StockModel from '../model/Stock';
 import WeaponModel from '../model/Weapon';
+import { TUserWeaponInfo, TUserStockInfo } from '../interfaces/game/user';
 
 const dataManager = DataManager.getInstance();
 
@@ -79,7 +80,7 @@ export default async () => {
 	);
 	const userList: User[] = userDBList.map(user => {
 		/** stock정보에 해당하는 class 불러와서 init */
-		const myStockList = user.stockList.reduce((acc: Array<UserStockInfo>, stockInfo) => {
+		const myStockList = user.stockList.reduce((acc: Array<TUserStockInfo>, stockInfo) => {
 			if (stockInfo.stock instanceof Types.ObjectId) {
 				return acc;
 			}
@@ -93,7 +94,7 @@ export default async () => {
 		}, []);
 
 		const myWeaponList = user.weaponList.reduce(
-			(acc: Array<UserWeaponInfo>, weaponInfo) => {
+			(acc: Array<TUserWeaponInfo>, weaponInfo) => {
 				if (weaponInfo.weapon instanceof Types.ObjectId) {
 					return acc;
 				}

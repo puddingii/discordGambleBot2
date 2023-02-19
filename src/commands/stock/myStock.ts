@@ -6,8 +6,12 @@ import {
 import dayjs from 'dayjs';
 import _ from 'lodash';
 import userController from '../../controller/bot/userController';
-import logger from '../../config/logger';
 import util from '../../config/util';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 export default {
 	data: new SlashCommandBuilder().setName('내주식').setDescription('내 주식임'),
@@ -25,7 +29,7 @@ export default {
 
 			/** DB Info */
 			const { stockList, totalMyValue, totalStockValue } =
-				userController.getMyStockList(discordId);
+				await userController.getMyStockList(discordId);
 
 			const upDownEmoji = (num: number) => {
 				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
@@ -67,7 +71,7 @@ export default {
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

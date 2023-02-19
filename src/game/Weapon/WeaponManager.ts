@@ -1,5 +1,5 @@
 import { getRandomNumber } from '../../config/util';
-import { UserWeaponInfo } from '../User/User';
+import { TUserWeaponInfo } from '../../interfaces/game/user';
 import Weapon, { WeaponConstructor } from './Weapon';
 
 type DataInfo = {
@@ -10,7 +10,7 @@ type IEnhanceWeaponResult = {
 	/** 1: 성공, 2: 실패, 3: 터짐 */
 	code?: 1 | 2 | 3;
 	curPower: number;
-} & Partial<Omit<UserWeaponInfo, 'weapon'>>;
+} & Partial<Omit<TUserWeaponInfo, 'weapon'>>;
 
 type WeaponParam = Partial<{
 	weapon: Weapon;

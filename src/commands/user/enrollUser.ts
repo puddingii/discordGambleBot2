@@ -1,6 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import logger from '../../config/logger';
 import userController from '../../controller/bot/userController';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,12 +19,12 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const nickname = interaction.options.getString('유저닉네임') ?? '';
 
-			await userController.addUser({ id: discordId, nickname });
+			userController.addUser({ id: discordId, nickname });
 			await interaction.reply({
 				content: '유저등록 완료! 이제부터 게임에 참여 가능합니다',
 			});
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

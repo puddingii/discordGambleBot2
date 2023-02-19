@@ -5,13 +5,16 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import secretKey from './config/secretKey';
-import logger from './config/logger';
+import { container } from './settings/container';
+import TYPES from './interfaces/containerType';
+import { ILogger } from './util/logger';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 (async function () {
+	const logger = container.get<ILogger>(TYPES.Logger);
 	if (!secretKey.botToken || !secretKey.clientId || !secretKey.guildId) {
-		logger.error('Required Env variables is not defined.');
+		logger.error('Required Env variables is not defined.', ['Deploy Command']);
 		return;
 	}
 
@@ -51,8 +54,10 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 		.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
 			body: commands,
 		})
-		.then(() => logger.info('Successfully registered application commands.'))
-		.catch(err => logger.error(err));
+		.then(() =>
+			logger.info('Successfully registered application commands.', ['Deploy Command']),
+		)
+		.catch(err => logger.error(err, ['Deploy Command']));
 	// if (secretKey.nodeEnv !== 'production') {
 	// 	rest
 	// 		.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {

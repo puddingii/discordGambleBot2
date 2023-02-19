@@ -1,8 +1,12 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import * as echarts from 'echarts';
 import sharp from 'sharp';
-import logger from '../../config/logger';
 import stockController from '../../controller/bot/stockController';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 type ChartOption = {
 	xAxis: {
@@ -93,7 +97,7 @@ export default {
 
 			await interaction.reply({ files: [imageBuf] });
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

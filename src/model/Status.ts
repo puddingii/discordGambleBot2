@@ -37,7 +37,7 @@ export type IStatusInfo = IStatus & {
 	_id: Types.ObjectId;
 };
 
-interface IStatusStatics extends Model<IStatus> {
+export interface IStatusStatics extends Model<IStatus> {
 	getStatus(isTest?: boolean): Promise<IStatusInfo>;
 	updateStatus(
 		statusInfo: Partial<UpdateStatusParam>,

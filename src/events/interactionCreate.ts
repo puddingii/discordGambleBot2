@@ -1,11 +1,14 @@
 import { BaseInteraction } from 'discord.js';
 import client from '../app';
-import logger from '../config/logger';
 import { isEnrolledUser } from '../middlewares/bot';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { ILogger } from '../util/logger';
 
 export default {
 	name: 'interactionCreate',
 	async execute(interaction: BaseInteraction) {
+		const logger = container.get<ILogger>(TYPES.Logger);
 		const {
 			user: { username },
 		} = interaction;
@@ -28,7 +31,7 @@ export default {
 		}
 		const notCheckCommandList = ['유저등록', '어드민'];
 		if (!notCheckCommandList.includes(commandName)) {
-			const isExist = isEnrolledUser(interaction);
+			const isExist = await isEnrolledUser(interaction);
 			if (!isExist) {
 				await interaction.reply('유저정보가 없습니다. 유저등록부터 해주세요');
 				return;
@@ -56,9 +59,13 @@ export default {
 				await command.execute(interaction);
 				logMessage = `[interactionCreate]${username} - ${commandName}`;
 			}
-			logger.info(logMessage);
-		} catch (error) {
-			logger.error(error);
+			logger.info(logMessage, ['(D)Event', 'Bot']);
+		} catch (err) {
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage, ['(D)Event', 'Bot']);
 		}
 	},
 };

@@ -1,9 +1,16 @@
 import _ from 'lodash';
 import User from '../../game/User/User';
-import UserModel from '../../model/User';
+import UserModel, { IUserStatics } from '../../model/User';
 import DataManager from '../../game/DataManager';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { IUserService, TUserParam } from '../../interfaces/services/userService';
 
 const dataManager = DataManager.getInstance();
+
+interface IUserController {
+	userRepository: IUserStatics;
+}
 
 interface MyStockInfo {
 	stockList: Array<{
@@ -29,22 +36,16 @@ type EnhanceWeaponType = {
 
 /** 신규유저 추가 */
 export const addUser = async (userInfo: { id: string; nickname: string }) => {
-	const userManager = dataManager.get('user');
-	await userManager.addUser(userInfo);
+	const userService = container.get<IUserService>(TYPES.UserService);
+	await userService.addUser(userInfo);
 };
 
 /** 유저머니 조정. */
-export const adjustMoney = async (
-	userInfo: Partial<{ discordId: string; nickname: string }>,
-	money: number,
-) => {
-	const userManager = dataManager.get('user');
-	const user = userManager.getUser(userInfo);
-	if (!user) {
-		throw Error('유저정보가 없습니다.');
-	}
-	user.updateMoney(money);
-	await UserModel.updateMoney(user.getId(), user.money);
+export const adjustMoney = async (userParam: TUserParam, money: number) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const user = await userService.getUser(userParam);
+
+	await userService.updateMoney(user, money);
 };
 
 /** 주식사기 */
@@ -59,11 +60,9 @@ export const buySellStock = async ({
 	cnt: number;
 	isFull: boolean;
 }): Promise<{ cnt: number; value: number; money: number }> => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const userInfo = await userService.getUser({ discordId });
 	const stockManager = dataManager.get('stock');
-	const userInfo = dataManager.get('user').getUser({ discordId });
-	if (!userInfo) {
-		throw Error('유저정보가 없습니다');
-	}
 
 	const stockInfo = stockManager.getStock('', stockName);
 	if (!stockInfo) {
@@ -132,56 +131,25 @@ export const enhanceWeapon = async ({
 
 /** 다른 사람한테 돈 기부 */
 export const giveMoney = async (
-	myInfo: Partial<{ discordId: string; nickname: string }>,
-	ptrInfo: Partial<{ discordId: string; nickname: string }>,
+	myInfo: TUserParam,
+	ptrInfo: TUserParam,
 	money: number,
 ) => {
-	const userManager = dataManager.get('user');
-	const user = userManager.getUser(myInfo);
-	const ptrUser = userManager.getUser(ptrInfo);
-	if (!user || !ptrUser) {
-		throw Error('유저정보가 없습니다.');
-	}
+	const userService = container.get<IUserService>(TYPES.UserService);
+	/** 회원 데이터 있는지 확인 */
+	const sender = await userService.getUser(myInfo);
+	await userService.getUser(ptrInfo);
 
-	user.updateMoney(money * -1);
-	ptrUser.updateMoney(money);
-	await dataManager.setTransaction();
-	const session = dataManager.getSession();
-	await session?.withTransaction(async () => {
-		await UserModel.updateMoney(user.getId(), user.money, session);
-		await UserModel.updateMoney(ptrUser.getId(), ptrUser.money, session);
-	});
-	await dataManager.setTransaction(true);
-};
-
-/** 주식 + 내돈을 합쳐서 젤 적은사람 반환 */
-export const getMinUser = (): User => {
-	const userManager = dataManager.get('user');
-	const userList = userManager.getUserList();
-
-	const getTotalMoney = (info: User) =>
-		info.stockList.reduce((acc, cur) => {
-			acc += cur.cnt * cur.stock.value;
-			return acc;
-		}, 0) + info.money;
-
-	const minUser = userList.reduce((minUser, user) => {
-		const afterMoney = getTotalMoney(user);
-		const beforeMoney = getTotalMoney(minUser);
-
-		return afterMoney - beforeMoney > 0 ? minUser : user;
-	}, userList[0]);
-
-	return minUser;
+	/** 보낸 사람은 돈 차감, 받는 사람은 선물목록에 추가 */
+	await userService.updateMoney(sender, money * -1);
+	await userService.addGift(ptrInfo, { type: 'money', value: money });
 };
 
 /** 유저정보 반환 */
-export const getUser = (info: Partial<{ discordId: string; nickname: string }>): User => {
-	const userManager = dataManager.get('user');
-	const user = userManager.getUser(info);
-	if (!user) {
-		throw Error('유저정보가 없습니다');
-	}
+export const getUser = async (info: TUserParam) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const user = await userService.getUser(info);
+
 	return user;
 };
 
@@ -192,8 +160,9 @@ export const getUserList = () => {
 };
 
 /** 내가 가지고 있는 주식리스트 */
-export const getMyStockList = (discordId: string): MyStockInfo => {
-	const user = getUser({ discordId });
+export const getMyStockList = async (discordId: string): Promise<MyStockInfo> => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const user = await userService.getUser({ discordId });
 
 	const stockInfo = user.stockList.reduce(
 		(acc: MyStockInfo, myStock) => {
@@ -239,20 +208,17 @@ export const getRankingList = () => {
 };
 
 /** 돈 갱신 */
-export const updateMoney = async (discordId: string, value: number): Promise<User> => {
-	const userInfo = dataManager.get('user').getUser({ discordId });
-	if (!userInfo) {
-		throw Error('유저정보가 없습니다');
-	}
-	userInfo.updateMoney(value);
-	await UserModel.updateMoney(userInfo.getId(), userInfo.money);
-	return userInfo;
+export const updateMoney = async (discordId: string, value: number) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const user = await userService.getUser({ discordId });
+	await userService.updateMoney(user, value);
+
+	return user;
 };
 
 /** 패스워드 (재)생성 */
 export const generatePassword = async (discordId: string) => {
-	const userManager = dataManager.get('user');
-	const myPassword = await userManager.generatePassword(discordId);
+	const myPassword = await UserModel.generatePassword(discordId);
 	return myPassword;
 };
 
@@ -261,7 +227,6 @@ export default {
 	adjustMoney,
 	buySellStock,
 	enhanceWeapon,
-	getMinUser,
 	getUser,
 	giveMoney,
 	getRankingList,

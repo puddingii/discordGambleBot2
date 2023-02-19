@@ -1,16 +1,24 @@
-import User, { UserWeaponInfo } from './User';
-import UserModel from '../../model/User';
+import { TUserWeaponInfo } from '../../interfaces/game/user';
+import User from './User';
 
-type UpdateWeaponInfo = Omit<UserWeaponInfo, 'weapon'>;
+type UpdateWeaponInfo = Omit<TUserWeaponInfo, 'weapon'>;
 type ValueOf<T> = T[keyof T];
 
 export default class UserManager {
 	userList: Array<User>;
-	waitingList: Set<User> = new Set();
-	waitingList2: Map<User, Array<{ type: string; subType?: string }>> = new Map();
 
 	constructor(userList: Array<User>) {
 		this.userList = userList;
+	}
+
+	/** 유저등록 */
+	addUser(userInfo: { id: string; nickname: string }) {
+		const isExistUser = this.getUser({ discordId: userInfo.id });
+		if (isExistUser) {
+			throw Error('이미 있는 유저입니다.');
+		}
+		const user = new User(userInfo);
+		this.userList.push(user);
 	}
 
 	/** 내가 가지고 있는 무기 반환 */
@@ -43,7 +51,10 @@ export default class UserManager {
 	}
 
 	/** 유저 무기관련 업데이트 */
-	updateWeapon(userWeapon: UserWeaponInfo, updatedWeaponInfo: Partial<UpdateWeaponInfo>) {
+	updateWeapon(
+		userWeapon: TUserWeaponInfo,
+		updatedWeaponInfo: Partial<UpdateWeaponInfo>,
+	) {
 		(Object.keys(updatedWeaponInfo) as Array<keyof typeof updatedWeaponInfo>).forEach(
 			info => {
 				if (info === 'curPower') {
@@ -53,22 +64,5 @@ export default class UserManager {
 				}
 			},
 		);
-	}
-
-	/** 유저등록 */
-	async addUser(userInfo: { id: string; nickname: string }) {
-		const isExistUser = this.getUser({ discordId: userInfo.id });
-		if (isExistUser) {
-			throw Error('이미 있는 유저입니다.');
-		}
-		const user = new User(userInfo);
-		this.userList.push(user);
-		await UserModel.addNewUser(userInfo.id, userInfo.nickname);
-	}
-
-	/** 유저 비밀번호 (재)생성 */
-	async generatePassword(discordId: string) {
-		const myPassword = await UserModel.generatePassword(discordId);
-		return myPassword;
 	}
 }

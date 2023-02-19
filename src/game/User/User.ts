@@ -1,55 +1,51 @@
 import Stock from '../Stock/Stock';
 import Coin from '../Stock/Coin';
-import Weapon from '../Weapon/Weapon';
+import {
+	IUser,
+	IUserInfo,
+	TUserGiftInfo,
+	TUpdateStockResult,
+	TUserConstructor,
+} from '../../interfaces/game/user';
 
-/** Class Constructor Param Type */
+export default class User implements IUser {
+	private _id: IUserInfo['id'];
+	giftList: IUserInfo['giftList'];
+	money: IUserInfo['money'];
+	nickname: IUserInfo['nickname'];
+	stockList: IUserInfo['stockList'];
+	weaponList: IUserInfo['weaponList'];
 
-/** 유저가 가지고 있는 주식정보 타입 */
-export type UserStockInfo = {
-	stock: Stock | Coin;
-	cnt: number;
-	value: number;
-};
-
-/** 유저가 가지고 있는 무기정보 */
-export type UserWeaponInfo = {
-	weapon: Weapon;
-	destroyCnt: number;
-	failCnt: number;
-	successCnt: number;
-	curPower: number;
-	bonusPower: number;
-	hitRatio: number;
-	missRatio: number;
-};
-
-interface UserInfo {
-	id: string;
-	nickname: string;
-	money: number;
-	stockList: Array<UserStockInfo>;
-	weaponList: Array<UserWeaponInfo>;
-}
-
-type UserConstructor = Pick<UserInfo, 'id' | 'nickname'> &
-	Omit<Partial<UserInfo>, 'id' | 'nickname'>;
-
-/** 유저가 가지고 있는 Stock 업데이트 할 때 사용하는 함수리턴 타입 */
-type UpdateStockReturnType = { cnt: number; value: number; money: number };
-
-export default class User {
-	private _id: UserInfo['id'];
-	money: UserInfo['money'];
-	nickname: UserInfo['nickname'];
-	stockList: UserInfo['stockList'];
-	weaponList: UserInfo['weaponList'];
-
-	constructor({ id, nickname, money, stockList, weaponList }: UserConstructor) {
+	constructor({
+		id,
+		nickname,
+		money,
+		stockList,
+		weaponList,
+		giftList,
+	}: TUserConstructor) {
 		this._id = id;
 		this.nickname = nickname;
 		this.money = money ?? 1000000;
 		this.stockList = stockList ?? [];
 		this.weaponList = weaponList ?? [];
+		this.giftList = giftList ?? [];
+	}
+
+	addGift(giftInfo: TUserGiftInfo) {
+		this.giftList.push(giftInfo);
+	}
+
+	deleteAllGift(type: string) {
+		this.giftList = this.giftList.filter(gift => gift.type !== type);
+	}
+
+	deleteGift({ type, value }: TUserGiftInfo) {
+		const idx = this.giftList.findIndex(v => v.type === type && v.value === value);
+		if (idx === -1) {
+			throw Error('해당하는 선물이 없습니다. 다시 확인해주세요!');
+		}
+		this.giftList.splice(idx, 1);
 	}
 
 	/** 유저 디스코드 아이디 가져오기 */
@@ -57,17 +53,14 @@ export default class User {
 		return this._id;
 	}
 
-	/** 가지고 있는 name에 해당하는 주식 가져오기 */
 	getStock(name: string) {
 		return this.stockList.find(stockInfo => stockInfo.stock.name === name);
 	}
 
-	/** 가지고 있는 무기 가져오기 */
 	getWeapon(type: string) {
 		return this.weaponList.find(weaponInfo => weaponInfo.weapon.type === type);
 	}
 
-	/** 가지고 있는 주식들 배당금 지급 */
 	giveDividend(): { code: number } {
 		const totalMoney = this.stockList.reduce((acc, cur) => {
 			if (cur.cnt > 0 && cur.stock instanceof Stock && cur.stock.type === 'stock') {
@@ -79,7 +72,6 @@ export default class User {
 		return { code: totalMoney ? 1 : 0 };
 	}
 
-	/** 유저가 가지고 있는 돈 업데이트 */
 	updateMoney(money: number, type?: 'stock' | 'coin' | 'weapon') {
 		if (this.money + money < 0) {
 			throw Error('돈이 부족함');
@@ -92,8 +84,7 @@ export default class User {
 		this.money += money * extraCommission;
 	}
 
-	/** 가지고 있는 주식 업데이트 하기(사고 팔때 사용) 살때는 cnt가 양수 아니면 음수 */
-	updateStock(stock: Stock | Coin, cnt: number, isFull: boolean): UpdateStockReturnType {
+	updateStock(stock: Stock | Coin, cnt: number, isFull: boolean): TUpdateStockResult {
 		const myStock = this.getStock(stock.name);
 		if (isFull) {
 			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : (myStock?.cnt ?? 0) * -1;

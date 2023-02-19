@@ -1,4 +1,3 @@
-import StatusModel from '../../model/Status';
 import Coin from './Coin';
 import Stock from './Stock';
 
@@ -84,7 +83,7 @@ export default class StockManager {
 	}
 
 	/** Gamble의 condition 조정 */
-	async updateCondition(curTime: number) {
+	updateCondition(curTime: number) {
 		if (curTime % this.conditionPeriod !== 0) {
 			return;
 		}
@@ -101,6 +100,6 @@ export default class StockManager {
 			return false;
 		});
 
-		await StatusModel.updateStatus({ gamble: { curCondition: this.curCondition } });
+		return this.curCondition;
 	}
 }

@@ -11,9 +11,13 @@ import userAdmin from './subCommand/userAdmin';
 import weaponAdmin from './subCommand/weaponAdmin';
 import gameStatusAdmin from './subCommand/gameStatusAdmin';
 import { getNewSelectMenu } from './subCommand/common';
-import logger from '../../config/logger';
 import secretKey from '../../config/secretKey';
 import client from '../../app';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 const {
 	modalSubmit: { updateStock },
@@ -69,7 +73,7 @@ export default {
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
-			logger.error(errorMessage);
+			logger.error(errorMessage, ['Command']);
 			await interaction.reply({
 				content: `${errorMessage}`,
 				components: [getNewSelectMenu()],
@@ -155,7 +159,7 @@ export default {
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
-			logger.error(errorMessage);
+			logger.error(errorMessage, ['Command']);
 			await interaction.reply({
 				content: `${errorMessage}`,
 				components: [getNewSelectMenu()],
@@ -194,7 +198,7 @@ export default {
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
-			logger.error(errorMessage);
+			logger.error(errorMessage, ['Command']);
 			await interaction.reply({
 				content: `${errorMessage}`,
 				components: [getNewSelectMenu()],

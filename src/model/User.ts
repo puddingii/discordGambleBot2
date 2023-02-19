@@ -2,10 +2,16 @@ import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
 import pwGenerator from 'generate-password';
 import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
-import logger from '../config/logger';
 import secretKey from '../config/secretKey';
-import UserController, { UserWeaponInfo } from '../game/User/User';
+import UserController from '../game/User/User';
 import WeaponModel, { IWeapon } from './Weapon';
+import { TUserWeaponInfo } from '../interfaces/game/user';
+import { TUserParam } from '../interfaces/services/userService';
+
+type UserParam = Partial<{
+	discordId: string;
+	nickname: string;
+}>;
 
 type WeaponInfo = {
 	weapon: Types.ObjectId | IWeapon;
@@ -65,7 +71,7 @@ export type IUserInfo = IUser & {
 	_id: Types.ObjectId;
 };
 
-interface IUserStatics extends Model<IUser> {
+export interface IUserStatics extends Model<IUser> {
 	/** 새로운 유저 추가 */
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	/** 새로운 주식 추가 */
@@ -73,26 +79,29 @@ interface IUserStatics extends Model<IUser> {
 	/** 새로운 무기 추가 */
 	addNewWeapon(type: string): Promise<void>;
 	/** 선물 추가 */
-	addGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
+	addGift(userParam: TUserParam, giftInfo: GiftInfo): Promise<void>;
 	/** 웹 패스워드 검증 */
 	checkPassword(
 		userInfo: Partial<{ discordId: string; nickname: string }>,
 		password: string,
 	): Promise<boolean>;
 	/** 디스코드 아이디로 유저정보 가져오기 */
-	findByDiscordId(discordId: string): Promise<IUserInfo | null>;
+	findByDiscordId(
+		discordId: string,
+		populateList?: Array<string>,
+	): Promise<IUserInfo | null>;
 	/** 웹 패스워드 발급 */
 	generatePassword(discordId: string): Promise<string>;
 	/** 유저 돈 업데이트 */
 	updateMoney(
-		discordId: string,
+		userInfo: UserParam,
 		money: number,
 		session?: ClientSession | null,
 	): Promise<boolean>;
 	/** 무기와 돈 같이 업데이트 */
 	updateWeaponAndMoney(
 		discordId: string,
-		updWeaponInfo: UserWeaponInfo,
+		updWeaponInfo: TUserWeaponInfo,
 		money?: number,
 	): Promise<boolean>;
 	/** 주식과 돈 같이 업데이트 */
@@ -244,8 +253,19 @@ User.statics.addNewWeapon = async function (type: string) {
 };
 
 /** 아이디로 유저정보 탐색 */
-User.statics.findByDiscordId = async function (discordId: string) {
-	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
+User.statics.findByDiscordId = async function (
+	discordId: string,
+	populateList?: Array<string>,
+) {
+	let userInfo = await this.findOne({ discordId });
+	if (!userInfo) {
+		throw Error('해당하는 유저정보가 없습니다');
+	}
+
+	if (populateList && populateList.length > 0) {
+		userInfo = await userInfo.populate(populateList.join(' '));
+	}
+
 	return userInfo;
 };
 
@@ -280,12 +300,12 @@ User.statics.checkPassword = async function (
 
 /** 유저 머니 업데이트 */
 User.statics.updateMoney = async function (
-	discordId: string,
+	userInfo: UserParam,
 	money: number,
 	session = null,
 ) {
 	const isSucceed = await this.findOneAndUpdate(
-		{ discordId },
+		userInfo,
 		{ $set: { money } },
 		{ new: true },
 	).session(session);
@@ -341,7 +361,7 @@ User.statics.deleteStockWithAllUser = async function (name: string) {
 /** 무기 업데이트 */
 User.statics.updateWeaponAndMoney = async function (
 	discordId: string,
-	updWeaponInfo: UserWeaponInfo,
+	updWeaponInfo: TUserWeaponInfo,
 	money?: number,
 ) {
 	const weapon = await WeaponModel.findOne({ type: updWeaponInfo.weapon.type });
@@ -408,18 +428,15 @@ User.statics.updateAll = async function (userList: UserController[]) {
 
 	resultList.forEach(result => {
 		if (result.status !== 'fulfilled') {
-			logger.error(`${result.reason}`);
+			throw Error(`${result.reason}`);
 		}
 	});
 };
 
-User.statics.addGift = async function (discordId: string, giftInfo: GiftInfo) {
-	await this.findOneAndUpdate(
-		{ discordId },
-		{
-			$push: { giftList: giftInfo },
-		},
-	);
+User.statics.addGift = async function (userParam: TUserParam, giftInfo: GiftInfo) {
+	await this.findOneAndUpdate(userParam, {
+		$push: { giftList: giftInfo },
+	});
 };
 
 User.statics.deleteGift = async function (discordId: string, giftInfo: GiftInfo) {

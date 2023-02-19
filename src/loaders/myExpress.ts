@@ -10,18 +10,18 @@ import path from 'path';
 
 // eslint-disable-next-line import/no-named-default
 import { default as connectMongo } from 'connect-mongodb-session';
-import userRouter from '../routes/userRouter';
-import authRouter from '../routes/authRouter';
-import stockRouter from '../routes/stockRouter';
-import weaponRouter from '../routes/weaponRouter';
+import setRouter from '../routes';
 import passportConfig from '../passport';
-import logger from '../config/logger';
 import secretKey from '../config/secretKey';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { ILogger } from '../util/logger';
 
 export default async (app: Express) => {
+	const logger = container.get<ILogger>(TYPES.Logger);
 	const stream: StreamOptions = {
 		// Use the http severity
-		write: message => logger.info(message),
+		write: message => logger.info(message, ['Loader']),
 	};
 	app.use(
 		morgan(':method :url :status :res[content-length] - :response-time ms', {
@@ -50,10 +50,7 @@ export default async (app: Express) => {
 	app.use(passport.session());
 	passportConfig();
 
-	app.use('/api/user', userRouter);
-	app.use('/api/auth', authRouter);
-	app.use('/api/stock', stockRouter);
-	app.use('/api/weapon', weaponRouter);
+	setRouter(app);
 
 	const swaggerFile = await fs.readFile(
 		path.resolve(__dirname, '../swagger/swagger-output.json'),

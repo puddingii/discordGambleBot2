@@ -1,8 +1,12 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import userController from '../../controller/bot/userController';
 import globalController from '../../controller/bot/statusController';
-import logger from '../../config/logger';
 import { setComma } from '../../config/util';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { ILogger } from '../../util/logger';
+
+const logger = container.get<ILogger>(TYPES.Logger);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -13,7 +17,7 @@ export default {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const user = userController.getUser({ discordId });
+			const user = await userController.getUser({ discordId });
 
 			const money = await globalController.giveGrantMoney(user);
 
@@ -21,7 +25,7 @@ export default {
 				content: `${setComma(money, true)}원을 받았습니다.`,
 			});
 		} catch (err) {
-			logger.error(err);
+			logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

@@ -4,7 +4,7 @@ import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
-import Status from '../../model/Status';
+import StatusModel from '../../model/Status';
 import StockModel from '../../model/Stock';
 import UserModel from '../../model/User';
 
@@ -144,7 +144,7 @@ export const setGambleStatus = async (status: Partial<UpdateStatusParam>) => {
 	if (conditionRatioPerList) {
 		stockManager.conditionRatioPerList = conditionRatioPerList;
 	}
-	await Status.updateStatus({ gamble: status });
+	await StatusModel.updateStatus({ gamble: status });
 };
 
 /** 주식 업데이트 */
@@ -207,13 +207,14 @@ export const giveDividend = async (curTime: number) => {
 		return !!result.code;
 	});
 	for await (const user of updUserList) {
-		await UserModel.updateMoney(user.getId(), user.money);
+		await UserModel.updateMoney({ discordId: user.getId() }, user.money);
 	}
 };
 
 export const updateCondition = async (curTime: number) => {
 	const stockManager = dataManager.get('stock');
-	await stockManager.updateCondition(curTime);
+	const curCondition = stockManager.updateCondition(curTime);
+	await StatusModel.updateStatus({ gamble: { curCondition } });
 };
 
 export default {
