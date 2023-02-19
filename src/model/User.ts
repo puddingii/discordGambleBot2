@@ -67,7 +67,7 @@ interface IUser extends Document, DoucmentResult<IUser> {
 	giftList: Types.Array<GiftInfo>;
 }
 
-export type IUserInfo = IUser & {
+export type TUserModelInfo = IUser & {
 	_id: Types.ObjectId;
 };
 
@@ -89,7 +89,7 @@ export interface IUserStatics extends Model<IUser> {
 	findByDiscordId(
 		discordId: string,
 		populateList?: Array<string>,
-	): Promise<IUserInfo | null>;
+	): Promise<TUserModelInfo | null>;
 	/** 웹 패스워드 발급 */
 	generatePassword(discordId: string): Promise<string>;
 	/** 유저 돈 업데이트 */

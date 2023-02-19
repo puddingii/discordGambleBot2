@@ -2,10 +2,11 @@ import { Types } from 'mongoose';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import Weapon from '../../game/Weapon/Weapon';
+import { IStock2 } from './stock';
 
 /** 유저가 가지고 있는 주식정보 타입 */
 export type TUserStockInfo = {
-	stock: Stock | Coin | Types.ObjectId;
+	stock: IStock2 | Coin | Types.ObjectId;
 	cnt: number;
 	value: number;
 };

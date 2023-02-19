@@ -1,16 +1,12 @@
-import _ from 'lodash';
-import User from '../../game/User/User';
-import UserModel, { IUserStatics } from '../../model/User';
+import UserModel from '../../model/User';
 import DataManager from '../../game/DataManager';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { IUserService, TUserParam } from '../../interfaces/services/userService';
+import { IStockService } from '../../interfaces/services/stockService';
+import { IStock2 } from '../../interfaces/game/stock';
 
 const dataManager = DataManager.getInstance();
-
-interface IUserController {
-	userRepository: IUserStatics;
-}
 
 interface MyStockInfo {
 	stockList: Array<{
@@ -59,27 +55,13 @@ export const buySellStock = async ({
 	stockName: string;
 	cnt: number;
 	isFull: boolean;
-}): Promise<{ cnt: number; value: number; money: number }> => {
+}) => {
 	const userService = container.get<IUserService>(TYPES.UserService);
-	const userInfo = await userService.getUser({ discordId });
-	const stockManager = dataManager.get('stock');
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const user = await userService.getUser({ discordId }, ['stockList.stock']);
+	const stock = await stockService.getStock(stockName);
 
-	const stockInfo = stockManager.getStock('', stockName);
-	if (!stockInfo) {
-		throw Error('주식/코인정보가 없습니다');
-	}
-
-	const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
-	await UserModel.updateStockAndMoney(
-		userInfo.getId(),
-		{
-			name: stockInfo.name,
-			cnt: stockResult.cnt,
-			value: stockResult.value,
-		},
-		userInfo.money,
-	);
-	return stockResult;
+	await userService.tradeStock(user, stock, cnt, isFull);
 };
 
 /** 무기강화 */
@@ -138,11 +120,11 @@ export const giveMoney = async (
 	const userService = container.get<IUserService>(TYPES.UserService);
 	/** 회원 데이터 있는지 확인 */
 	const sender = await userService.getUser(myInfo);
-	await userService.getUser(ptrInfo);
+	const receiver = await userService.getUser(ptrInfo);
 
 	/** 보낸 사람은 돈 차감, 받는 사람은 선물목록에 추가 */
 	await userService.updateMoney(sender, money * -1);
-	await userService.addGift(ptrInfo, { type: 'money', value: money });
+	await userService.addGift(receiver, { type: 'money', value: money });
 };
 
 /** 유저정보 반환 */
@@ -154,48 +136,30 @@ export const getUser = async (info: TUserParam) => {
 };
 
 /** 게임에 참여하는 유저리스트 반환 */
-export const getUserList = () => {
-	const userManager = dataManager.get('user');
-	return userManager.getUserList();
+export const getUserList = async (
+	populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>,
+) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const userList = await userService.getAllUser(populatedList);
+	return userList;
 };
 
-/** 내가 가지고 있는 주식리스트 */
+/** 내가 1개 이상 가지고 있는 주식리스트 */
 export const getMyStockList = async (discordId: string): Promise<MyStockInfo> => {
 	const userService = container.get<IUserService>(TYPES.UserService);
-	const user = await userService.getUser({ discordId });
-
-	const stockInfo = user.stockList.reduce(
-		(acc: MyStockInfo, myStock) => {
-			if (myStock.cnt > 0) {
-				const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
-				acc.totalMyValue += myStock.cnt * myStock.value;
-				acc.totalStockValue += myStock.cnt * myStock.stock.value;
-				acc.stockList.push({
-					name: myStock.stock.name,
-					cnt: myStock.cnt,
-					myValue: myStock.value,
-					myRatio,
-					stockValue: myStock.stock.value,
-					stockType: myStock.stock.type,
-					stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
-					profilMargin: myStock.cnt * (myStock.stock.value - myStock.value),
-				});
-			}
-			return acc;
-		},
-		{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
-	);
+	const user = await userService.getUser({ discordId }, ['stockList.stock']);
+	const stockInfo = userService.getProcessedStock(user);
 
 	return stockInfo;
 };
 
 /** 주식 + 내돈 합친 값 */
-export const getRankingList = () => {
-	const userList = getUserList();
+export const getRankingList = async () => {
+	const userList = await getUserList(['stockList.stock']);
 	const rankingList = userList.map(user => {
 		const money =
 			user.stockList.reduce((acc, cur) => {
-				acc += cur.cnt * cur.stock.value;
+				acc += cur.cnt * (<IStock2>cur.stock).value;
 				return acc;
 			}, 0) + user.money;
 		return {

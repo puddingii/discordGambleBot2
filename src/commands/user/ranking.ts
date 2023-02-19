@@ -25,9 +25,9 @@ export default {
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
-			const rankingList = userController
-				.getRankingList()
-				.sort((a, b) => b.money - a.money);
+			const rankingList = (await userController.getRankingList()).sort(
+				(a, b) => b.money - a.money,
+			);
 
 			rankingList.forEach(user => {
 				embedBox.addFields({
