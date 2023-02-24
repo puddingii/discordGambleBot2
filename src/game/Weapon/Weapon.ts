@@ -1,27 +1,15 @@
-type WeaponInfo = {
-	type: string;
-	name: string;
-	comment: string;
-	powerMultiple: number;
-	enhanceCost: number;
-	baseMoney: number;
-	ratioList: Array<{ failRatio: number; destroyRatio: number }>;
-	maxPower: number;
-};
+import { TWeaponInfo, TWeaponConstructor, IWeapon } from '../../interfaces/game/weapon';
 
-export type WeaponConstructor = Omit<WeaponInfo, 'comment'> &
-	Pick<Partial<WeaponInfo>, 'comment'>;
+export default class Weapon implements IWeapon {
+	baseMoney: TWeaponInfo['baseMoney'];
+	comment: TWeaponInfo['comment'];
+	enhanceCost: TWeaponInfo['enhanceCost'];
+	maxPower: TWeaponInfo['maxPower'];
 
-export default class Weapon {
-	baseMoney: WeaponInfo['baseMoney'];
-	comment?: WeaponInfo['comment'];
-	enhanceCost: WeaponInfo['enhanceCost'];
-	maxPower: WeaponInfo['maxPower'];
-
-	name: WeaponInfo['name'];
-	powerMultiple: WeaponInfo['powerMultiple'];
-	ratioList: WeaponInfo['ratioList'];
-	type: WeaponInfo['type'];
+	name: TWeaponInfo['name'];
+	powerMultiple: TWeaponInfo['powerMultiple'];
+	ratioList: TWeaponInfo['ratioList'];
+	type: TWeaponInfo['type'];
 
 	constructor({
 		powerMultiple,
@@ -32,7 +20,7 @@ export default class Weapon {
 		name,
 		ratioList,
 		maxPower,
-	}: WeaponConstructor) {
+	}: TWeaponConstructor) {
 		this.type = type;
 		this.name = name;
 		this.powerMultiple = powerMultiple;
@@ -43,27 +31,19 @@ export default class Weapon {
 		this.maxPower = maxPower;
 	}
 
-	getCost(
-		exponent: number,
-		option?: { isPreventDown?: boolean; isPreventDestroy?: boolean },
-	) {
-		if (exponent < 0 && exponent >= this.maxPower) {
-			throw Error('0미만 및 강화 최대치 이상의 비용은 책정할 수 없습니다');
-		}
-		let cost = (this.baseMoney ** (exponent - 10) + 1) * this.enhanceCost;
-		if (option) {
-			const { isPreventDestroy, isPreventDown } = option;
-			cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost * 10 : 0);
-		}
-
-		return cost;
-	}
-
 	getPower(power: number) {
 		if (power < 0 && power > this.maxPower) {
 			throw Error('0미만 및 강화 최대치 초과의 힘은 책정할 수 없습니다');
 		}
 		return power * this.powerMultiple;
+	}
+
+	getRatio(power: number) {
+		if (!this.isValidPower(power)) {
+			throw Error('유효하지 않는 파워값입니다');
+		}
+
+		return this.ratioList[power];
 	}
 
 	isValidPower(power: number) {

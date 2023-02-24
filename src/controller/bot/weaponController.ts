@@ -1,115 +1,62 @@
-import _ from 'lodash';
-import { startSession } from 'mongoose';
-import { setComma } from '../../config/util';
-import DataManager from '../../game/DataManager';
-import { WeaponConstructor } from '../../game/Weapon/Weapon';
-import WeaponModel from '../../model/Weapon';
-import UserModel from '../../model/User';
-
-const dataManager = DataManager.getInstance();
-
-type FormattedRatioList = Array<{ value: string; name: string }>;
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { TWeaponConstructor } from '../../interfaces/game/weapon';
+import { IWeaponService } from '../../interfaces/services/weaponService';
+import { IUserService } from '../../interfaces/services/userService';
 
 /** 무기종류 추가 */
-export const addWeapon = async (param: WeaponConstructor) => {
-	const weaponManager = dataManager.get('weapon');
-	const weapon = weaponManager.addWeapon(param);
-
-	const session = await startSession();
-	await session.withTransaction(async () => {
-		const weaponResult = await WeaponModel.addWeapon(weapon);
-		if (weaponResult.code === 0) {
-			throw Error(weaponResult?.message ?? 'error');
-		}
-		await UserModel.addNewWeapon(weapon.type);
-	});
-	await session.endSession();
-};
-
-/** 내 무기들 가져오기 */
-export const getMyWeapon = ({ discordId, type }: { discordId: string; type: string }) => {
-	const userManager = dataManager.get('user');
-	return userManager.getMyWeapon({ discordId, type });
+export const addWeapon = async (param: TWeaponConstructor) => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const weapon = await weaponService.addWeapon(param);
+	await userService.addWeapon(weapon);
 };
 
 /** 무기 가져오기 */
-export const getWeapon = (type: string) => {
-	const weaponManager = dataManager.get('weapon');
-	return weaponManager.getInfo({ type });
+export const getWeapon = async (type: string) => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const weapon = await weaponService.getWeapon(type);
+
+	return weapon;
 };
 
 /** 무기 업데이트 */
-export const updateWeapon = async (param: WeaponConstructor) => {
-	const weaponManager = dataManager.get('weapon');
+export const updateWeapon = async (param: TWeaponConstructor) => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const weapon = await weaponService.getWeapon(param.type);
 
-	weaponManager.updateWeapon({ type: param.type }, param);
-	await WeaponModel.updateWeapon(param);
+	await weaponService.updateWeapon(weapon, param);
 };
 
 /** 모든 무기 다 가져오기 */
-export const getAllWeapon = () => {
-	const weaponManager = dataManager.get('weapon');
-	return weaponManager.weaponList;
+export const getAllWeapon = async () => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const weaponList = await weaponService.getAllWeapon();
+
+	return weaponList;
 };
 
-/** 타입에 해당하는 무기정보 class 리턴 */
-export const getWeaponInfo = (type: string) => {
-	const weaponManager = dataManager.get('weapon');
-	return weaponManager.getBaseMoney({ type });
+/** 현재 상태의 무기를 강화하는데 필요한 정보 가져오기 */
+export const getEnhanceInfo = async (type: string, power: number) => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const weapon = await weaponService.getWeapon(type);
+
+	return weaponService.getEnhanceInfo(weapon, power);
 };
 
-/** perCnt를 기준으로 나눠서 Ratio 설명표를 리턴함 */
-export const getFormattedRatioList = (
-	type: string,
-	perCnt: number,
-): FormattedRatioList => {
-	const weaponManager = dataManager.get('weapon');
-	const myWeapon = weaponManager.getInfo({ type });
-	const list = myWeapon.ratioList;
-	const listLen = list.length;
-	const resultList: FormattedRatioList = [];
-	for (let i = 0; i < listLen; i += perCnt) {
-		let value = '';
-		for (let j = i; j < i + perCnt && j < listLen; j++) {
-			const fail = _.round(list[j].failRatio * 100, 2);
-			const destroy = _.round(list[j].destroyRatio * 100, 2);
-			const success = _.round(100 - destroy - fail, 2);
-			const money = myWeapon.getCost(j);
-			value = `${value}\n${j}~${j + 1}: (${success}%/${fail}%/${destroy}%)-${setComma(
-				money,
-				true,
-			)}원`;
-		}
-		resultList.push({
-			value,
-			name: `${i}~${i + perCnt >= listLen ? listLen : i + perCnt}강`,
-		});
-	}
+/** 무기를 끝까지 강화하는데 필요한 정보 가져오기 */
+export const getEnhanceInfoList = async (type: string) => {
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const weapon = await weaponService.getWeapon(type);
 
-	return resultList;
-};
-
-/** 다음 강화확률 반환 */
-export const getNextRatio = ({
-	type,
-	discordId,
-}: {
-	type: string;
-	discordId: string;
-}) => {
-	const userWeapon = getMyWeapon({ discordId, type });
-	const weaponManager = dataManager.get('weapon');
-	const curPower = userWeapon?.curPower ?? 0;
-
-	return weaponManager.getNextRatio({ type }, curPower);
+	return weapon.ratioList.map((_, idx) => weaponService.getEnhanceInfo(weapon, idx));
 };
 
 export default {
 	addWeapon,
-	getFormattedRatioList,
-	getNextRatio,
-	getMyWeapon,
 	getWeapon,
 	updateWeapon,
 	getAllWeapon,
+	getEnhanceInfo,
+	getEnhanceInfoList,
 };

@@ -13,6 +13,7 @@ import Weapon from '../game/weapon/Weapon';
 import { IUser, TUserGiftInfo } from '../interfaces/game/user';
 import { IStock2 } from '../interfaces/game/stock';
 import { TUserModelInfo } from '../model/User';
+import { IWeapon } from '../interfaces/game/weapon';
 
 @injectable()
 class UserService implements IUserService {
@@ -110,18 +111,6 @@ class UserService implements IUserService {
 		return stockInfo;
 	}
 
-	private getUserStockInfo(user: IUser, stockName: string) {
-		if (user.stockList.length <= 0) {
-			throw Error('보유하고 있는 주식이 없습니다');
-		}
-
-		if (user.stockList.at(0)?.stock instanceof Types.ObjectId) {
-			throw Error('Populated Error.. 운영자에게 문의하세요');
-		}
-
-		return user.stockList.find(stock => (<IStock2>stock.stock).name === stockName);
-	}
-
 	async addGift(user: IUser, giftInfo: TUserGiftInfo) {
 		user.giftList.push(giftInfo);
 		await this.userModel.addGift({ discordId: user.getId() }, giftInfo);
@@ -129,6 +118,10 @@ class UserService implements IUserService {
 
 	async addUser(userInfo: { id: string; nickname: string }) {
 		await this.userModel.addNewUser(userInfo.id, userInfo.nickname);
+	}
+
+	async addWeapon(weapon: IWeapon) {
+		await this.userModel.addNewWeapon(weapon.type);
 	}
 
 	async getAllUser(populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>) {
@@ -156,7 +149,7 @@ class UserService implements IUserService {
 	}
 
 	async tradeStock(user: IUser, stock: IStock2, cnt: number, isFull: boolean) {
-		const myStock = this.getUserStockInfo(user, stock.name);
+		const myStock = user.getStock(stock.name);
 		if (isFull) {
 			cnt = cnt > 0 ? Math.floor(user.money / stock.value) : (myStock?.cnt ?? 0) * -1;
 		}

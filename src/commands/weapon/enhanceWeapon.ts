@@ -1,6 +1,4 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import _ from 'lodash';
-import weaponController from '../../controller/bot/weaponController';
 import userController from '../../controller/bot/userController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
@@ -35,9 +33,6 @@ export default {
 			const type = <'sword'>interaction.options.getString('종류') ?? 'sword';
 			// const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const [successRatio] = Object.values(
-				weaponController.getNextRatio({ discordId, type }),
-			).map(ratio => ratio * 100);
 			const { code, curPower, beforePower } = await userController.enhanceWeapon({
 				discordId,
 				type,
@@ -45,10 +40,7 @@ export default {
 				isPreventDown: false,
 			});
 
-			let content = `${beforePower}강 ▶︎ ${curPower}강 (성공확률: ${_.round(
-				successRatio,
-				2,
-			)}%)`;
+			let content = `${beforePower}강 ▶︎ ${curPower}강 `;
 			switch (code) {
 				case 2:
 					content = `실패! ${content}`;

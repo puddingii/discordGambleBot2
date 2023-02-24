@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import weaponController from '../../../controller/bot/weaponController';
-import { WeaponConstructor } from '../../../game/Weapon/Weapon';
+import { TWeaponConstructor } from '../../../interfaces/game/weapon';
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -35,7 +35,7 @@ const showWeaponModal = async (
 	};
 
 	if (weaponType) {
-		const weapon = weaponController.getWeapon(weaponType);
+		const weapon = await weaponController.getWeapon(weaponType);
 		inputBoxInfo.weaponType.value = `${weapon.type}/${weapon.name}`;
 		inputBoxInfo.powerMultipleAndMax.value = `${weapon.powerMultiple}/${weapon.maxPower}`;
 		inputBoxInfo.cost.value = `${weapon.enhanceCost}/${weapon.baseMoney}`;
@@ -77,7 +77,7 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 	}
 
 	let content = '';
-	const defaultClassParam: WeaponConstructor = {
+	const defaultClassParam: TWeaponConstructor = {
 		type: weaponType,
 		name,
 		powerMultiple,
@@ -111,7 +111,9 @@ const showWeaponList = async (interaction: SelectMenuInteraction) => {
 					.setCustomId('어드민')
 					.setPlaceholder('무기 리스트')
 					.addOptions(
-						weaponController.getAllWeapon().map(weapon => ({
+						(
+							await weaponController.getAllWeapon()
+						).map(weapon => ({
 							label: weapon.type,
 							value: `updateWeapon-${weapon.type}`,
 							description: weapon.type,

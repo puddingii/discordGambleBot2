@@ -28,7 +28,7 @@ export default {
 				return;
 			}
 
-			await userController.buySellStock({
+			await userController.tradeStock({
 				discordId,
 				stockName: name,
 				cnt: cnt * -1,

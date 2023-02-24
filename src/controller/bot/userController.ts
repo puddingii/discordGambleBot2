@@ -45,7 +45,7 @@ export const adjustMoney = async (userParam: TUserParam, money: number) => {
 };
 
 /** 주식사기 */
-export const buySellStock = async ({
+export const tradeStock = async ({
 	discordId,
 	stockName,
 	cnt,
@@ -135,6 +135,14 @@ export const getUser = async (info: TUserParam) => {
 	return user;
 };
 
+/** 내 무기들 가져오기 */
+export const getMyWeapon = async (discordId: string, type: string) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const user = await userService.getUser({ discordId }, ['weaponList.weapon']);
+
+	return user.getWeapon(type);
+};
+
 /** 게임에 참여하는 유저리스트 반환 */
 export const getUserList = async (
 	populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>,
@@ -189,12 +197,13 @@ export const generatePassword = async (discordId: string) => {
 export default {
 	addUser,
 	adjustMoney,
-	buySellStock,
+	tradeStock,
 	enhanceWeapon,
 	getUser,
 	giveMoney,
 	getRankingList,
 	getMyStockList,
+	getMyWeapon,
 	generatePassword,
 	updateMoney,
 };

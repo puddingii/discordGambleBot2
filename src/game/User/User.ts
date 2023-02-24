@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import Stock from '../Stock/Stock';
 import Coin from '../Stock/Coin';
 import {
@@ -7,6 +8,8 @@ import {
 	TUpdateStockResult,
 	TUserConstructor,
 } from '../../interfaces/game/user';
+import { IWeapon } from '../../interfaces/game/weapon';
+import { IStock2 } from '../../interfaces/game/stock';
 
 export default class User implements IUser {
 	private _id: IUserInfo['id'];
@@ -54,13 +57,30 @@ export default class User implements IUser {
 	}
 
 	getStock(name: string) {
-		return this.stockList.find(stockInfo => stockInfo.stock.name === name);
+		if (this.stockList.length <= 0) {
+			throw Error('보유하고 있는 주식이 없습니다');
+		}
+
+		if (this.stockList.at(0)?.stock instanceof Types.ObjectId) {
+			throw Error('Populated Error.. 운영자에게 문의하세요');
+		}
+
+		return this.stockList.find(stockInfo => (<IStock2>stockInfo.stock).name === name);
 	}
 
 	getWeapon(type: string) {
-		return this.weaponList.find(weaponInfo => weaponInfo.weapon.type === type);
+		if (this.weaponList.length <= 0) {
+			throw Error('보유하고 있는 무기가 없습니다');
+		}
+
+		if (this.weaponList.at(0)?.weapon instanceof Types.ObjectId) {
+			throw Error('Populated Error.. 운영자에게 문의하세요');
+		}
+
+		return this.weaponList.find(weaponInfo => (<IWeapon>weaponInfo.weapon).type === type);
 	}
 
+	/** FIXME */
 	giveDividend(): { code: number } {
 		const totalMoney = this.stockList.reduce((acc, cur) => {
 			if (cur.cnt > 0 && cur.stock instanceof Stock && cur.stock.type === 'stock') {
@@ -70,58 +90,5 @@ export default class User implements IUser {
 		}, 0);
 		this.money += totalMoney;
 		return { code: totalMoney ? 1 : 0 };
-	}
-
-	updateMoney(money: number, type?: 'stock' | 'coin' | 'weapon') {
-		if (this.money + money < 0) {
-			throw Error('돈이 부족함');
-		}
-		let extraCommission = 1;
-		// 주식이고 파는 경우 수수료 2%를 땐다.
-		if (money > 0 && type === 'stock') {
-			extraCommission = 0.98;
-		}
-		this.money += money * extraCommission;
-	}
-
-	updateStock(stock: Stock | Coin, cnt: number, isFull: boolean): TUpdateStockResult {
-		const myStock = this.getStock(stock.name);
-		if (isFull) {
-			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : (myStock?.cnt ?? 0) * -1;
-		}
-		if (!cnt) {
-			throw Error('돈이 부족하거나 갯수 입력값이 잘못됨.');
-		}
-		// 파는데 숫자가 잘못될 경우
-		if ((myStock && myStock.cnt + cnt < 0) || (!myStock && cnt < 0)) {
-			throw Error('가지고있는 갯수보다 많이 입력함.');
-		}
-
-		const totalMoney = cnt * stock.value;
-		this.updateMoney(totalMoney * -1, stock.type);
-
-		let averageValue = 0;
-		let totalCnt = cnt;
-		// 예전에 사고판적이 있을 때
-		if (myStock) {
-			// 팔 때면 수량의 차이만 있어야한다. 평단가가 바뀌면 안됨.
-			if (totalMoney > 0) {
-				averageValue = Math.floor(
-					(myStock.cnt * myStock.value + totalMoney) / (myStock.cnt + cnt),
-				);
-				averageValue = myStock.cnt + cnt !== 0 ? averageValue : 0;
-				myStock.value = averageValue;
-			} else {
-				averageValue = myStock.value;
-			}
-			totalCnt += myStock.cnt;
-			myStock.cnt += cnt;
-		} else {
-			// 처음 살 때
-			averageValue = stock.value;
-			this.stockList.push({ stock: stock, cnt, value: averageValue });
-		}
-
-		return { cnt: totalCnt, value: averageValue, money: this.money };
 	}
 }

@@ -1,6 +1,7 @@
 import { getRandomNumber } from '../../config/util';
 import { TUserWeaponInfo } from '../../interfaces/game/user';
-import Weapon, { WeaponConstructor } from './Weapon';
+import { TWeaponConstructor } from '../../interfaces/game/weapon';
+import Weapon from './Weapon';
 
 type DataInfo = {
 	weaponList: Array<Weapon>;
@@ -27,7 +28,7 @@ export default class WeaponManager {
 	}
 
 	/** 주식 추가 */
-	addWeapon(weaponParam: WeaponConstructor) {
+	addWeapon(weaponParam: TWeaponConstructor) {
 		const isExistStock = this.weaponList.find(
 			weaponInfo => weaponInfo.type === weaponParam.type,
 		);
@@ -93,26 +94,12 @@ export default class WeaponManager {
 		return weaponInfo;
 	}
 
-	/** 다음 강화할 때 확률 */
-	getNextRatio(weaponParam: WeaponParam, curPower: number) {
-		const weaponInfo = this.getInfo(weaponParam);
-		if (!weaponInfo.isValidPower(curPower + 1)) {
-			throw Error('더이상 강화할 수 없습니다.');
-		}
-		const ratio = weaponInfo.ratioList[curPower];
-		return {
-			success: 1 - (ratio.destroyRatio + ratio.failRatio),
-			fail: ratio.failRatio,
-			destroy: ratio.destroyRatio,
-		};
-	}
-
 	getRatioList(weaponParam: WeaponParam) {
 		const weapon = this.getInfo(weaponParam);
 		return weapon.ratioList;
 	}
 
-	updateWeapon(weaponParam: WeaponParam, updatedWeaponInfo: Partial<WeaponConstructor>) {
+	updateWeapon(weaponParam: WeaponParam, updatedWeaponInfo: Partial<TWeaponConstructor>) {
 		const weaponInfo = this.getInfo(weaponParam);
 		(Object.keys(updatedWeaponInfo) as Array<keyof typeof updatedWeaponInfo>).forEach(
 			info => {

@@ -3,14 +3,14 @@ import passport from 'passport';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { ILogger } from '../../util/logger';
-import { IUserInfo } from '../../model/User';
+import { TUserModelInfo } from '../../model/User';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 
 export const getLoginInfo = (req: Request, res: Response) => {
 	return res.status(200).json({
 		isLoggedIn: req.isAuthenticated(),
-		nickname: (req.user as IUserInfo)?.nickname,
+		nickname: (req.user as TUserModelInfo)?.nickname,
 	});
 };
 

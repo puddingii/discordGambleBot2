@@ -4,10 +4,10 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dayjs from 'dayjs';
-import weaponController from '../../controller/bot/weaponController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { ILogger } from '../../util/logger';
+import userController from '../../controller/bot/userController';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 
@@ -19,7 +19,7 @@ export default {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const myWeapon = weaponController.getMyWeapon({ discordId, type: 'sword' });
+			const myWeapon = await userController.getMyWeapon(discordId, 'sword');
 
 			if (!myWeapon) {
 				await interaction.reply({ content: '내역 없음' });

@@ -10,8 +10,10 @@ import WeaponModel, { IWeaponStatics } from '../model/Weapon';
 import StatusModel, { IStatusStatics } from '../model/Status';
 import { IUserService } from '../interfaces/services/userService';
 import { IStockService } from '../interfaces/services/stockService';
+import { IWeaponService } from '../interfaces/services/weaponService';
 import UserService from '../services/userService';
 import StockService from '../services/stockService';
+import WeaponService from '../services/weaponService';
 
 export const container = new Container();
 export const { lazyInject } = getDecorators(container);
@@ -30,5 +32,6 @@ container.bind<IStatusStatics>(TYPES.StatusModel).toConstantValue(StatusModel);
 // Service
 container.bind<IUserService>(TYPES.UserService).to(UserService);
 container.bind<IStockService>(TYPES.StockService).to(StockService);
+container.bind<IWeaponService>(TYPES.WeaponService).to(WeaponService);
 
 export default {};

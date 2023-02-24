@@ -19,7 +19,7 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름') ?? '';
 
-			await userController.buySellStock({
+			await userController.tradeStock({
 				discordId,
 				stockName: name,
 				cnt: -1,
