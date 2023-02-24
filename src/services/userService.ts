@@ -10,10 +10,11 @@ import {
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
 import Weapon from '../game/weapon/Weapon';
-import { IUser, TUserGiftInfo } from '../interfaces/game/user';
+import { IUser, TUserGiftInfo, TUserWeaponInfo } from '../interfaces/game/user';
 import { IStock2 } from '../interfaces/game/stock';
 import { TUserModelInfo } from '../model/User';
 import { IWeapon } from '../interfaces/game/weapon';
+import { TEnhanceSimulateResult } from '../interfaces/services/weaponService';
 
 @injectable()
 class UserService implements IUserService {
@@ -203,6 +204,37 @@ class UserService implements IUserService {
 		user.money += money * extraCommission;
 
 		await this.userModel.updateMoney({ discordId: user.getId() }, user.money);
+	}
+
+	async updateWeaponAndUserMoney(
+		user: IUser,
+		myWeapon: TUserWeaponInfo,
+		enhanceResult: TEnhanceSimulateResult,
+		option?: Partial<{ isPreventDestroy: boolean; isPreventDown: boolean }>,
+	) {
+		const beforePower = myWeapon.curPower;
+		const { code, cost } = enhanceResult;
+		if (user.money - cost < 0) {
+			throw Error('강화에 필요한 돈이 부족합니다');
+		}
+		if (code === 2) {
+			if (option && !option.isPreventDown && beforePower > 0) {
+				myWeapon.curPower -= 1;
+			}
+			myWeapon.failCnt += 1;
+		}
+		// 터짐
+		else if (code === 3) {
+			if (option && !option.isPreventDestroy) {
+				myWeapon.curPower = 0;
+			}
+			myWeapon.destroyCnt += 1;
+		} else {
+			myWeapon.curPower += 1;
+			myWeapon.successCnt += 1;
+		}
+
+		await this.userModel.updateWeaponAndMoney(user.getId(), myWeapon, user.money - cost);
 	}
 }
 

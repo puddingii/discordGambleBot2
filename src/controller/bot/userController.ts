@@ -5,6 +5,8 @@ import TYPES from '../../interfaces/containerType';
 import { IUserService, TUserParam } from '../../interfaces/services/userService';
 import { IStockService } from '../../interfaces/services/stockService';
 import { IStock2 } from '../../interfaces/game/stock';
+import { IWeaponService } from '../../interfaces/services/weaponService';
+import { IWeapon } from '../../interfaces/game/weapon';
 
 const dataManager = DataManager.getInstance();
 
@@ -75,40 +77,26 @@ export const enhanceWeapon = async ({
 	type: string;
 	isPreventDestroy: boolean;
 	isPreventDown: boolean;
-}): Promise<EnhanceWeaponType> => {
-	const userManager = dataManager.get('user');
-	const weaponManager = dataManager.get('weapon');
-	const weaponInfo = weaponManager.getInfo({ type });
-	const userInfo = userManager.getUser({ discordId });
-	if (!userInfo) {
-		throw Error('유저정보가 없습니다');
-	}
-
-	const myWeapon = userInfo.weaponList.find(weapon => weapon.weapon.type === type);
+}) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
+	const user = await userService.getUser({ discordId }, ['weaponList.weapon']);
+	const myWeapon = user.getWeapon(type);
 	if (!myWeapon) {
-		throw Error('무기정보가 없습니다.');
+		throw Error('해당 무기를 가지고있지 않습니다');
 	}
 
 	const beforePower = myWeapon.curPower;
-
-	/** 강화진행 */
-	const enhanceResult = weaponManager.enhanceWeapon(weaponInfo, beforePower, {
+	const enhanceResult = weaponService.simulateWeaponEnhance(
+		<IWeapon>myWeapon.weapon,
+		myWeapon.curPower,
+	);
+	await userService.updateWeaponAndUserMoney(user, myWeapon, enhanceResult, {
 		isPreventDestroy,
 		isPreventDown,
 	});
-	const code = enhanceResult.code ?? 2;
-	delete enhanceResult.code;
-	userManager.updateWeapon(myWeapon, enhanceResult);
 
-	// 강화비용 계산
-	const cost = weaponInfo.getCost(beforePower, {
-		isPreventDestroy,
-		isPreventDown,
-	});
-	userInfo.updateMoney(-1 * cost, 'weapon');
-
-	await UserModel.updateWeaponAndMoney(userInfo.getId(), myWeapon, userInfo.money);
-	return { code, curPower: enhanceResult.curPower, beforePower };
+	return { code: enhanceResult.code, curPower: myWeapon.curPower, beforePower };
 };
 
 /** 다른 사람한테 돈 기부 */

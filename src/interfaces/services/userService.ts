@@ -2,8 +2,9 @@ import { IStockStatics } from '../../model/Stock';
 import { IUserStatics } from '../../model/User';
 import { IWeaponStatics } from '../../model/Weapon';
 import { IStock2 } from '../game/stock';
-import { IUser, TUserGiftInfo } from '../game/user';
+import { IUser, TUserGiftInfo, TUserWeaponInfo } from '../game/user';
 import { IWeapon } from '../game/weapon';
+import { TEnhanceSimulateResult } from './weaponService';
 
 export type TUserParam = Partial<{ discordId: string; nickname: string }>;
 export type TProcessedStockInfo = {
@@ -30,6 +31,12 @@ export interface IUserService {
 	addGift(user: IUser, giftInfo: TUserGiftInfo): Promise<void>;
 	/** 유저에게 무기추가 */
 	addWeapon(weapon: IWeapon): Promise<void>;
+	updateWeaponAndUserMoney(
+		user: IUser,
+		myWeapon: TUserWeaponInfo,
+		enhanceResult: TEnhanceSimulateResult,
+		option?: Partial<{ isPreventDestroy: boolean; isPreventDown: boolean }>,
+	): Promise<void>;
 	/** 특정 유저 가져오기 */
 	getUser(
 		userParam: TUserParam,

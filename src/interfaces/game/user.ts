@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import Coin from '../../game/Stock/Coin';
-import Weapon from '../../game/Weapon/Weapon';
 import { IStock2 } from './stock';
+import { IWeapon } from './weapon';
 
 /** 유저가 가지고 있는 주식정보 타입 */
 export type TUserStockInfo = {
@@ -12,7 +12,7 @@ export type TUserStockInfo = {
 
 /** 유저가 가지고 있는 무기정보 */
 export type TUserWeaponInfo = {
-	weapon: Weapon | Types.ObjectId;
+	weapon: IWeapon | Types.ObjectId;
 	destroyCnt: number;
 	failCnt: number;
 	successCnt: number;

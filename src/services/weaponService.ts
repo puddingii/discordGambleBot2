@@ -1,14 +1,24 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../interfaces/containerType';
 import Weapon from '../game/Weapon/Weapon';
-import { IWeaponService, ValueOf } from '../interfaces/services/weaponService';
+import {
+	IWeaponService,
+	TEnhanceSimulateResult,
+	ValueOf,
+} from '../interfaces/services/weaponService';
 import { IWeapon, TWeaponConstructor, TWeaponInfo } from '../interfaces/game/weapon';
 
 @injectable()
 class WeaponService implements IWeaponService {
+	formatter: IWeaponService['formatter'];
 	weaponModel: IWeaponService['weaponModel'];
-	constructor(@inject(TYPES.WeaponModel) weaponModel: IWeaponService['weaponModel']) {
+
+	constructor(
+		@inject(TYPES.WeaponModel) weaponModel: IWeaponService['weaponModel'],
+		@inject(TYPES.Formatter) formatter: IWeaponService['formatter'],
+	) {
 		this.weaponModel = weaponModel;
+		this.formatter = formatter;
 	}
 
 	getCost(
@@ -46,6 +56,29 @@ class WeaponService implements IWeaponService {
 		}
 
 		return weapon.powerMultiple * power;
+	}
+
+	simulateWeaponEnhance(weapon: IWeapon, power: number): TEnhanceSimulateResult {
+		if (!weapon.isValidPower(power + 1)) {
+			throw Error('더이상 강화할 수 없습니다');
+		}
+		const { fail, destroy, cost } = this.getEnhanceInfo(weapon, power);
+		const MAX_NUMBER = 1000;
+		const randomNum = this.formatter.getRandomNumber(MAX_NUMBER, 1);
+		// 실패
+		if (fail * MAX_NUMBER >= randomNum) {
+			return { code: 2, cost };
+		}
+		// 터짐
+		if ((fail + destroy) * MAX_NUMBER >= randomNum) {
+			return { code: 3, cost };
+		}
+
+		// 성공
+		return {
+			code: 1,
+			cost,
+		};
 	}
 
 	async addWeapon(param: TWeaponConstructor) {
