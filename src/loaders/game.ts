@@ -6,7 +6,6 @@ import User from '../game/User/User';
 import Weapon from '../game/Weapon/Weapon';
 import StockManager from '../game/Stock/StockManager';
 import UserManager from '../game/User/UserManager';
-import WeaponManager from '../game/Weapon/WeaponManager';
 import GlobalManager from '../game/Status/StatusManager';
 import StatusModel from '../model/Status';
 import UserModel from '../model/User';
@@ -152,5 +151,4 @@ export default async () => {
 		}),
 	);
 	dataManager.set('user', new UserManager(userList));
-	dataManager.set('weapon', new WeaponManager({ weaponList: weaponAllList }));
 };

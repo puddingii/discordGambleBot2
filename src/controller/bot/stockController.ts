@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import { startSession } from 'mongoose';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
 import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
@@ -7,6 +9,7 @@ import DataManager from '../../game/DataManager';
 import StatusModel from '../../model/Status';
 import StockModel from '../../model/Stock';
 import UserModel from '../../model/User';
+import { IStockService, TStockType } from '../../interfaces/services/stockService';
 
 const dataManager = DataManager.getInstance();
 const stockManager = dataManager.get('stock');
@@ -40,27 +43,17 @@ export interface CoinParam extends DefaultStockParam {
 }
 
 /** 주식정보 가져오기 */
-export const getStock = (type: 'coin' | 'stock' | '', name: string) => {
-	const stockManager = dataManager.get('stock');
-	const stockTypeList = ['coin', 'stock', 'all'];
-	if (!stockTypeList.includes(type)) {
-		throw Error('타입에러');
-	}
-	const stock = stockManager.getStock(type, name);
-	if (!stock) {
-		throw Error('이름에 해당하는 주식이 없습니다');
-	}
+export const getStock = async (name: string) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const stock = await stockService.getStock(name);
 	return stock;
 };
 
 /** 타입에 해당하는 모든 주식 가져오기 */
-export const getAllStock = (type: 'coin' | 'stock' | 'all') => {
-	const stockManager = dataManager.get('stock');
-	const stockTypeList = ['coin', 'stock', 'all'];
-	if (!stockTypeList.includes(type)) {
-		throw Error('타입에러');
-	}
-	return stockManager.getAllStock(type);
+export const getAllStock = async (type?: TStockType) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const stockList = await stockService.getAllStock(type);
+	return stockList;
 };
 
 /** 도박 컨텐츠 게임 상태값들 가져오기 */

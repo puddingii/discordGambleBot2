@@ -35,7 +35,7 @@ const showStockModal = async (interaction: SelectMenuInteraction, stockName?: st
 	};
 
 	if (stockName) {
-		const stock = stockController.getStock('stock', stockName);
+		const stock = await stockController.getStock(stockName);
 		inputBoxInfo.nameType.value = `${stock.name}/${stock.type}`;
 		inputBoxInfo.value.value = `${stock.value}`;
 		const { min, max } = stock.getRatio();
@@ -128,7 +128,9 @@ const showStockList = async (interaction: SelectMenuInteraction) => {
 					.setCustomId('어드민')
 					.setPlaceholder('주식 리스트')
 					.addOptions(
-						stockController.getAllStock('all').map(stock => ({
+						(
+							await stockController.getAllStock()
+						).map(stock => ({
 							label: stock.name,
 							value: `updateStock-${stock.name}`,
 							description: stock.type,

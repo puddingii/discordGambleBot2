@@ -4,7 +4,11 @@ import { IUserService, TUserParam } from '../interfaces/services/userService';
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
 import { IUser, TUserGiftInfo } from '../interfaces/game/user';
-import { IStockService, TValidStockParam } from '../interfaces/services/stockService';
+import {
+	IStockService,
+	TStockType,
+	TValidStockParam,
+} from '../interfaces/services/stockService';
 import { IStock2 } from '../interfaces/game/stock';
 
 @injectable()
@@ -47,6 +51,30 @@ class StockService implements IStockService {
 		}
 
 		return { code: 1 };
+	}
+
+	async getAllStock(type?: TStockType) {
+		let stockList;
+		if (type) {
+			stockList = await this.stockModel.find({ type });
+		} else {
+			stockList = await this.stockModel.find();
+		}
+
+		return stockList.map(
+			stockInfo =>
+				new Stock({
+					name: stockInfo.name,
+					ratio: { min: stockInfo.minRatio, max: stockInfo.maxRatio },
+					type: <'stock'>stockInfo.type,
+					updateTime: stockInfo.updateTime,
+					value: stockInfo.value,
+					comment: stockInfo.comment,
+					conditionList: stockInfo.conditionList,
+					correctionCnt: stockInfo.correctionCnt,
+					dividend: stockInfo.dividend,
+				}),
+		);
 	}
 
 	async getStock(stockName: string) {
