@@ -1,5 +1,4 @@
 import UserModel from '../../model/User';
-import DataManager from '../../game/DataManager';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { IUserService, TUserParam } from '../../interfaces/services/userService';
@@ -7,30 +6,6 @@ import { IStockService } from '../../interfaces/services/stockService';
 import { IStock2 } from '../../interfaces/game/stock';
 import { IWeaponService } from '../../interfaces/services/weaponService';
 import { IWeapon } from '../../interfaces/game/weapon';
-
-const dataManager = DataManager.getInstance();
-
-interface MyStockInfo {
-	stockList: Array<{
-		name: string;
-		cnt: number;
-		myRatio: number;
-		myValue: number;
-		stockValue: number;
-		stockType: 'stock' | 'coin';
-		stockBeforeRatio: number;
-		profilMargin: number;
-	}>;
-	totalMyValue: number;
-	totalStockValue: number;
-}
-
-type EnhanceWeaponType = {
-	/** 1: 성공, 2: 실패, 3: 터짐 */
-	code: 1 | 2 | 3;
-	curPower: number;
-	beforePower: number;
-};
 
 /** 신규유저 추가 */
 export const addUser = async (userInfo: { id: string; nickname: string }) => {
@@ -141,7 +116,7 @@ export const getUserList = async (
 };
 
 /** 내가 1개 이상 가지고 있는 주식리스트 */
-export const getMyStockList = async (discordId: string): Promise<MyStockInfo> => {
+export const getMyStockList = async (discordId: string) => {
 	const userService = container.get<IUserService>(TYPES.UserService);
 	const user = await userService.getUser({ discordId }, ['stockList.stock']);
 	const stockInfo = userService.getProcessedStock(user);
