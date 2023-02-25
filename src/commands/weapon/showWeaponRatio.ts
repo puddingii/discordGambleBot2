@@ -4,7 +4,7 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 import _ from 'lodash';
-import weaponController from '../../controller/bot/weaponController';
+import weaponController from '../../controller/weaponController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { IUtil } from '../../util/util';

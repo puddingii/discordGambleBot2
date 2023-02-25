@@ -1,7 +1,6 @@
 import { Client } from 'discord.js';
 import { Express } from 'express';
 import dbLoader from './db';
-import gameLoader from './game';
 import botLoader from './bot';
 import cronLoader from './cron';
 import expressLoader from './myExpress';
@@ -17,7 +16,6 @@ export default async ({
 	if (!dbResult.code) {
 		return;
 	}
-	await gameLoader();
 	await botLoader(client);
 	cronLoader.loadCron();
 	await expressLoader(app);

@@ -1,15 +1,15 @@
-import { container } from '../../settings/container';
-import TYPES from '../../interfaces/containerType';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
 import {
 	IStockService,
 	TStockType,
 	TValidStockParam,
-} from '../../interfaces/services/stockService';
-import { IStatusService, TGambleStatus } from '../../interfaces/services/statusService';
-import { IUserService } from '../../interfaces/services/userService';
-import { IStock2 } from '../../interfaces/game/stock';
-import { TUserGiftInfo } from '../../interfaces/game/user';
-import { ILogger } from '../../util/logger';
+} from '../interfaces/services/stockService';
+import { IStatusService, TGambleStatus } from '../interfaces/services/statusService';
+import { IUserService } from '../interfaces/services/userService';
+import { IStock2 } from '../interfaces/game/stock';
+import { TUserGiftInfo } from '../interfaces/game/user';
+import { ILogger } from '../util/logger';
 
 /** 주식정보 가져오기 */
 export const getStock = async (name: string) => {
@@ -134,6 +134,9 @@ export const updateCondition = async () => {
 	const statusService = container.get<IStatusService>(TYPES.StatusService);
 	const statusInfo = await statusService.getGambleStatus();
 	const curCondition = statusService.getRandomCondition(statusInfo);
+	if (curCondition === -1) {
+		return;
+	}
 	await statusService.setGambleStatus({ curCondition });
 };
 

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { setComma } from '../../config/util';
-import globalController from '../../controller/bot/statusController';
+import globalController from '../../controller/statusController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { ILogger } from '../../util/logger';

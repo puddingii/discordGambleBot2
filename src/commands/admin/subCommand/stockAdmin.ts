@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../game/Stock/Stock';
-import stockController from '../../../controller/bot/stockController';
+import stockController from '../../../controller/stockController';
 import secretKey from '../../../config/secretKey';
 import { TValidStockParam } from '../../../interfaces/services/stockService';
 

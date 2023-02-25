@@ -1,8 +1,8 @@
-import { container } from '../../settings/container';
-import TYPES from '../../interfaces/containerType';
-import { TWeaponConstructor } from '../../interfaces/game/weapon';
-import { IWeaponService } from '../../interfaces/services/weaponService';
-import { IUserService } from '../../interfaces/services/userService';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { TWeaponConstructor } from '../interfaces/game/weapon';
+import { IWeaponService } from '../interfaces/services/weaponService';
+import { IUserService } from '../interfaces/services/userService';
 
 /** 무기종류 추가 */
 export const addWeapon = async (param: TWeaponConstructor) => {

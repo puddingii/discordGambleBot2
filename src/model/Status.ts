@@ -91,7 +91,7 @@ Status.statics.updateCurTime = async function (cnt: number, isTest = false) {
 	await this.findOneAndUpdate(
 		{ isTest },
 		{
-			$inc: { gamble: { curTime: cnt } },
+			$inc: { 'gamble.curTime': cnt },
 		},
 	);
 };
@@ -109,7 +109,7 @@ Status.statics.updateStatus = async function (
 		const options = statusInfo[statusType];
 		if (options && typeof options === 'object' && !Array.isArray(options)) {
 			(Object.keys(options) as Array<keyof typeof options>).forEach(option => {
-				if (options[option]) {
+				if (options[option] === 0 || options[option]) {
 					updInfo[`${statusType}.${option}`] = options[option];
 				}
 			});

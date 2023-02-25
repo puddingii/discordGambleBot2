@@ -2,14 +2,11 @@ import { IStockStatics } from '../../model/Stock';
 import { IUserStatics } from '../../model/User';
 import { IWeaponStatics } from '../../model/Weapon';
 import { IStock2 } from '../game/stock';
-import {
-	IUser,
-	TPopulatedUserWeaponInfo,
-	TUserGiftInfo,
-	TUserWeaponInfo,
-} from '../game/user';
+import { IUser, TPopulatedUserWeaponInfo, TUserGiftInfo } from '../game/user';
 import { IWeapon } from '../game/weapon';
 import { TEnhanceSimulateResult } from './weaponService';
+
+export type TPopulatedList = Array<'stockList.stock' | 'weaponList.weapon'>;
 
 export type TUserParam = Partial<{ discordId: string; nickname: string }>;
 export type TProcessedStockInfo = {
@@ -22,9 +19,11 @@ export type TProcessedStockInfo = {
 		stockType: 'stock' | 'coin';
 		stockBeforeRatio: number;
 		profilMargin: number;
+		holdingRatio?: number;
 	}>;
 	totalMyValue: number;
 	totalStockValue: number;
+	totalMyMoney: number;
 };
 export interface IUserService {
 	userModel: IUserStatics;
@@ -48,18 +47,18 @@ export interface IUserService {
 		option?: Partial<{ isPreventDestroy: boolean; isPreventDown: boolean }>,
 	): Promise<void>;
 	/** 특정 유저 가져오기 */
-	getUser(
-		userParam: TUserParam,
-		populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>,
-	): Promise<IUser>;
+	getUser(userParam: TUserParam, populatedList?: TPopulatedList): Promise<IUser>;
 	/** 모든 유저리스트 가져오기 */
-	getAllUser(
-		populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>,
-	): Promise<Array<IUser>>;
+	getAllUser(populatedList?: TPopulatedList): Promise<Array<IUser>>;
 	/** 1개 이상 가지고 있는 주식정보를 가공 */
 	getProcessedStock(user: IUser): TProcessedStockInfo;
 	/** 주식 거래(사고 팔때 사용) 살때는 cnt가 양수 아니면 음수 */
-	tradeStock(user: IUser, stock: IStock2, cnt: number, isFull: boolean): Promise<void>;
+	tradeStock(
+		user: IUser,
+		stock: IStock2,
+		cnt: number,
+		isFull: boolean,
+	): Promise<{ cnt: number; value: number }>;
 	/** 가지고 있는 돈 업데이트 */
 	updateMoney(
 		user: IUser,

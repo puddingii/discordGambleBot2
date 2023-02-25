@@ -4,6 +4,7 @@ import _ from 'lodash';
 import TYPES from '../interfaces/containerType';
 import {
 	IUserService,
+	TPopulatedList,
 	TProcessedStockInfo,
 	TUserParam,
 } from '../interfaces/services/userService';
@@ -89,26 +90,48 @@ class UserService implements IUserService {
 				if (myStock.stock instanceof Types.ObjectId) {
 					return acc;
 				}
-				const stock = <IStock2>myStock.stock;
-				if (myStock.cnt > 0) {
-					const myRatio = _.round((stock.value / myStock.value) * 100 - 100, 2);
-					acc.totalMyValue += myStock.cnt * myStock.value;
-					acc.totalStockValue += myStock.cnt * stock.value;
-					acc.stockList.push({
-						name: stock.name,
-						cnt: myStock.cnt,
-						myValue: myStock.value,
-						myRatio,
-						stockValue: stock.value,
-						stockType: stock.type,
-						stockBeforeRatio: _.round(stock.beforeHistoryRatio * 100, 2),
-						profilMargin: myStock.cnt * (stock.value - myStock.value),
-					});
+				let myRatio = 0;
+				const stock = myStock.stock;
+				const { cnt: myCnt, value: myAvgValue } = myStock;
+
+				if (myCnt > 0) {
+					myRatio = _.round((stock.value / myAvgValue) * 100 - 100, 2);
+					// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
+					acc.totalMyValue += myCnt * myAvgValue;
+					acc.totalStockValue += myCnt * stock.value;
 				}
+
+				// 내 주식 정보
+				acc.stockList.push({
+					name: stock.name,
+					cnt: myCnt,
+					myValue: myAvgValue ?? 0,
+					myRatio,
+					stockValue: stock.value,
+					stockType: stock.type,
+					stockBeforeRatio: _.round(stock.beforeHistoryRatio * 100, 2),
+					profilMargin: myCnt * (stock.value - myAvgValue),
+				});
+
 				return acc;
 			},
-			{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
+			{
+				stockList: [],
+				totalMyValue: 0,
+				totalStockValue: 0,
+				totalMyMoney: user.money,
+			},
 		);
+
+		// 각각의 주식의 가치비중 계산
+		stockInfo.stockList = stockInfo.stockList.map(stock => {
+			const holdingRatio = _.round(
+				((stock.cnt * stock.myValue) / stockInfo.totalMyValue) * 100,
+				2,
+			);
+			return { ...stock, holdingRatio };
+		});
+
 		return stockInfo;
 	}
 
@@ -134,7 +157,7 @@ class UserService implements IUserService {
 		await this.userModel.addNewWeapon(weapon.type);
 	}
 
-	async getAllUser(populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>) {
+	async getAllUser(populatedList?: TPopulatedList) {
 		const populatedStr = populatedList?.join(' ') ?? '';
 		const userList = await this.userModel.find({}).populate(populatedStr);
 
@@ -143,10 +166,7 @@ class UserService implements IUserService {
 		});
 	}
 
-	async getUser(
-		userParam: TUserParam,
-		populatedList?: Array<'stockList.stock' | 'weaponList.weapon'>,
-	) {
+	async getUser(userParam: TUserParam, populatedList?: TPopulatedList) {
 		const populatedStr = populatedList?.join(' ') ?? '';
 		const userInfo = await this.userModel.findOne(userParam).populate(populatedStr);
 		if (!userInfo) {
@@ -199,6 +219,8 @@ class UserService implements IUserService {
 			{ cnt: totalCnt, name: stock.name, value: averageValue },
 			user.money,
 		);
+
+		return { cnt: totalCnt, value: averageValue };
 	}
 
 	async updateMoney(user: IUser, money: number, type?: 'stock' | 'coin' | 'weapon') {

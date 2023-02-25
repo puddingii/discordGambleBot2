@@ -1,6 +1,6 @@
-import { container } from '../../settings/container';
-import TYPES from '../../interfaces/containerType';
-import { IStatusService } from '../../interfaces/services/statusService';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { IStatusService } from '../interfaces/services/statusService';
 
 export const getGrantMoney = async () => {
 	const statusService = container.get<IStatusService>(TYPES.StatusService);

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import userController from '../../controller/bot/userController';
+import userController from '../../controller/userController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { ILogger } from '../../util/logger';

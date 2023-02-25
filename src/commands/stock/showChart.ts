@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import * as echarts from 'echarts';
 import sharp from 'sharp';
-import stockController from '../../controller/bot/stockController';
+import stockController from '../../controller/stockController';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import { ILogger } from '../../util/logger';

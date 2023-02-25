@@ -13,7 +13,6 @@ export default class Stock extends StockAbstract implements IStock2 {
 		this.conditionList = info.conditionList ?? [0, -0.06, -0.04, 0.04, 0.06];
 	}
 
-	/** FIXME Service단으로 이동할것 */
 	update(curTime: number, curCondition: number): { code: number } {
 		const myStock = new Condition(this);
 		const ratio = myStock.getRandomRatio();

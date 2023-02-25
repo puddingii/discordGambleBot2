@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import _ from 'lodash';
-import userController from '../../controller/bot/userController';
+import userController from '../../controller/userController';
 import util from '../../config/util';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
