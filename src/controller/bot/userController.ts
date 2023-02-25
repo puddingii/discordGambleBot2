@@ -87,7 +87,11 @@ export const giveMoney = async (
 
 	/** 보낸 사람은 돈 차감, 받는 사람은 선물목록에 추가 */
 	await userService.updateMoney(sender, money * -1);
-	await userService.addGift(receiver, { type: 'money', value: money });
+	await userService.addGift(receiver, {
+		type: 'money',
+		value: money,
+		comment: `${sender.nickname}이 보냄`,
+	});
 };
 
 /** 유저정보 반환 */

@@ -29,8 +29,11 @@ export interface IUserService {
 	addUser(userInfo: { id: string; nickname: string }): Promise<void>;
 	/** 유저에게 선물주기 */
 	addGift(user: IUser, giftInfo: TUserGiftInfo): Promise<void>;
+	/** 유저에게 선물주기 */
+	addGiftList(user: IUser, giftList: Array<TUserGiftInfo>): Promise<void>;
 	/** 유저에게 무기추가 */
 	addWeapon(weapon: IWeapon): Promise<void>;
+	/** 무기 업데이트 및 돈 저장 */
 	updateWeaponAndUserMoney(
 		user: IUser,
 		myWeapon: TUserWeaponInfo,

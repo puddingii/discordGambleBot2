@@ -17,7 +17,7 @@ export default {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const condition = stockController.getCurrentCondition();
+			const { curCondition: condition } = await stockController.getGambleStatus();
 			let conditionText = '';
 			switch (condition) {
 				case 1:

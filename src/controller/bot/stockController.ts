@@ -1,26 +1,19 @@
-import dayjs from 'dayjs';
 import { startSession } from 'mongoose';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
-import User from '../../game/User/User';
 import Stock from '../../game/Stock/Stock';
 import Coin from '../../game/Stock/Coin';
 import DataManager from '../../game/DataManager';
-import StatusModel from '../../model/Status';
 import StockModel from '../../model/Stock';
 import UserModel from '../../model/User';
 import { IStockService, TStockType } from '../../interfaces/services/stockService';
+import { IStatusService, TGambleStatus } from '../../interfaces/services/statusService';
+import { IUserService } from '../../interfaces/services/userService';
+import { IStock2 } from '../../interfaces/game/stock';
+import { TUserGiftInfo } from '../../interfaces/game/user';
+import { ILogger } from '../../util/logger';
 
 const dataManager = DataManager.getInstance();
-const stockManager = dataManager.get('stock');
-
-type StockManager = typeof stockManager;
-
-interface UpdateStatusParam {
-	curCondition: StockManager['curCondition'];
-	conditionRatioPerList: StockManager['conditionRatioPerList'];
-	conditionPeriod: StockManager['conditionPeriod'];
-}
 
 interface DefaultStockParam {
 	name: string;
@@ -57,28 +50,23 @@ export const getAllStock = async (type?: TStockType) => {
 };
 
 /** 도박 컨텐츠 게임 상태값들 가져오기 */
-export const getGambleStatus = () => {
-	const stockManager = dataManager.get('stock');
+export const getGambleStatus = async () => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const { conditionPeriod, conditionRatioPerList, curCondition } =
+		await statusService.getGambleStatus();
+
 	return {
-		curCondition: stockManager.curCondition,
-		conditionPeriod: stockManager.conditionPeriod,
-		conditionRatioPerList: stockManager.conditionRatioPerList,
+		curCondition,
+		conditionPeriod,
+		conditionRatioPerList,
 	};
 };
 
-/** 현재 주식흐름 */
-export const getCurrentCondition = () => {
-	const stockManager = dataManager.get('stock');
-	return stockManager.curCondition;
-};
-
 /** 다음 컨디션 업데이트까지 남은시간 */
-export const getNextUpdateTime = () => {
-	const stockManager = dataManager.get('stock');
-	const globalManager = dataManager.get('globalStatus');
-	return (
-		stockManager.conditionPeriod - (globalManager.curTime % stockManager.conditionPeriod)
-	);
+export const getNextUpdateTime = async () => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const { conditionPeriod, curTime } = await statusService.getGambleStatus();
+	return conditionPeriod - (curTime % conditionPeriod);
 };
 
 /** 차트 데이터 생성 */
@@ -90,58 +78,24 @@ export const getChartData = async ({
 	stockName: string;
 	stickTime: number;
 	chartType: 'stick' | 'line';
-}): Promise<{ xDataList: Array<string>; yDataList: Array<Array<number> | number> }> => {
-	const type = 'stock';
-	const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
-	const stockInfo = await StockModel.getUpdateHistory(stockName, stickPerCnt * 30);
-	const stockCnt = stockInfo.length;
+}) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const stickPerCnt = stickTime / 2;
+	const list = await stockService.getStockUpdateHistoryList(stockName, stickPerCnt * 30);
+	const chartData = stockService.convertListToChartData(list, stickPerCnt, chartType);
 
-	let beforeHistory = 0;
-	const xDataList: Array<string> = [];
-	const yDataList: Array<Array<number> | number> = [];
-	for (let i = 0; i < stockCnt; i += stickPerCnt) {
-		const stickData = stockInfo.slice(i, i + stickPerCnt);
-		const stickLastIdx = stickData.length - 1;
-		if (stickData.length === -1) {
-			break;
-		}
-		const valueList = stickData.map(data => data.value);
-		beforeHistory && valueList.unshift(beforeHistory);
-		const stickValue =
-			chartType === 'stick'
-				? [
-						valueList[0],
-						valueList[stickLastIdx],
-						Math.min(...valueList),
-						Math.max(...valueList),
-				  ]
-				: valueList[stickLastIdx];
-		beforeHistory = valueList[stickLastIdx];
-		xDataList.push(dayjs(stickData[0].date).format('MM.DD'));
-		yDataList.push(stickValue);
-	}
-
-	return { xDataList, yDataList };
+	return chartData;
 };
 
 /** 도박 컨텐츠 게임 상태값들 셋팅 */
-export const setGambleStatus = async (status: Partial<UpdateStatusParam>) => {
-	const { curCondition, conditionRatioPerList, conditionPeriod } = status;
-	const stockManager = dataManager.get('stock');
-	if (curCondition) {
-		stockManager.curCondition = curCondition;
-	}
-	if (conditionPeriod) {
-		stockManager.conditionPeriod = conditionPeriod;
-	}
-	if (conditionRatioPerList) {
-		stockManager.conditionRatioPerList = conditionRatioPerList;
-	}
-	await StatusModel.updateStatus({ gamble: status });
+export const setGambleStatus = async (status: Partial<TGambleStatus>) => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	await statusService.setGambleStatus(status);
 };
 
 /** 주식 업데이트 */
 export const updateStock = async (isNew: boolean, param: StockParam | CoinParam) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
 	const stockManager = dataManager.get('stock');
 	if (isNew) {
 		const stock = param.type === 'stock' ? new Stock(param) : new Coin(param);
@@ -188,33 +142,53 @@ export const updateStockRandom = async (curTime: number) => {
 };
 
 /** 유저에게 배당금 주기 */
-export const giveDividend = async (curTime: number) => {
+export const giveDividend = async () => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const logger = container.get<ILogger>(TYPES.Logger);
+
+	const { curTime } = await statusService.getGambleStatus();
 	if (curTime % 48 !== 0) {
 		return;
 	}
-	const userManager = dataManager.get('user');
-	const userList = userManager.getUserList();
-	let updUserList: User[] = [];
-	updUserList = userList.filter(user => {
-		const result = user.giveDividend();
-		return !!result.code;
+	const userList = await userService.getAllUser(['stockList.stock']);
+
+	const updateUserList = userList.map(user => {
+		const giftList: Array<TUserGiftInfo> = [];
+		user.stockList.forEach(stock => {
+			const money = stockService.getStockDividend(stock.stock, stock.cnt);
+			if (money) {
+				giftList.push({
+					type: 'money',
+					value: money,
+					comment: `${(<IStock2>stock.stock).name}의 배당금`,
+				});
+			}
+		});
+		return userService.addGiftList(user, giftList);
 	});
-	for await (const user of updUserList) {
-		await UserModel.updateMoney({ discordId: user.getId() }, user.money);
-	}
+
+	const resultList = await Promise.allSettled(updateUserList);
+
+	resultList.forEach(result => {
+		if (result.status !== 'fulfilled') {
+			logger.error(`${result.reason}`, ['Controller']);
+		}
+	});
 };
 
-export const updateCondition = async (curTime: number) => {
-	const stockManager = dataManager.get('stock');
-	const curCondition = stockManager.updateCondition(curTime);
-	await StatusModel.updateStatus({ gamble: { curCondition } });
+export const updateCondition = async () => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const statusInfo = await statusService.getGambleStatus();
+	const curCondition = statusService.getRandomCondition(statusInfo);
+	await statusService.setGambleStatus({ curCondition });
 };
 
 export default {
 	getAllStock,
 	getStock,
 	getChartData,
-	getCurrentCondition,
 	getNextUpdateTime,
 	getGambleStatus,
 	giveDividend,

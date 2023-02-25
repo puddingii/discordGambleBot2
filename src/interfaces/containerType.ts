@@ -14,4 +14,5 @@ export default {
 	UserService: Symbol.for('UserService'),
 	StockService: Symbol.for('StockService'),
 	WeaponService: Symbol.for('WeaponService'),
+	StatusService: Symbol.for('StatusService'),
 };

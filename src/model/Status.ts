@@ -11,9 +11,9 @@ type UpdateStatusParam = {
 		/** 주식 흐름 바뀌는 확률 */
 		conditionRatioPerList: Array<number>;
 	}>;
-	user: {
+	user: Partial<{
 		grantMoney: number;
-	};
+	}>;
 };
 
 interface DoucmentResult<T> {

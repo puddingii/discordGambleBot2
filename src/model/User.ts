@@ -44,6 +44,8 @@ type GiftInfo = {
 	type: string;
 	/** 가치나 카운트 */
 	value: number;
+	/** 코멘트 */
+	comment: string;
 };
 
 interface DoucmentResult<T> {
@@ -80,6 +82,8 @@ export interface IUserStatics extends Model<IUser> {
 	addNewWeapon(type: string): Promise<void>;
 	/** 선물 추가 */
 	addGift(userParam: TUserParam, giftInfo: GiftInfo): Promise<void>;
+	/** 선물리스트 추가 */
+	addGiftList(userParam: TUserParam, giftInfo: Array<GiftInfo>): Promise<void>;
 	/** 웹 패스워드 검증 */
 	checkPassword(
 		userInfo: Partial<{ discordId: string; nickname: string }>,
@@ -208,6 +212,10 @@ const User = new Schema<IUser, IUserStatics>({
 			value: {
 				type: Number,
 				default: 0,
+			},
+			comment: {
+				type: String,
+				default: '',
 			},
 		},
 	],
@@ -436,6 +444,15 @@ User.statics.updateAll = async function (userList: UserController[]) {
 User.statics.addGift = async function (userParam: TUserParam, giftInfo: GiftInfo) {
 	await this.findOneAndUpdate(userParam, {
 		$push: { giftList: giftInfo },
+	});
+};
+
+User.statics.addGiftList = async function (
+	userParam: TUserParam,
+	giftList: Array<GiftInfo>,
+) {
+	await this.findOneAndUpdate(userParam, {
+		$push: { giftList: { $each: giftList } },
 	});
 };
 

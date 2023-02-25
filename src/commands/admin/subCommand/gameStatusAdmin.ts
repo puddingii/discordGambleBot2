@@ -3,8 +3,8 @@ import { getNewSelectMenu, getModal } from './common';
 import stockController from '../../../controller/bot/stockController';
 
 const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
-	const curCondition = stockController.getCurrentCondition();
-	const { conditionPeriod, conditionRatioPerList } = stockController.getGambleStatus();
+	const { curCondition, conditionPeriod, conditionRatioPerList } =
+		await stockController.getGambleStatus();
 	const modalInfo = {
 		id: '어드민-updateStatus',
 		title: '주식상태 업데이트',

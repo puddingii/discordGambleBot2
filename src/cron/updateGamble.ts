@@ -35,12 +35,12 @@ try {
 			/** 12시간마다 컨디션 조정 */
 			const globalManager = dataManager.get('globalStatus');
 			const { curTime } = globalManager;
-			await stockController.updateCondition(curTime);
+			await stockController.updateCondition();
 			await statusController.updateCurTime(curTime + 1);
 			await statusController.updateGrantMoney();
 
 			await stockController.updateStockRandom(curTime);
-			await stockController.giveDividend(curTime);
+			await stockController.giveDividend();
 
 			logger.info(`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`, ['CRON']);
 		} catch (err) {

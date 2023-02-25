@@ -1,9 +1,10 @@
+import dayjs from 'dayjs';
 import { inject, injectable } from 'inversify';
 import TYPES from '../interfaces/containerType';
 import { IUserService, TUserParam } from '../interfaces/services/userService';
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
-import { IUser, TUserGiftInfo } from '../interfaces/game/user';
+import { IUser, TUserGiftInfo, TUserStockInfo } from '../interfaces/game/user';
 import {
 	IStockService,
 	TStockType,
@@ -22,6 +23,47 @@ class StockService implements IStockService {
 	) {
 		this.userModel = userModel;
 		this.stockModel = stockModel;
+	}
+
+	convertListToChartData(
+		list: { value: number; date: string }[],
+		stackCnt: number,
+		chartType: 'stick' | 'line',
+	) {
+		const listLen = list.length;
+		const xDataList: Array<string> = [];
+		const yDataList: Array<Array<number> | number> = [];
+		let beforeHistory = 0;
+		for (let i = 0; i < listLen; i += stackCnt) {
+			const stickData = list.slice(i, i + stackCnt);
+			const stickLastIdx = stickData.length - 1;
+			if (stickData.length === -1) {
+				break;
+			}
+			const valueList = stickData.map(data => data.value);
+			beforeHistory && valueList.unshift(beforeHistory);
+			const stickValue =
+				chartType === 'stick'
+					? [
+							valueList[0],
+							valueList[stickLastIdx],
+							Math.min(...valueList),
+							Math.max(...valueList),
+					  ]
+					: valueList[stickLastIdx];
+			beforeHistory = valueList[stickLastIdx];
+			xDataList.push(dayjs(stickData[0].date).format('MM.DD'));
+			yDataList.push(stickValue);
+		}
+
+		return { xDataList, yDataList };
+	}
+
+	getStockDividend(stock: TUserStockInfo['stock'], cnt: number) {
+		if (!(stock instanceof Stock)) {
+			return 0;
+		}
+		return stock.value * cnt * stock.dividend;
 	}
 
 	isValidStockParam(param: TValidStockParam): {
@@ -95,6 +137,11 @@ class StockService implements IStockService {
 		});
 
 		return stock;
+	}
+
+	async getStockUpdateHistoryList(stockName: string, limitedCnt: number) {
+		const historyList = await this.stockModel.getUpdateHistory(stockName, limitedCnt);
+		return historyList;
 	}
 }
 

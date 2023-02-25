@@ -117,6 +117,11 @@ class UserService implements IUserService {
 		await this.userModel.addGift({ discordId: user.getId() }, giftInfo);
 	}
 
+	async addGiftList(user: IUser, giftList: Array<TUserGiftInfo>) {
+		user.giftList.push(...giftList);
+		await this.userModel.addGiftList({ discordId: user.getId() }, giftList);
+	}
+
 	async addUser(userInfo: { id: string; nickname: string }) {
 		await this.userModel.addNewUser(userInfo.id, userInfo.nickname);
 	}

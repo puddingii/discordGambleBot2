@@ -25,6 +25,7 @@ export type TUserWeaponInfo = {
 export type TUserGiftInfo = {
 	type: string;
 	value: number;
+	comment: string;
 };
 
 export interface IUserInfo {
