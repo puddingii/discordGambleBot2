@@ -37,7 +37,7 @@ export default {
 			/** Discord Info */
 			const stockType =
 				<'coin' | 'stock' | 'all'>interaction.options.getString('종류') || 'all';
-			const condition = stockController.getNextUpdateTime();
+			const condition = await stockController.getNextUpdateTime();
 
 			const embedBox = new EmbedBuilder();
 			embedBox

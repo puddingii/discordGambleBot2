@@ -39,7 +39,7 @@ try {
 			await statusController.updateCurTime(curTime + 1);
 			await statusController.updateGrantMoney();
 
-			await stockController.updateStockRandom(curTime);
+			await stockController.updateStockRandom();
 			await stockController.giveDividend();
 
 			logger.info(`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`, ['CRON']);

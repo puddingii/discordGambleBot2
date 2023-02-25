@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import userController from '../../controller/bot/userController';
-import globalController from '../../controller/bot/statusController';
 import { setComma } from '../../config/util';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
@@ -16,10 +15,7 @@ export default {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-
-			const user = await userController.getUser({ discordId });
-
-			const money = await globalController.giveGrantMoney(user);
+			const money = await userController.giveGrantMoney(discordId);
 
 			await interaction.reply({
 				content: `${setComma(money, true)}원을 받았습니다.`,

@@ -71,6 +71,22 @@ class StatusService implements IStatusService {
 	async setUserStatus(statusInfo: Partial<TUserStatus>, isTest?: boolean | undefined) {
 		await this.statusModel.updateStatus({ user: statusInfo }, null, isTest);
 	}
+
+	async updateCurTime(cnt: number, isTest?: boolean | undefined): Promise<void> {
+		await this.statusModel.updateCurTime(cnt, isTest);
+	}
+
+	async updateGrantMoney(grantMoney: number, num?: number) {
+		if (num === 0 || num) {
+			grantMoney = num;
+			return;
+		}
+		grantMoney += 210 + grantMoney * 0.02;
+		if (grantMoney > 5_000_000) {
+			grantMoney = 5_000_000;
+		}
+		await this.statusModel.updateStatus({ user: { grantMoney } });
+	}
 }
 
 export default StatusService;

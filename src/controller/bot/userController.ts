@@ -6,6 +6,7 @@ import { IStockService } from '../../interfaces/services/stockService';
 import { IStock2 } from '../../interfaces/game/stock';
 import { IWeaponService } from '../../interfaces/services/weaponService';
 import { IWeapon } from '../../interfaces/game/weapon';
+import { IStatusService } from '../../interfaces/services/statusService';
 
 /** 신규유저 추가 */
 export const addUser = async (userInfo: { id: string; nickname: string }) => {
@@ -155,7 +156,19 @@ export const updateMoney = async (discordId: string, value: number) => {
 	return user;
 };
 
-/** 패스워드 (재)생성 */
+/** 보조금 유저에게 지급 */
+export const giveGrantMoney = async (discordId: string) => {
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const user = await userService.getUser({ discordId });
+	const { grantMoney } = await statusService.getUserStatus();
+	await userService.updateMoney(user, grantMoney);
+	await statusService.setUserStatus({ grantMoney: 0 });
+
+	return grantMoney;
+};
+
+/** FIXME 패스워드 (재)생성 */
 export const generatePassword = async (discordId: string) => {
 	const myPassword = await UserModel.generatePassword(discordId);
 	return myPassword;
@@ -168,6 +181,7 @@ export default {
 	enhanceWeapon,
 	getUser,
 	giveMoney,
+	giveGrantMoney,
 	getRankingList,
 	getMyStockList,
 	getMyWeapon,

@@ -6,12 +6,9 @@ import {
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../game/Stock/Stock';
-import Coin from '../../../game/Stock/Coin';
-import stockController, {
-	CoinParam,
-	StockParam,
-} from '../../../controller/bot/stockController';
+import stockController from '../../../controller/bot/stockController';
 import secretKey from '../../../config/secretKey';
+import { TValidStockParam } from '../../../interfaces/services/stockService';
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -78,13 +75,6 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 	if (!['coin', 'stock'].includes(param.type)) {
 		throw Error('type을 잘못 입력함');
 	}
-	const { code, message } =
-		type === 'stock'
-			? Stock.checkStockValidation(<Omit<typeof param, 'type'> & { type: 'stock' }>param)
-			: Coin.checkStockValidation(<Omit<typeof param, 'type'> & { type: 'coin' }>param);
-	if (!code) {
-		throw Error(message);
-	}
 
 	let content = '';
 	const defaultClassParam = {
@@ -95,21 +85,23 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		correctionCnt: param.correctionCnt,
 		updateTime: secretKey.stockUpdateTime,
 	};
-	const stockParam: StockParam = {
+	const stockParam: TValidStockParam = {
 		conditionList: param.conditionList,
 		dividend: param.dividend,
 		...defaultClassParam,
 		type: 'stock',
 	};
-	const coinParam: CoinParam = {
+	const coinParam = {
 		...defaultClassParam,
 		type: 'coin',
 	};
 
-	await stockController.updateStock(
-		isNew ?? false,
-		type === 'stock' ? stockParam : coinParam,
-	);
+	if (type === 'stock' && !isNew) {
+		await stockController.updateStock(stockParam);
+	} else if (type === 'stock' && isNew) {
+		await stockController.addStock(stockParam);
+	}
+
 	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';
 
 	await interaction.reply({

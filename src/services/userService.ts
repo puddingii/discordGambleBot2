@@ -10,7 +10,7 @@ import {
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
 import Weapon from '../game/weapon/Weapon';
-import { IUser, TUserGiftInfo, TUserWeaponInfo } from '../interfaces/game/user';
+import { IUser, TPopulatedUserWeaponInfo, TUserGiftInfo } from '../interfaces/game/user';
 import { IStock2 } from '../interfaces/game/stock';
 import { TUserModelInfo } from '../model/User';
 import { IWeapon } from '../interfaces/game/weapon';
@@ -122,6 +122,10 @@ class UserService implements IUserService {
 		await this.userModel.addGiftList({ discordId: user.getId() }, giftList);
 	}
 
+	async addStock(stock: IStock2) {
+		await this.userModel.addNewStock(stock.name);
+	}
+
 	async addUser(userInfo: { id: string; nickname: string }) {
 		await this.userModel.addNewUser(userInfo.id, userInfo.nickname);
 	}
@@ -213,7 +217,7 @@ class UserService implements IUserService {
 
 	async updateWeaponAndUserMoney(
 		user: IUser,
-		myWeapon: TUserWeaponInfo,
+		myWeapon: TPopulatedUserWeaponInfo,
 		enhanceResult: TEnhanceSimulateResult,
 		option?: Partial<{ isPreventDestroy: boolean; isPreventDown: boolean }>,
 	) {

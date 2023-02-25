@@ -1,10 +1,9 @@
 import dayjs from 'dayjs';
 import { inject, injectable } from 'inversify';
 import TYPES from '../interfaces/containerType';
-import { IUserService, TUserParam } from '../interfaces/services/userService';
-import User from '../game/User/User';
+import { IUserService } from '../interfaces/services/userService';
 import Stock from '../game/Stock/Stock';
-import { IUser, TUserGiftInfo, TUserStockInfo } from '../interfaces/game/user';
+import { TUserStockInfo } from '../interfaces/game/user';
 import {
 	IStockService,
 	TStockType,
@@ -66,7 +65,8 @@ class StockService implements IStockService {
 		return stock.value * cnt * stock.dividend;
 	}
 
-	isValidStockParam(param: TValidStockParam): {
+	/** 주식 값 유효성 검사 */
+	private isValidStockParam(param: TValidStockParam): {
 		code: number;
 		message?: string;
 	} {
@@ -84,8 +84,8 @@ class StockService implements IStockService {
 		};
 
 		if (
-			isOverMaxRatio(param.minRatio) ||
-			isOverMaxRatio(param.maxRatio) ||
+			isOverMaxRatio(param.ratio.min) ||
+			isOverMaxRatio(param.ratio.max) ||
 			isOverMaxRatio(param.dividend) ||
 			param.conditionList.some(isOverMaxRatio)
 		) {
@@ -93,6 +93,27 @@ class StockService implements IStockService {
 		}
 
 		return { code: 1 };
+	}
+
+	async addStock(stockInfo: TValidStockParam) {
+		const result = this.isValidStockParam(stockInfo);
+		if (result.code === 0) {
+			throw Error(result.message);
+		}
+		const stock = new Stock({
+			name: stockInfo.name,
+			ratio: { min: stockInfo.ratio.min, max: stockInfo.ratio.max },
+			type: stockInfo.type,
+			updateTime: stockInfo.updateTime,
+			value: stockInfo.value,
+			comment: stockInfo.comment,
+			conditionList: stockInfo.conditionList,
+			correctionCnt: stockInfo.correctionCnt,
+			dividend: stockInfo.dividend,
+		});
+		await this.stockModel.addStock(stock);
+
+		return stock;
 	}
 
 	async getAllStock(type?: TStockType) {
@@ -142,6 +163,33 @@ class StockService implements IStockService {
 	async getStockUpdateHistoryList(stockName: string, limitedCnt: number) {
 		const historyList = await this.stockModel.getUpdateHistory(stockName, limitedCnt);
 		return historyList;
+	}
+
+	async updateRandomStock(
+		stockList: Array<IStock2>,
+		status: { curCondition: number; curTime: number },
+	) {
+		const updatedList: Array<IStock2> = [];
+		stockList.forEach(stock => {
+			const result = stock.update(status.curTime, status.curCondition);
+			result.code && updatedList.push(stock);
+		});
+		await this.stockModel.updateStockList(updatedList);
+	}
+
+	async updateStock(stock: IStock2, param: TValidStockParam): Promise<void> {
+		const result = this.isValidStockParam(param);
+		if (result.code === 0) {
+			throw Error(result.message);
+		}
+		stock.comment = param.comment;
+		stock.value = param.value;
+		stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
+		stock.correctionCnt = param.correctionCnt;
+		stock.conditionList = param.conditionList;
+		stock.dividend = param.dividend;
+
+		await this.stockModel.updateStock(stock);
 	}
 }
 

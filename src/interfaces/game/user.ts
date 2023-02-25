@@ -22,6 +22,10 @@ export type TUserWeaponInfo = {
 	missRatio: number;
 };
 
+export type TPopulatedUserWeaponInfo = Omit<TUserWeaponInfo, 'weapon'> & {
+	weapon: IWeapon;
+};
+
 export type TUserGiftInfo = {
 	type: string;
 	value: number;
@@ -55,7 +59,5 @@ export interface IUser extends Omit<IUserInfo, 'id'> {
 	/** 가지고 있는 name에 해당하는 주식 가져오기 */
 	getStock(name: string): TUserStockInfo | undefined;
 	/** 가지고 있는 무기 가져오기 */
-	getWeapon(type: string): TUserWeaponInfo | undefined;
-	/** 가지고 있는 주식들 배당금 지급 */
-	giveDividend(): { code: number };
+	getWeapon(type: string): TPopulatedUserWeaponInfo | undefined;
 }

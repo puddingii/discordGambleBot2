@@ -1,14 +1,11 @@
 import { Types } from 'mongoose';
-import Stock from '../Stock/Stock';
-import Coin from '../Stock/Coin';
 import {
 	IUser,
 	IUserInfo,
 	TUserGiftInfo,
-	TUpdateStockResult,
 	TUserConstructor,
+	TPopulatedUserWeaponInfo,
 } from '../../interfaces/game/user';
-import { IWeapon } from '../../interfaces/game/weapon';
 import { IStock2 } from '../../interfaces/game/stock';
 
 export default class User implements IUser {
@@ -73,22 +70,13 @@ export default class User implements IUser {
 			throw Error('보유하고 있는 무기가 없습니다');
 		}
 
-		if (this.weaponList.at(0)?.weapon instanceof Types.ObjectId) {
+		if (this.weaponList[0].weapon instanceof Types.ObjectId) {
 			throw Error('Populated Error.. 운영자에게 문의하세요');
 		}
-
-		return this.weaponList.find(weaponInfo => (<IWeapon>weaponInfo.weapon).type === type);
-	}
-
-	/** FIXME */
-	giveDividend(): { code: number } {
-		const totalMoney = this.stockList.reduce((acc, cur) => {
-			if (cur.cnt > 0 && cur.stock instanceof Stock && cur.stock.type === 'stock') {
-				acc += cur.stock.dividend * cur.stock.value * cur.cnt;
-			}
-			return acc;
-		}, 0);
-		this.money += totalMoney;
-		return { code: totalMoney ? 1 : 0 };
+		const myWeapon = this.weaponList.find(
+			weaponInfo =>
+				!(weaponInfo.weapon instanceof Types.ObjectId) && weaponInfo.weapon.type === type,
+		);
+		return myWeapon as TPopulatedUserWeaponInfo;
 	}
 }

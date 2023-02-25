@@ -5,6 +5,7 @@ import secretKey from '../config/secretKey';
 
 import CoinClass from '../game/Stock/Coin';
 import StockClass from '../game/Stock/Stock';
+import { IStock2 } from '../interfaces/game/stock';
 
 export interface UpdatedStockInfo {
 	name: string;
@@ -69,10 +70,10 @@ export interface IStockStatics extends Model<IStock> {
 	getUpdateHistory(name: string, limitedCnt: number): Promise<IStock['updHistory']>;
 
 	/** 주식 List 업데이트(주식 히스토리 누적) */
-	updateStockList(updateList: (CoinClass | StockClass)[]): Promise<void>;
+	updateStockList(updateList: IStock2[]): Promise<void>;
 
 	/** 주식 단일 업데이트(주식 히스토리 미누적) */
-	updateStock(updatedStockInfo: UpdatedStockInfo): Promise<void>;
+	updateStock(updatedStockInfo: IStock2): Promise<void>;
 }
 
 const Stock = new Schema<IStock, IStockStatics>({
@@ -171,7 +172,7 @@ Stock.statics.findByName = async function (name: string) {
 	return stockInfo;
 };
 
-Stock.statics.updateStockList = async function (updateList: (CoinClass | StockClass)[]) {
+Stock.statics.updateStockList = async function (updateList: IStock2[]) {
 	const updPromiseList = updateList.map(updStock => {
 		return this.findOneAndUpdate(
 			{ name: updStock.name },
@@ -193,14 +194,15 @@ Stock.statics.updateStockList = async function (updateList: (CoinClass | StockCl
 	});
 };
 
-Stock.statics.updateStock = async function (updatedStockInfo: UpdatedStockInfo) {
+Stock.statics.updateStock = async function (updatedStockInfo: IStock2) {
+	const { max, min } = updatedStockInfo.getRatio();
 	await this.findOneAndUpdate(
 		{ name: updatedStockInfo.name },
 		{
 			comment: updatedStockInfo.comment,
 			conditionList: updatedStockInfo?.conditionList ?? [],
 			correctionCnt: updatedStockInfo.correctionCnt,
-			ratio: { max: updatedStockInfo.ratio.max, min: updatedStockInfo.ratio.min },
+			ratio: { max, min },
 			value: updatedStockInfo.value,
 			dividend: updatedStockInfo.dividend ?? 0,
 		},

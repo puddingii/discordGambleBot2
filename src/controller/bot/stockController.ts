@@ -1,39 +1,15 @@
-import { startSession } from 'mongoose';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
-import Stock from '../../game/Stock/Stock';
-import Coin from '../../game/Stock/Coin';
-import DataManager from '../../game/DataManager';
-import StockModel from '../../model/Stock';
-import UserModel from '../../model/User';
-import { IStockService, TStockType } from '../../interfaces/services/stockService';
+import {
+	IStockService,
+	TStockType,
+	TValidStockParam,
+} from '../../interfaces/services/stockService';
 import { IStatusService, TGambleStatus } from '../../interfaces/services/statusService';
 import { IUserService } from '../../interfaces/services/userService';
 import { IStock2 } from '../../interfaces/game/stock';
 import { TUserGiftInfo } from '../../interfaces/game/user';
 import { ILogger } from '../../util/logger';
-
-const dataManager = DataManager.getInstance();
-
-interface DefaultStockParam {
-	name: string;
-	type: 'stock' | 'coin';
-	value: number;
-	comment: string;
-	ratio: { min: number; max: number };
-	correctionCnt: number;
-	updateTime: number;
-}
-
-export interface StockParam extends DefaultStockParam {
-	type: 'stock';
-	conditionList: Array<number>;
-	dividend: number;
-}
-
-export interface CoinParam extends DefaultStockParam {
-	type: 'coin';
-}
 
 /** 주식정보 가져오기 */
 export const getStock = async (name: string) => {
@@ -93,52 +69,28 @@ export const setGambleStatus = async (status: Partial<TGambleStatus>) => {
 	await statusService.setGambleStatus(status);
 };
 
-/** 주식 업데이트 */
-export const updateStock = async (isNew: boolean, param: StockParam | CoinParam) => {
+/** 주식추가 */
+export const addStock = async (param: TValidStockParam) => {
 	const stockService = container.get<IStockService>(TYPES.StockService);
-	const stockManager = dataManager.get('stock');
-	if (isNew) {
-		const stock = param.type === 'stock' ? new Stock(param) : new Coin(param);
-		stockManager.addStock(stock);
-		const session = await startSession();
-		await session.withTransaction(async () => {
-			const stockResult = await StockModel.addStock(stock);
-			if (stockResult.code === 0) {
-				throw Error(stockResult?.message ?? 'error');
-			}
-			await UserModel.addNewStock(stock.name);
-		});
-		await session.endSession();
-		return;
-	}
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const stock = await stockService.addStock(param);
+	await userService.addStock(stock);
+};
 
-	const stock = stockManager.getStock(param.type, param.name);
-	if (!stock) {
-		throw Error(
-			`해당하는 이름의 ${param.type === 'stock' ? '주식' : '코인'}이 없습니다.`,
-		);
-	}
-
-	stock.comment = param.comment;
-	stock.value = param.value;
-	stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
-	stock.correctionCnt = param.correctionCnt;
-	if (stock instanceof Stock && param.type === 'stock') {
-		stock.conditionList = param.conditionList;
-		stock.dividend = param.dividend;
-	}
-	await StockModel.updateStock(param);
+/** 주식 업데이트 */
+export const updateStock = async (param: TValidStockParam) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const stock = await stockService.getStock(param.name);
+	await stockService.updateStock(stock, param);
 };
 
 /** 주식정보 갱신 및 배당금 지급 */
-export const updateStockRandom = async (curTime: number) => {
-	const stockManager = dataManager.get('stock');
-	const { stockList, coinList } = stockManager.update(curTime);
-
-	const totalList = [...stockList, ...coinList];
-	if (totalList.length > 0) {
-		await StockModel.updateStockList(totalList);
-	}
+export const updateStockRandom = async () => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const { curTime, curCondition } = await statusService.getGambleStatus();
+	const stockList = await stockService.getAllStock();
+	await stockService.updateRandomStock(stockList, { curTime, curCondition });
 };
 
 /** 유저에게 배당금 주기 */
@@ -186,6 +138,7 @@ export const updateCondition = async () => {
 };
 
 export default {
+	addStock,
 	getAllStock,
 	getStock,
 	getChartData,

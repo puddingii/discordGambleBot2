@@ -3,9 +3,8 @@ import pwGenerator from 'generate-password';
 import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
 import secretKey from '../config/secretKey';
-import UserController from '../game/User/User';
 import WeaponModel, { IWeapon } from './Weapon';
-import { TUserWeaponInfo } from '../interfaces/game/user';
+import { TPopulatedUserWeaponInfo } from '../interfaces/game/user';
 import { TUserParam } from '../interfaces/services/userService';
 
 type UserParam = Partial<{
@@ -105,7 +104,7 @@ export interface IUserStatics extends Model<IUser> {
 	/** 무기와 돈 같이 업데이트 */
 	updateWeaponAndMoney(
 		discordId: string,
-		updWeaponInfo: TUserWeaponInfo,
+		updWeaponInfo: TPopulatedUserWeaponInfo,
 		money?: number,
 	): Promise<boolean>;
 	/** 주식과 돈 같이 업데이트 */
@@ -124,8 +123,6 @@ export interface IUserStatics extends Model<IUser> {
 	deleteAllGift(discordId: string, type: string): Promise<void>;
 	/** 유저가 가지고 있는 type과 value가 같은 선물 단일삭제 */
 	deleteGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
-	/** 유저리스트의 유저들 모두 갱신 */
-	updateAll(userList: UserController[]): Promise<void>;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -369,7 +366,7 @@ User.statics.deleteStockWithAllUser = async function (name: string) {
 /** 무기 업데이트 */
 User.statics.updateWeaponAndMoney = async function (
 	discordId: string,
-	updWeaponInfo: TUserWeaponInfo,
+	updWeaponInfo: TPopulatedUserWeaponInfo,
 	money?: number,
 ) {
 	const weapon = await WeaponModel.findOne({ type: updWeaponInfo.weapon.type });
@@ -396,49 +393,6 @@ User.statics.updateWeaponAndMoney = async function (
 	);
 
 	return !!userInfo;
-};
-
-User.statics.updateAll = async function (userList: UserController[]) {
-	const stockAllList = await StockModel.findAllList('all');
-	const weaponAllList = await WeaponModel.findAllList();
-	const updPromiseList = userList.map(updUser => {
-		const weaponList = updUser.weaponList.reduce((acc: Array<WeaponInfo>, weaponInfo) => {
-			const myWeapon = weaponAllList.find(
-				weapon => weapon.type === weaponInfo.weapon.type,
-			);
-			myWeapon &&
-				acc.push({
-					weapon: myWeapon,
-					bonusPower: weaponInfo.bonusPower,
-					curPower: weaponInfo.curPower,
-					destroyCnt: weaponInfo.destroyCnt,
-					failCnt: weaponInfo.failCnt,
-					hitRatio: weaponInfo.hitRatio,
-					missRatio: weaponInfo.missRatio,
-					successCnt: weaponInfo.successCnt,
-				});
-			return acc;
-		}, []);
-		const stockList = updUser.stockList.reduce((acc: Array<StockInfo>, stockInfo) => {
-			const myStock = stockAllList.find(stock => stock.name === stockInfo.stock.name);
-			myStock && acc.push({ stock: myStock, cnt: stockInfo.cnt, value: stockInfo.value });
-			return acc;
-		}, []);
-		return this.findOneAndUpdate(
-			{ discordId: updUser.getId() },
-			{
-				$set: { money: updUser.money, nickname: updUser.nickname, weaponList, stockList },
-			},
-		);
-	});
-
-	const resultList = await Promise.allSettled(updPromiseList);
-
-	resultList.forEach(result => {
-		if (result.status !== 'fulfilled') {
-			throw Error(`${result.reason}`);
-		}
-	});
 };
 
 User.statics.addGift = async function (userParam: TUserParam, giftInfo: GiftInfo) {

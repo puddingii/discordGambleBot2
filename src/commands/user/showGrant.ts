@@ -13,8 +13,9 @@ export default {
 		.setDescription('보조금 누적액수'),
 	async execute(interaction: ChatInputCommandInteraction) {
 		try {
+			const money = await globalController.getGrantMoney();
 			await interaction.reply({
-				content: `${setComma(globalController.getGrantMoney(), true)}원 누적되어 있음.`,
+				content: `${setComma(money, true)}원 누적되어 있음.`,
 			});
 		} catch (err) {
 			logger.error(err, ['Command']);

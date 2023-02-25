@@ -39,6 +39,7 @@ export type IStatusInfo = IStatus & {
 
 export interface IStatusStatics extends Model<IStatus> {
 	getStatus(isTest?: boolean): Promise<IStatusInfo>;
+	updateCurTime(cnt: number, isTest?: boolean): Promise<void>;
 	updateStatus(
 		statusInfo: Partial<UpdateStatusParam>,
 		session?: ClientSession | null,
@@ -84,6 +85,15 @@ Status.statics.getStatus = async function (isTest = false) {
 		status = await this.create({ isTest });
 	}
 	return status;
+};
+
+Status.statics.updateCurTime = async function (cnt: number, isTest = false) {
+	await this.findOneAndUpdate(
+		{ isTest },
+		{
+			$inc: { gamble: { curTime: cnt } },
+		},
+	);
 };
 
 Status.statics.updateStatus = async function (

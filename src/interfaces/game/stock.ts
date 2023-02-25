@@ -35,10 +35,13 @@ export type TStockAbstractConstructor = Omit<
 > &
 	Pick<Partial<TStockInfo>, 'correctionCnt' | 'comment'>;
 
-export type TStockInfo2 = {
+type TAddedStock2 = {
 	conditionList: number[];
 	dividend: number;
 };
-export interface IStock2 extends IStockAbstract, TStockInfo2 {}
+export type TStockInfo2 = TStockInfo & TAddedStock2;
+export interface IStock2 extends IStockAbstract, TAddedStock2 {
+	update(curTime: number, curCondition: number): { code: number };
+}
 
 export type TStockConstructor = TStockAbstractConstructor & Partial<TStockInfo2>;

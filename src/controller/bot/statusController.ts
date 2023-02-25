@@ -1,52 +1,26 @@
-import DataManager from '../../game/DataManager';
-import UserModel from '../../model/User';
-import StatusModel from '../../model/Status';
-import User from '../../game/User/User';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
+import { IStatusService } from '../../interfaces/services/statusService';
 
-const dataManager = DataManager.getInstance();
-
-export const getCurTime = () => {
-	const globalManager = dataManager.get('globalStatus');
-	return globalManager.curTime;
-};
-
-export const getGrantMoney = () => {
-	const globalManager = dataManager.get('globalStatus');
-	return globalManager.grantMoney;
+export const getGrantMoney = async () => {
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const { grantMoney } = await statusService.getUserStatus();
+	return grantMoney;
 };
 
 export const updateGrantMoney = async (value?: number) => {
-	const globalManager = dataManager.get('globalStatus');
-	globalManager.updateGrantMoney(value);
-	await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
-};
-
-export const giveGrantMoney = async (user: User) => {
-	const globalManager = dataManager.get('globalStatus');
-	const money = getGrantMoney();
-	user.updateMoney(money);
-	globalManager.updateGrantMoney(0);
-
-	await dataManager.setTransaction();
-	const session = dataManager.getSession();
-	await session?.withTransaction(async () => {
-		await UserModel.updateMoney({ discordId: user.getId() }, user.money, session);
-		await StatusModel.updateStatus({ user: { grantMoney: globalManager.grantMoney } });
-	});
-	await dataManager.setTransaction(true);
-	return money;
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	const { grantMoney } = await statusService.getUserStatus();
+	await statusService.updateGrantMoney(grantMoney, value);
 };
 
 export const updateCurTime = async (value: number) => {
-	const globalManager = dataManager.get('globalStatus');
-	globalManager.updateCurTime(value);
-	await StatusModel.updateStatus({ gamble: { curTime: globalManager.curTime } });
+	const statusService = container.get<IStatusService>(TYPES.StatusService);
+	await statusService.updateCurTime(value);
 };
 
 export default {
-	getCurTime,
 	getGrantMoney,
-	giveGrantMoney,
 	updateGrantMoney,
 	updateCurTime,
 };
