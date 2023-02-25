@@ -1,13 +1,16 @@
 import { Types } from 'mongoose';
-import Coin from '../../game/Stock/Coin';
-import { IStock2 } from './stock';
+import { ICoin, IStock2 } from './stock';
 import { IWeapon } from './weapon';
 
 /** 유저가 가지고 있는 주식정보 타입 */
 export type TUserStockInfo = {
-	stock: IStock2 | Coin | Types.ObjectId;
+	stock: IStock2 | ICoin | Types.ObjectId;
 	cnt: number;
 	value: number;
+};
+
+export type TPopulatedUserStockInfo = Omit<TUserStockInfo, 'stock'> & {
+	stock: IStock2 | ICoin;
 };
 
 /** 유저가 가지고 있는 무기정보 */
@@ -57,7 +60,7 @@ export interface IUser extends Omit<IUserInfo, 'id'> {
 	/** 유저 디스코드 아이디 가져오기 */
 	getId(): string;
 	/** 가지고 있는 name에 해당하는 주식 가져오기 */
-	getStock(name: string): TUserStockInfo | undefined;
+	getStock(name: string): TPopulatedUserStockInfo | undefined;
 	/** 가지고 있는 무기 가져오기 */
 	getWeapon(type: string): TPopulatedUserWeaponInfo | undefined;
 }

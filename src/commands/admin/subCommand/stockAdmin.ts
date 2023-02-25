@@ -8,7 +8,10 @@ import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../game/Stock/Stock';
 import stockController from '../../../controller/stockController';
 import secretKey from '../../../config/secretKey';
-import { TValidStockParam } from '../../../interfaces/services/stockService';
+import {
+	TValidCoinParam,
+	TValidStockParam,
+} from '../../../interfaces/services/stockService';
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -91,7 +94,7 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		...defaultClassParam,
 		type: 'stock',
 	};
-	const coinParam = {
+	const coinParam: TValidCoinParam = {
 		...defaultClassParam,
 		type: 'coin',
 	};
@@ -100,6 +103,10 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		await stockController.updateStock(stockParam);
 	} else if (type === 'stock' && isNew) {
 		await stockController.addStock(stockParam);
+	} else if (type === 'coin' && !isNew) {
+		await stockController.updateStock(coinParam);
+	} else {
+		await stockController.addCoin(coinParam);
 	}
 
 	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';

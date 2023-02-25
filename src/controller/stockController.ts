@@ -3,11 +3,12 @@ import TYPES from '../interfaces/containerType';
 import {
 	IStockService,
 	TStockType,
+	TValidCoinParam,
 	TValidStockParam,
 } from '../interfaces/services/stockService';
 import { IStatusService, TGambleStatus } from '../interfaces/services/statusService';
 import { IUserService } from '../interfaces/services/userService';
-import { IStock2 } from '../interfaces/game/stock';
+import { ICoin, IStock2 } from '../interfaces/game/stock';
 import { TUserGiftInfo } from '../interfaces/game/user';
 import { ILogger } from '../util/logger';
 
@@ -77,11 +78,23 @@ export const addStock = async (param: TValidStockParam) => {
 	await userService.addStock(stock);
 };
 
+/** 주식추가 */
+export const addCoin = async (param: TValidCoinParam) => {
+	const stockService = container.get<IStockService>(TYPES.StockService);
+	const userService = container.get<IUserService>(TYPES.UserService);
+	const stock = await stockService.addCoin(param);
+	await userService.addStock(stock);
+};
+
 /** 주식 업데이트 */
-export const updateStock = async (param: TValidStockParam) => {
+export const updateStock = async (param: TValidStockParam | TValidCoinParam) => {
 	const stockService = container.get<IStockService>(TYPES.StockService);
 	const stock = await stockService.getStock(param.name);
-	await stockService.updateStock(stock, param);
+	if (stock.type === 'stock') {
+		await stockService.updateStock(stock as IStock2, param as TValidStockParam);
+	} else {
+		await stockService.updateCoin(stock as ICoin, param as TValidCoinParam);
+	}
 };
 
 /** 주식정보 갱신 및 배당금 지급 */
@@ -141,6 +154,7 @@ export const updateCondition = async () => {
 };
 
 export default {
+	addCoin,
 	addStock,
 	getAllStock,
 	getStock,

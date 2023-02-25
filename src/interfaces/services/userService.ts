@@ -1,8 +1,12 @@
 import { IStockStatics } from '../../model/Stock';
 import { IUserStatics } from '../../model/User';
 import { IWeaponStatics } from '../../model/Weapon';
-import { IStock2 } from '../game/stock';
-import { IUser, TPopulatedUserWeaponInfo, TUserGiftInfo } from '../game/user';
+import {
+	IUser,
+	TPopulatedUserStockInfo,
+	TPopulatedUserWeaponInfo,
+	TUserGiftInfo,
+} from '../game/user';
 import { IWeapon } from '../game/weapon';
 import { TEnhanceSimulateResult } from './weaponService';
 
@@ -38,7 +42,7 @@ export interface IUserService {
 	/** 유저에게 무기추가 */
 	addWeapon(weapon: IWeapon): Promise<void>;
 	/** 유저에게 주식추가 */
-	addStock(stock: IStock2): Promise<void>;
+	addStock(stock: TPopulatedUserStockInfo['stock']): Promise<void>;
 	/** 무기 업데이트 및 돈 저장 */
 	updateWeaponAndUserMoney(
 		user: IUser,
@@ -55,7 +59,7 @@ export interface IUserService {
 	/** 주식 거래(사고 팔때 사용) 살때는 cnt가 양수 아니면 음수 */
 	tradeStock(
 		user: IUser,
-		stock: IStock2,
+		stock: TPopulatedUserStockInfo['stock'],
 		cnt: number,
 		isFull: boolean,
 	): Promise<{ cnt: number; value: number }>;

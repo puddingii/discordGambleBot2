@@ -40,8 +40,12 @@ type TAddedStock2 = {
 	dividend: number;
 };
 export type TStockInfo2 = TStockInfo & TAddedStock2;
+export type TCoinInfo = TStockInfo;
+
 export interface IStock2 extends IStockAbstract, TAddedStock2 {
 	update(curTime: number, curCondition: number): { code: number };
 }
-
+export interface ICoin extends IStockAbstract {
+	update(curTime: number): { code: number };
+}
 export type TStockConstructor = TStockAbstractConstructor & Partial<TStockInfo2>;

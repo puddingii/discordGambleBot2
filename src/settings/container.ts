@@ -7,7 +7,7 @@ import Util from '../util/util';
 import UserModel, { IUserStatics } from '../model/User';
 import StockModel, { IStockStatics } from '../model/Stock';
 import WeaponModel, { IWeaponStatics } from '../model/Weapon';
-import StatusModel, { IStatusStatics } from '../model/Status';
+import StatusModel, { IStatusModelStatics } from '../model/Status';
 import { IUserService } from '../interfaces/services/userService';
 import { IStockService } from '../interfaces/services/stockService';
 import { IWeaponService } from '../interfaces/services/weaponService';
@@ -29,7 +29,7 @@ container.bind<Util>(TYPES.Util).to(Util);
 container.bind<IUserStatics>(TYPES.UserModel).toConstantValue(UserModel);
 container.bind<IStockStatics>(TYPES.StockModel).toConstantValue(StockModel);
 container.bind<IWeaponStatics>(TYPES.WeaponModel).toConstantValue(WeaponModel);
-container.bind<IStatusStatics>(TYPES.StatusModel).toConstantValue(StatusModel);
+container.bind<IStatusModelStatics>(TYPES.StatusModel).toConstantValue(StatusModel);
 
 // Service
 container.bind<IUserService>(TYPES.UserService).to(UserService);

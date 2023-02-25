@@ -5,8 +5,8 @@ import {
 	TUserGiftInfo,
 	TUserConstructor,
 	TPopulatedUserWeaponInfo,
+	TPopulatedUserStockInfo,
 } from '../../interfaces/game/user';
-import { IStock2 } from '../../interfaces/game/stock';
 
 export default class User implements IUser {
 	private _id: IUserInfo['id'];
@@ -58,11 +58,12 @@ export default class User implements IUser {
 			throw Error('보유하고 있는 주식이 없습니다');
 		}
 
-		if (this.stockList.at(0)?.stock instanceof Types.ObjectId) {
-			throw Error('Populated Error.. 운영자에게 문의하세요');
-		}
+		const myStock = this.stockList.find(
+			stockInfo =>
+				!(stockInfo.stock instanceof Types.ObjectId) && stockInfo.stock.name === name,
+		);
 
-		return this.stockList.find(stockInfo => (<IStock2>stockInfo.stock).name === name);
+		return myStock as TPopulatedUserStockInfo;
 	}
 
 	getWeapon(type: string) {
@@ -70,13 +71,11 @@ export default class User implements IUser {
 			throw Error('보유하고 있는 무기가 없습니다');
 		}
 
-		if (this.weaponList[0].weapon instanceof Types.ObjectId) {
-			throw Error('Populated Error.. 운영자에게 문의하세요');
-		}
 		const myWeapon = this.weaponList.find(
 			weaponInfo =>
 				!(weaponInfo.weapon instanceof Types.ObjectId) && weaponInfo.weapon.type === type,
 		);
+
 		return myWeapon as TPopulatedUserWeaponInfo;
 	}
 }

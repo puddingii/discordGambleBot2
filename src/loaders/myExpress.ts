@@ -21,7 +21,7 @@ export default async (app: Express) => {
 	const logger = container.get<ILogger>(TYPES.Logger);
 	const stream: StreamOptions = {
 		// Use the http severity
-		write: message => logger.info(message, ['Loader']),
+		write: message => logger.info(message, ['Express']),
 	};
 	app.use(
 		morgan(':method :url :status :res[content-length] - :response-time ms', {

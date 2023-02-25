@@ -1,15 +1,17 @@
 import dayjs from 'dayjs';
 import { inject, injectable } from 'inversify';
 import TYPES from '../interfaces/containerType';
-import { IUserService } from '../interfaces/services/userService';
 import Stock from '../game/Stock/Stock';
-import { TUserStockInfo } from '../interfaces/game/user';
+import Coin from '../game/Stock/Coin';
+import { TPopulatedUserStockInfo, TUserStockInfo } from '../interfaces/game/user';
+import { IUserService } from '../interfaces/services/userService';
 import {
 	IStockService,
 	TStockType,
 	TValidStockParam,
+	TValidCoinParam,
 } from '../interfaces/services/stockService';
-import { IStock2 } from '../interfaces/game/stock';
+import { ICoin, IStock2 } from '../interfaces/game/stock';
 
 @injectable()
 class StockService implements IStockService {
@@ -65,6 +67,22 @@ class StockService implements IStockService {
 		return stock.value * cnt * stock.dividend;
 	}
 
+	/** 코인 값 유효성 검사 */
+	private isValidCoinParam(param: TValidCoinParam): { code: number; message?: string } {
+		const MAX_RATIO = 0.2;
+
+		/** 비율이 일정 수준이 넘었는지 */
+		const isOverMaxRatio = (ratio: number) => {
+			return Math.abs(ratio) > MAX_RATIO;
+		};
+
+		if (isOverMaxRatio(param.ratio.min) || isOverMaxRatio(param.ratio.max)) {
+			return { code: 0, message: '모든 비율은 +-0.2퍼센트 초과로 지정할 수 없습니다.' };
+		}
+
+		return { code: 1 };
+	}
+
 	/** 주식 값 유효성 검사 */
 	private isValidStockParam(param: TValidStockParam): {
 		code: number;
@@ -93,6 +111,25 @@ class StockService implements IStockService {
 		}
 
 		return { code: 1 };
+	}
+
+	async addCoin(stockInfo: TValidCoinParam) {
+		const result = this.isValidCoinParam(stockInfo);
+		if (result.code === 0) {
+			throw Error(result.message);
+		}
+		const coin = new Coin({
+			name: stockInfo.name,
+			ratio: { min: stockInfo.ratio.min, max: stockInfo.ratio.max },
+			type: stockInfo.type,
+			updateTime: stockInfo.updateTime,
+			value: stockInfo.value,
+			comment: stockInfo.comment,
+			correctionCnt: stockInfo.correctionCnt,
+		});
+		await this.stockModel.addStock(coin);
+
+		return coin;
 	}
 
 	async addStock(stockInfo: TValidStockParam) {
@@ -145,19 +182,28 @@ class StockService implements IStockService {
 		if (!stockInfo) {
 			throw Error('이름에 해당하는 주식이 없습니다');
 		}
-		const stock = new Stock({
+		if (stockInfo.type === 'stock') {
+			return new Stock({
+				name: stockInfo.name,
+				ratio: { min: stockInfo.minRatio, max: stockInfo.maxRatio },
+				type: <'stock'>stockInfo.type,
+				updateTime: stockInfo.updateTime,
+				value: stockInfo.value,
+				comment: stockInfo.comment,
+				conditionList: stockInfo.conditionList,
+				correctionCnt: stockInfo.correctionCnt,
+				dividend: stockInfo.dividend,
+			});
+		}
+		return new Coin({
 			name: stockInfo.name,
 			ratio: { min: stockInfo.minRatio, max: stockInfo.maxRatio },
-			type: <'stock'>stockInfo.type,
+			type: <'coin'>stockInfo.type,
 			updateTime: stockInfo.updateTime,
 			value: stockInfo.value,
 			comment: stockInfo.comment,
-			conditionList: stockInfo.conditionList,
 			correctionCnt: stockInfo.correctionCnt,
-			dividend: stockInfo.dividend,
 		});
-
-		return stock;
 	}
 
 	async getStockUpdateHistoryList(stockName: string, limitedCnt: number) {
@@ -165,11 +211,24 @@ class StockService implements IStockService {
 		return historyList;
 	}
 
+	async updateCoin(stock: ICoin, param: TValidCoinParam) {
+		const result = this.isValidCoinParam(param);
+		if (result.code === 0) {
+			throw Error(result.message);
+		}
+		stock.comment = param.comment;
+		stock.value = param.value;
+		stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
+		stock.correctionCnt = param.correctionCnt;
+
+		await this.stockModel.updateStock(stock);
+	}
+
 	async updateRandomStock(
-		stockList: Array<IStock2>,
+		stockList: Array<TPopulatedUserStockInfo['stock']>,
 		status: { curCondition: number; curTime: number },
 	) {
-		const updatedList: Array<IStock2> = [];
+		const updatedList: Array<TPopulatedUserStockInfo['stock']> = [];
 		stockList.forEach(stock => {
 			const result = stock.update(status.curTime, status.curCondition);
 			result.code && updatedList.push(stock);

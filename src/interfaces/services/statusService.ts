@@ -1,4 +1,4 @@
-import { IStatusStatics } from '../../model/Status';
+import { IStatusModelStatics } from '../../model/Status';
 import { IFormatter } from '../../util/formatter';
 
 export type TUserStatus = { grantMoney: number };
@@ -14,7 +14,7 @@ export type TTotalStatus = {
 };
 
 export interface IStatusService {
-	statusModel: IStatusStatics;
+	statusModel: IStatusModelStatics;
 	formatter: IFormatter;
 	getUserStatus(isTest?: boolean): Promise<TUserStatus>;
 	getGambleStatus(isTest?: boolean): Promise<TGambleStatus>;

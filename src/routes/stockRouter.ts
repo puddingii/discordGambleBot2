@@ -1,6 +1,7 @@
 import express from 'express';
 import { isLoggedIn } from '../middlewares/express';
 import stockController from '../controller/stockController';
+import Stock from '../game/Stock/Stock';
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get('/', isLoggedIn, async (req, res) => {
 		const stock = await stockController.getStock(name as string);
 		return res.status(200).json({
 			comment: stock.comment,
-			dividend: stock.dividend,
+			dividend: stock instanceof Stock ? stock.dividend : 0,
 			type: stock.type,
 			value: stock.value,
 		});

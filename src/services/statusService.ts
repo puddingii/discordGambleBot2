@@ -61,15 +61,15 @@ class StatusService implements IStatusService {
 		statusInfo: Partial<TGambleStatus>,
 		isTest?: boolean | undefined,
 	) {
-		await this.statusModel.updateStatus({ gamble: statusInfo }, null, isTest);
+		await this.statusModel.updateStatus({ gamble: statusInfo }, isTest);
 	}
 
 	async setTotalStatus(statusInfo: Partial<TTotalStatus>, isTest?: boolean | undefined) {
-		await this.statusModel.updateStatus(statusInfo, null, isTest);
+		await this.statusModel.updateStatus(statusInfo, isTest);
 	}
 
 	async setUserStatus(statusInfo: Partial<TUserStatus>, isTest?: boolean | undefined) {
-		await this.statusModel.updateStatus({ user: statusInfo }, null, isTest);
+		await this.statusModel.updateStatus({ user: statusInfo }, isTest);
 	}
 
 	async updateCurTime(cnt: number, isTest?: boolean | undefined): Promise<void> {

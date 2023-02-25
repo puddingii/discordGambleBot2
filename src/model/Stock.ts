@@ -2,21 +2,8 @@ import { Schema, Model, model, Types, Document } from 'mongoose';
 import dayjs from 'dayjs';
 
 import secretKey from '../config/secretKey';
-
-import CoinClass from '../game/Stock/Coin';
-import StockClass from '../game/Stock/Stock';
+import { TPopulatedUserStockInfo } from '../interfaces/game/user';
 import { IStock2 } from '../interfaces/game/stock';
-
-export interface UpdatedStockInfo {
-	name: string;
-	type: string;
-	value: number;
-	comment: string;
-	ratio: { max: number; min: number };
-	correctionCnt: number;
-	conditionList?: number[];
-	dividend?: number;
-}
 
 interface DoucmentResult<T> {
 	_doc: T;
@@ -60,7 +47,7 @@ export interface IStockStatics extends Model<IStock> {
 
 	/** 주식추가 */
 	addStock(
-		stockInfo: CoinClass | StockClass,
+		stockInfo: TPopulatedUserStockInfo['stock'],
 	): Promise<{ code: number; message?: string }>;
 
 	/** 주식제거 */
@@ -70,10 +57,10 @@ export interface IStockStatics extends Model<IStock> {
 	getUpdateHistory(name: string, limitedCnt: number): Promise<IStock['updHistory']>;
 
 	/** 주식 List 업데이트(주식 히스토리 누적) */
-	updateStockList(updateList: IStock2[]): Promise<void>;
+	updateStockList(updateList: TPopulatedUserStockInfo['stock'][]): Promise<void>;
 
 	/** 주식 단일 업데이트(주식 히스토리 미누적) */
-	updateStock(updatedStockInfo: IStock2): Promise<void>;
+	updateStock(updatedStockInfo: TPopulatedUserStockInfo['stock']): Promise<void>;
 }
 
 const Stock = new Schema<IStock, IStockStatics>({
@@ -155,7 +142,7 @@ Stock.statics.deleteStock = async function (name: string) {
 	return { cnt: result.deletedCount };
 };
 
-Stock.statics.addStock = async function (stockInfo: CoinClass | StockClass) {
+Stock.statics.addStock = async function (stockInfo: TPopulatedUserStockInfo['stock']) {
 	const isExist = await this.exists({ name: stockInfo.name });
 	if (isExist) {
 		return { code: 0, message: '같은 이름이 있습니다.' };
@@ -172,7 +159,9 @@ Stock.statics.findByName = async function (name: string) {
 	return stockInfo;
 };
 
-Stock.statics.updateStockList = async function (updateList: IStock2[]) {
+Stock.statics.updateStockList = async function (
+	updateList: TPopulatedUserStockInfo['stock'][],
+) {
 	const updPromiseList = updateList.map(updStock => {
 		return this.findOneAndUpdate(
 			{ name: updStock.name },
@@ -194,19 +183,30 @@ Stock.statics.updateStockList = async function (updateList: IStock2[]) {
 	});
 };
 
-Stock.statics.updateStock = async function (updatedStockInfo: IStock2) {
+Stock.statics.updateStock = async function (
+	updatedStockInfo: TPopulatedUserStockInfo['stock'],
+) {
 	const { max, min } = updatedStockInfo.getRatio();
-	await this.findOneAndUpdate(
-		{ name: updatedStockInfo.name },
-		{
-			comment: updatedStockInfo.comment,
-			conditionList: updatedStockInfo?.conditionList ?? [],
-			correctionCnt: updatedStockInfo.correctionCnt,
-			ratio: { max, min },
-			value: updatedStockInfo.value,
-			dividend: updatedStockInfo.dividend ?? 0,
-		},
-	);
+	const updateInfo = {
+		comment: updatedStockInfo.comment,
+		correctionCnt: updatedStockInfo.correctionCnt,
+		ratio: { max, min },
+		value: updatedStockInfo.value,
+	};
+
+	if (updatedStockInfo.type === 'stock') {
+		await this.findOneAndUpdate(
+			{ name: updatedStockInfo.name },
+			{
+				...updateInfo,
+				conditionList: (updatedStockInfo as IStock2).conditionList,
+				dividend: (updatedStockInfo as IStock2).dividend,
+			},
+		);
+		return;
+	}
+
+	await this.findOneAndUpdate({ name: updatedStockInfo.name }, updateInfo);
 };
 
 export default model<IStock, IStockStatics>('Stock', Stock);

@@ -1,53 +1,50 @@
-import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
+import { Schema, Model, model, Types, Document } from 'mongoose';
 
-type UpdateStatusParam = {
-	gamble: Partial<{
-		/** 게임 내 시간 */
-		curTime: number;
-		/** 현재 주식 흐름 */
-		curCondition: number;
-		/** 주식 흐름 바뀌는 주기 */
-		conditionPeriod: number;
-		/** 주식 흐름 바뀌는 확률 */
-		conditionRatioPerList: Array<number>;
-	}>;
-	user: Partial<{
-		grantMoney: number;
-	}>;
+type TGambleStatus = {
+	/** 게임 내 시간 */
+	curTime: number;
+	/** 현재 주식 흐름 */
+	curCondition: number;
+	/** 주식 흐름 바뀌는 주기 */
+	conditionPeriod: number;
+	/** 주식 흐름 바뀌는 확률 */
+	conditionRatioPerList: Array<number>;
 };
+
+type TUserStatus = {
+	/** 보조 지원금 */
+	grantMoney: number;
+};
+
+export type TUpdateStatusParam = Partial<{
+	gamble: Partial<TGambleStatus>;
+	user: Partial<TUserStatus>;
+}>;
 
 interface DoucmentResult<T> {
 	_doc: T;
 }
 
-interface IStatus extends Document, DoucmentResult<IStatus> {
+interface IStatusModel extends Document, DoucmentResult<IStatusModel> {
 	isTest: boolean;
-	user: {
-		grantMoney: number;
-	};
-	gamble: {
-		curTime: number;
-		curCondition: number;
-		conditionPeriod: number;
-		conditionRatioPerList: Types.Array<number>;
-	};
+	user: TUserStatus;
+	gamble: TGambleStatus;
 }
 
-export type IStatusInfo = IStatus & {
+export type IStatusModelInfo = IStatusModel & {
 	_id: Types.ObjectId;
 };
 
-export interface IStatusStatics extends Model<IStatus> {
-	getStatus(isTest?: boolean): Promise<IStatusInfo>;
+export interface IStatusModelStatics extends Model<IStatusModel> {
+	/** 상태정보 가져오기 */
+	getStatus(isTest?: boolean): Promise<IStatusModelInfo>;
+	/** 현재 게임시간 업데이트 */
 	updateCurTime(cnt: number, isTest?: boolean): Promise<void>;
-	updateStatus(
-		statusInfo: Partial<UpdateStatusParam>,
-		session?: ClientSession | null,
-		isTest?: boolean,
-	): Promise<void>;
+	/** 상태정보 업데이트 */
+	updateStatus(statusInfo: TUpdateStatusParam, isTest?: boolean): Promise<void>;
 }
 
-const Status = new Schema<IStatus, IStatusStatics>({
+const Status = new Schema<IStatusModel, IStatusModelStatics>({
 	isTest: {
 		type: Boolean,
 		default: false,
@@ -97,8 +94,7 @@ Status.statics.updateCurTime = async function (cnt: number, isTest = false) {
 };
 
 Status.statics.updateStatus = async function (
-	statusInfo: Partial<UpdateStatusParam>,
-	session: ClientSession | null = null,
+	statusInfo: TUpdateStatusParam,
 	isTest = false,
 ) {
 	if (Object.keys(statusInfo).length === 0) {
@@ -116,9 +112,7 @@ Status.statics.updateStatus = async function (
 		}
 	});
 
-	await this.findOneAndUpdate({ isTest }, { $set: updInfo }, { upsert: true }).session(
-		session,
-	);
+	await this.findOneAndUpdate({ isTest }, { $set: updInfo }, { upsert: true });
 };
 
-export default model<IStatus, IStatusStatics>('Status', Status);
+export default model<IStatusModel, IStatusModelStatics>('Status', Status);
