@@ -51,12 +51,17 @@ export default {
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
+			const upDownEmoji = (num: number) => {
+				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
+			};
 			const stockList = await stockController.getAllStock();
 			stockList.forEach(stock => {
 				embedBox.addFields({
 					name: `${stock.name} ${
 						stock.type === 'stock' ? '주식' : '코인'
-					} - ${util.setComma(stock.value, true)}원`,
+					} - ${util.setComma(stock.value, true)}원(${upDownEmoji(
+						stock.beforeHistoryRatio * 100,
+					)}%)`,
 					value: stock.comment,
 				});
 			});
