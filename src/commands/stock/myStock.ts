@@ -31,17 +31,12 @@ export default {
 			const { stockList, totalMyValue, totalStockValue } =
 				await userController.getMyStockList(discordId);
 
-			const upDownEmoji = (num: number) => {
-				return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
-			};
 			const totalCalc = stockList.reduce((acc, stock) => {
 				acc += stock.profilMargin;
 				embedBox.addFields({
 					name: `${stock.name} ${
 						stock.stockType === 'stock' ? '주식' : '코인'
-					} - ${util.setComma(stock.stockValue, true)}원 (${upDownEmoji(
-						stock.stockBeforeRatio,
-					)}%)`,
+					} - ${util.setComma(stock.stockValue, true)}원`,
 					value: `내 포지션: ${util.setComma(
 						stock.myValue,
 						true,

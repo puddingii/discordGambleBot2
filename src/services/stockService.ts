@@ -154,12 +154,7 @@ class StockService implements IStockService {
 	}
 
 	async getAllStock(type?: TStockType) {
-		let stockList;
-		if (type) {
-			stockList = await this.stockModel.find({ type });
-		} else {
-			stockList = await this.stockModel.find();
-		}
+		const stockList = await this.stockModel.findAllList(type || 'all');
 
 		return stockList.map(
 			stockInfo =>
@@ -173,12 +168,13 @@ class StockService implements IStockService {
 					conditionList: stockInfo.conditionList,
 					correctionCnt: stockInfo.correctionCnt,
 					dividend: stockInfo.dividend,
+					beforeHistoryRatio: stockInfo.beforeHistoryRatio,
 				}),
 		);
 	}
 
 	async getStock(stockName: string) {
-		const stockInfo = await this.stockModel.findOne({ name: stockName });
+		const stockInfo = await this.stockModel.findByName(stockName);
 		if (!stockInfo) {
 			throw Error('이름에 해당하는 주식이 없습니다');
 		}
@@ -193,6 +189,7 @@ class StockService implements IStockService {
 				conditionList: stockInfo.conditionList,
 				correctionCnt: stockInfo.correctionCnt,
 				dividend: stockInfo.dividend,
+				beforeHistoryRatio: stockInfo.beforeHistoryRatio,
 			});
 		}
 		return new Coin({
@@ -203,6 +200,7 @@ class StockService implements IStockService {
 			value: stockInfo.value,
 			comment: stockInfo.comment,
 			correctionCnt: stockInfo.correctionCnt,
+			beforeHistoryRatio: stockInfo.beforeHistoryRatio,
 		});
 	}
 

@@ -24,6 +24,7 @@ export default abstract class StockAbstract implements IStockAbstract {
 		updateTime,
 		correctionCnt,
 		comment,
+		beforeHistoryRatio,
 	}: TStockAbstractConstructor) {
 		this._ratio = ratio;
 		this.name = name;
@@ -33,7 +34,7 @@ export default abstract class StockAbstract implements IStockAbstract {
 		this.correctionCnt = correctionCnt ?? 4;
 		this.comment = comment ?? '';
 		this.correctionHistory = [];
-		this.beforeHistoryRatio = 0;
+		this.beforeHistoryRatio = beforeHistoryRatio ?? 0;
 	}
 
 	addCorrectionHistory(value: number, ratio: number) {

@@ -127,8 +127,6 @@ class UserService implements IUserService {
 					myRatio,
 					stockValue: stock.value,
 					stockType: stock.type,
-					// FIXME 없음...그 뭐냐 히스토리 기준으로 바꿔야할듯?
-					stockBeforeRatio: _.round(stock.beforeHistoryRatio * 100, 2),
 					profilMargin: myCnt * (stock.value - myAvgValue),
 				});
 

@@ -38,12 +38,16 @@ export type IStockInfo = IStock & {
 	_id: Types.ObjectId;
 };
 
+export type TAggregatedStockInfo = Omit<IStockInfo, 'updHistory'> & {
+	beforeHistoryRatio: number;
+};
+
 export interface IStockStatics extends Model<IStock> {
 	/** Type에 맞는 주식정보 다 가져오기 */
-	findAllList(type: 'stock' | 'coin' | 'all'): Promise<IStockInfo[]>;
+	findAllList(type: 'stock' | 'coin' | 'all'): Promise<TAggregatedStockInfo[]>;
 
 	/** 주식이름으로 주식정보 찾아오기 */
-	findByName(name: string): Promise<IStockInfo | null>;
+	findByName(name: string): Promise<TAggregatedStockInfo | null>;
 
 	/** 주식추가 */
 	addStock(
@@ -133,7 +137,39 @@ Stock.statics.getUpdateHistory = async function (name: string, limitedCnt: numbe
 
 Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
 	const condition = type === 'all' ? {} : { type };
-	const stockList = await this.find(condition);
+	const stockList = await this.aggregate([
+		{ $match: condition },
+		{
+			$project: {
+				name: '$name',
+				type: '$type',
+				value: '$value',
+				comment: '$comment',
+				minRatio: '$minRatio',
+				maxRatio: '$maxRatio',
+				updateTime: '$updateTime',
+				correctionCnt: '$correctionCnt',
+				conditionList: '$conditionList',
+				dividend: '$dividend',
+				beforeHistoryRatio: {
+					$round: [
+						{
+							$divide: [
+								{
+									$subtract: [
+										{ $arrayElemAt: ['$updHistory.value', -1] },
+										{ $arrayElemAt: ['$updHistory.value', -2] },
+									],
+								},
+								{ $arrayElemAt: ['$updHistory.value', -1] },
+							],
+						},
+						2,
+					],
+				},
+			},
+		},
+	]);
 	return stockList ?? [];
 };
 
@@ -155,8 +191,40 @@ Stock.statics.addStock = async function (stockInfo: TPopulatedUserStockInfo['sto
 };
 
 Stock.statics.findByName = async function (name: string) {
-	const stockInfo = await this.findOne({ name });
-	return stockInfo;
+	const stockInfo = await this.aggregate([
+		{ $match: { name } },
+		{
+			$project: {
+				name: '$name',
+				type: '$type',
+				value: '$value',
+				comment: '$comment',
+				minRatio: '$minRatio',
+				maxRatio: '$maxRatio',
+				updateTime: '$updateTime',
+				correctionCnt: '$correctionCnt',
+				conditionList: '$conditionList',
+				dividend: '$dividend',
+				beforeHistoryRatio: {
+					$round: [
+						{
+							$divide: [
+								{
+									$subtract: [
+										{ $arrayElemAt: ['$updHistory.value', -1] },
+										{ $arrayElemAt: ['$updHistory.value', -2] },
+									],
+								},
+								{ $arrayElemAt: ['$updHistory.value', -1] },
+							],
+						},
+						2,
+					],
+				},
+			},
+		},
+	]);
+	return stockInfo.at(0);
 };
 
 Stock.statics.updateStockList = async function (

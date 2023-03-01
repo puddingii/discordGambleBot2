@@ -33,7 +33,7 @@ export type TStockAbstractConstructor = Omit<
 	TStockInfo,
 	'correctionCnt' | 'comment' | 'beforeHistoryRatio'
 > &
-	Pick<Partial<TStockInfo>, 'correctionCnt' | 'comment'>;
+	Pick<Partial<TStockInfo>, 'correctionCnt' | 'comment' | 'beforeHistoryRatio'>;
 
 type TAddedStock2 = {
 	conditionList: number[];
@@ -48,4 +48,4 @@ export interface IStock2 extends IStockAbstract, TAddedStock2 {
 export interface ICoin extends IStockAbstract {
 	update(curTime: number): { code: number };
 }
-export type TStockConstructor = TStockAbstractConstructor & Partial<TStockInfo2>;
+export type TStockConstructor = TStockAbstractConstructor & Partial<TAddedStock2>;
