@@ -64,11 +64,7 @@ export interface IUserService {
 		isFull: boolean,
 	): Promise<{ cnt: number; value: number }>;
 	/** 가지고 있는 돈 업데이트 */
-	updateMoney(
-		user: IUser,
-		money: number,
-		type?: 'stock' | 'coin' | 'weapon',
-	): Promise<void>;
+	updateMoney(user: IUser, money: number): Promise<void>;
 }
 
 export default {};

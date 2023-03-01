@@ -125,7 +125,7 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 		const stockResult = await userController.tradeStock({
 			discordId: user.discordId,
 			stockName,
-			cnt,
+			cnt: type === 's' ? -1 * cnt : cnt,
 			isFull: false,
 		});
 

@@ -11,7 +11,7 @@ export default () => {
 	// 페이지 방문할때마다 발동
 	passport.deserializeUser(async (id, done) => {
 		try {
-			const userInfo = await UserModel.findByDiscordId(id as string);
+			const userInfo = await UserModel.findByUserInfo({ discordId: id as string });
 			done(null, userInfo);
 		} catch (e) {
 			done(e);

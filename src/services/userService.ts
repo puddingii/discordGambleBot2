@@ -55,7 +55,16 @@ class UserService implements IUserService {
 		});
 
 		const weaponList = userInfo.weaponList.map(weaponInfo => {
-			const { weapon } = weaponInfo;
+			const {
+				weapon,
+				bonusPower,
+				curPower,
+				destroyCnt,
+				failCnt,
+				hitRatio,
+				missRatio,
+				successCnt,
+			} = weaponInfo;
 			const myWeapon =
 				weapon instanceof Types.ObjectId
 					? weapon
@@ -69,7 +78,16 @@ class UserService implements IUserService {
 							type: weapon.type,
 							comment: weapon.comment,
 					  });
-			return { ...weaponInfo, weapon: myWeapon };
+			return {
+				bonusPower,
+				curPower,
+				destroyCnt,
+				failCnt,
+				hitRatio,
+				missRatio,
+				successCnt,
+				weapon: myWeapon,
+			};
 		});
 
 		const user = new User({
@@ -159,8 +177,7 @@ class UserService implements IUserService {
 	}
 
 	async getAllUser(populatedList?: TPopulatedList) {
-		const populatedStr = populatedList?.join(' ') ?? '';
-		const userList = await this.userModel.find({}).populate(populatedStr);
+		const userList = await this.userModel.getAllUserList(populatedList);
 
 		return userList.map(user => {
 			return this.convertDataToClass(user);
@@ -168,12 +185,7 @@ class UserService implements IUserService {
 	}
 
 	async getUser(userParam: TUserParam, populatedList?: TPopulatedList) {
-		const populatedStr = populatedList?.join(' ') ?? '';
-		const userInfo = await this.userModel.findOne(userParam).populate(populatedStr);
-		if (!userInfo) {
-			throw Error('해당하는 유저데이터가 없습니다');
-		}
-
+		const userInfo = await this.userModel.findByUserInfo(userParam, populatedList);
 		const user = this.convertDataToClass(userInfo);
 
 		return user;
@@ -215,6 +227,13 @@ class UserService implements IUserService {
 			user.stockList.push({ stock: stock, cnt, value: averageValue });
 		}
 
+		let extraCommission = 1;
+		// 주식이고 파는 경우 수수료 2%를 땐다.
+		if (totalMoney < 0 && myStock?.stock.type === 'stock') {
+			extraCommission = 0.98;
+		}
+		user.money -= totalMoney * extraCommission;
+
 		await this.userModel.updateStockAndMoney(
 			user.getId(),
 			{ cnt: totalCnt, name: stock.name, value: averageValue },
@@ -224,16 +243,11 @@ class UserService implements IUserService {
 		return { cnt: totalCnt, value: averageValue };
 	}
 
-	async updateMoney(user: IUser, money: number, type?: 'stock' | 'coin' | 'weapon') {
+	async updateMoney(user: IUser, money: number) {
 		if (user.money + money < 0) {
 			throw Error('돈이 부족함');
 		}
-		let extraCommission = 1;
-		// 주식이고 파는 경우 수수료 2%를 땐다.
-		if (money > 0 && type === 'stock') {
-			extraCommission = 0.98;
-		}
-		user.money += money * extraCommission;
+		user.money += money;
 
 		await this.userModel.updateMoney({ discordId: user.getId() }, user.money);
 	}

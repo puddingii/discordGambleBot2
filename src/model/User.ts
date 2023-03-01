@@ -5,7 +5,7 @@ import StockModel, { IStock } from './Stock';
 import secretKey from '../config/secretKey';
 import WeaponModel, { IWeapon } from './Weapon';
 import { TPopulatedUserWeaponInfo } from '../interfaces/game/user';
-import { TUserParam } from '../interfaces/services/userService';
+import { TPopulatedList, TUserParam } from '../interfaces/services/userService';
 
 type UserParam = Partial<{
 	discordId: string;
@@ -89,10 +89,12 @@ export interface IUserStatics extends Model<IUser> {
 		password: string,
 	): Promise<boolean>;
 	/** 디스코드 아이디로 유저정보 가져오기 */
-	findByDiscordId(
-		discordId: string,
-		populateList?: Array<string>,
-	): Promise<TUserModelInfo | null>;
+	findByUserInfo(
+		userParam: UserParam,
+		populateList?: TPopulatedList,
+	): Promise<TUserModelInfo>;
+	/** 모든 유저 가져오기 */
+	getAllUserList(populateList?: TPopulatedList): Promise<Array<TUserModelInfo>>;
 	/** 웹 패스워드 발급 */
 	generatePassword(discordId: string): Promise<string>;
 	/** 유저 돈 업데이트 */
@@ -258,20 +260,50 @@ User.statics.addNewWeapon = async function (type: string) {
 };
 
 /** 아이디로 유저정보 탐색 */
-User.statics.findByDiscordId = async function (
-	discordId: string,
-	populateList?: Array<string>,
+User.statics.findByUserInfo = async function (
+	userParam: UserParam,
+	populateList?: TPopulatedList,
 ) {
-	let userInfo = await this.findOne({ discordId });
-	if (!userInfo) {
+	let userInfo = this.findOne(userParam);
+	if (populateList) {
+		userInfo = populateList?.reduce((acc, cur) => {
+			if (cur === 'stockList.stock') {
+				acc.populate(
+					cur,
+					'name type value comment minRatio maxRatio updateTime correctionCnt conditionList dividend',
+				);
+			} else {
+				acc.populate(cur);
+			}
+			return acc;
+		}, userInfo);
+	}
+	const user = await userInfo.exec();
+	if (!user) {
 		throw Error('해당하는 유저정보가 없습니다');
 	}
 
-	if (populateList && populateList.length > 0) {
-		userInfo = await userInfo.populate(populateList.join(' '));
-	}
+	return user;
+};
 
-	return userInfo;
+User.statics.getAllUserList = async function (populateList?: TPopulatedList) {
+	let userInfo = this.find({});
+	if (populateList) {
+		userInfo = populateList?.reduce((acc, cur) => {
+			if (cur === 'stockList.stock') {
+				acc.populate(
+					cur,
+					'name type value comment minRatio maxRatio updateTime correctionCnt conditionList dividend',
+				);
+			} else {
+				acc.populate(cur);
+			}
+			return acc;
+		}, userInfo);
+	}
+	const userList = await userInfo.exec();
+
+	return userList;
 };
 
 /** 비밀번호 (재)발급 */

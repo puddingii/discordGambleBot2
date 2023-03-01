@@ -9,7 +9,7 @@ export default () => {
 			{ usernameField: 'nickname', passwordField: 'password' },
 			async function (nickname, password, done) {
 				try {
-					const userInfo = await UserModel.findOne({ nickname });
+					const userInfo = await UserModel.findByUserInfo({ nickname });
 					if (!userInfo) {
 						return done(null, false, { message: '유저정보가 없습니다.' });
 					}
