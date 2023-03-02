@@ -21,9 +21,9 @@ export const container = new Container();
 export const { lazyInject } = getDecorators(container);
 
 // Util
-container.bind<Formatter>(TYPES.Formatter).to(Formatter);
-container.bind<Logger>(TYPES.Logger).to(Logger);
-container.bind<Util>(TYPES.Util).to(Util);
+container.bind<Formatter>(TYPES.Formatter).to(Formatter).inSingletonScope();
+container.bind<Logger>(TYPES.Logger).to(Logger).inSingletonScope();
+container.bind<Util>(TYPES.Util).to(Util).inSingletonScope();
 
 // Model
 container.bind<IUserStatics>(TYPES.UserModel).toConstantValue(UserModel);
@@ -32,9 +32,9 @@ container.bind<IWeaponStatics>(TYPES.WeaponModel).toConstantValue(WeaponModel);
 container.bind<IStatusModelStatics>(TYPES.StatusModel).toConstantValue(StatusModel);
 
 // Service
-container.bind<IUserService>(TYPES.UserService).to(UserService);
-container.bind<IStockService>(TYPES.StockService).to(StockService);
-container.bind<IWeaponService>(TYPES.WeaponService).to(WeaponService);
-container.bind<IStatusService>(TYPES.StatusService).to(StatusService);
+container.bind<IUserService>(TYPES.UserService).to(UserService).inSingletonScope();
+container.bind<IStockService>(TYPES.StockService).to(StockService).inSingletonScope();
+container.bind<IWeaponService>(TYPES.WeaponService).to(WeaponService).inSingletonScope();
+container.bind<IStatusService>(TYPES.StatusService).to(StatusService).inSingletonScope();
 
 export default {};
