@@ -1,62 +1,52 @@
-import { container } from '../../settings/container';
+import { inject, injectable } from 'inversify';
 import TYPES from '../../interfaces/containerType';
-import { TWeaponConstructor } from '../../interfaces/game/weapon';
-import { IWeaponService } from '../../interfaces/services/weaponService';
-import { IUserService } from '../../interfaces/services/userService';
+import { IWeapon, TWeaponConstructor } from '../../interfaces/game/weapon';
+import { IWeaponController } from '../../interfaces/common/controller/weapon';
 
-/** 무기종류 추가 */
-export const addWeapon = async (param: TWeaponConstructor) => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const userService = container.get<IUserService>(TYPES.UserService);
-	const weapon = await weaponService.addWeapon(param);
-	await userService.addWeapon(weapon);
-};
+@injectable()
+export default class WeaponController implements IWeaponController {
+	weaponService: IWeaponController['weaponService'];
 
-/** 무기 가져오기 */
-export const getWeapon = async (type: string) => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const weapon = await weaponService.getWeapon(type);
+	constructor(
+		@inject(TYPES.WeaponService) weaponService: IWeaponController['weaponService'],
+	) {
+		this.weaponService = weaponService;
+	}
 
-	return weapon;
-};
+	async getAllWeapon(): Promise<IWeapon[]> {
+		const weaponList = await this.weaponService.getAllWeapon();
 
-/** 무기 업데이트 */
-export const updateWeapon = async (param: TWeaponConstructor) => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const weapon = await weaponService.getWeapon(param.type);
+		return weaponList;
+	}
 
-	await weaponService.updateWeapon(weapon, param);
-};
+	async getEnhanceInfo(
+		type: string,
+		power: number,
+	): Promise<{ success: number; fail: number; destroy: number; cost: number }> {
+		const weapon = await this.weaponService.getWeapon(type);
 
-/** 모든 무기 다 가져오기 */
-export const getAllWeapon = async () => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const weaponList = await weaponService.getAllWeapon();
+		return this.weaponService.getEnhanceInfo(weapon, power);
+	}
 
-	return weaponList;
-};
+	async getEnhanceInfoList(
+		type: string,
+	): Promise<{ success: number; fail: number; destroy: number; cost: number }[]> {
+		const weapon = await this.weaponService.getWeapon(type);
 
-/** 현재 상태의 무기를 강화하는데 필요한 정보 가져오기 */
-export const getEnhanceInfo = async (type: string, power: number) => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const weapon = await weaponService.getWeapon(type);
+		return weapon.ratioList.map((_, idx) =>
+			this.weaponService.getEnhanceInfo(weapon, idx),
+		);
+	}
 
-	return weaponService.getEnhanceInfo(weapon, power);
-};
+	async getWeapon(type: string): Promise<IWeapon> {
+		const weapon = await this.weaponService.getWeapon(type);
 
-/** 무기를 끝까지 강화하는데 필요한 정보 가져오기 */
-export const getEnhanceInfoList = async (type: string) => {
-	const weaponService = container.get<IWeaponService>(TYPES.WeaponService);
-	const weapon = await weaponService.getWeapon(type);
+		return weapon;
+	}
 
-	return weapon.ratioList.map((_, idx) => weaponService.getEnhanceInfo(weapon, idx));
-};
+	async updateWeapon(param: TWeaponConstructor): Promise<void> {
+		const weapon = await this.weaponService.getWeapon(param.type);
 
-export default {
-	addWeapon,
-	getWeapon,
-	updateWeapon,
-	getAllWeapon,
-	getEnhanceInfo,
-	getEnhanceInfoList,
-};
+		await this.weaponService.updateWeapon(weapon, param);
+	}
+}

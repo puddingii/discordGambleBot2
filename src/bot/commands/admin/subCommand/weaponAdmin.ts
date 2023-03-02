@@ -5,8 +5,16 @@ import {
 	SelectMenuInteraction,
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
-import weaponController from '../../../../common/controller/weaponController';
 import { TWeaponConstructor } from '../../../../interfaces/game/weapon';
+import TYPES from '../../../../interfaces/containerType';
+import { container } from '../../../../settings/container';
+import { IWeaponController } from '../../../../interfaces/common/controller/weapon';
+import { IUserWeaponController } from '../../../../interfaces/common/controller/userWeapon';
+
+const weaponController = container.get<IWeaponController>(TYPES.WeaponController);
+const userWeaponController = container.get<IUserWeaponController>(
+	TYPES.UserWeaponController,
+);
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -89,7 +97,7 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 	};
 
 	if (isNew) {
-		await weaponController.addWeapon(defaultClassParam);
+		await userWeaponController.addWeaponAndUpdateUsers(defaultClassParam);
 	} else {
 		await weaponController.updateWeapon(defaultClassParam);
 	}

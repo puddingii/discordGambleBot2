@@ -4,12 +4,13 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 import _ from 'lodash';
-import weaponController from '../../../common/controller/weaponController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { IUtil } from '../../../common/util/util';
+import { IWeaponController } from '../../../interfaces/common/controller/weapon';
 
 const util = container.get<IUtil>(TYPES.Util);
+const weaponController = container.get<IWeaponController>(TYPES.WeaponController);
 
 // FIXME 여기도 바꿔야함
 export default {

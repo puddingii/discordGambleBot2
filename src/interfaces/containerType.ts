@@ -20,5 +20,7 @@ export default {
 	StatusController: Symbol.for('StatusController'),
 	StockController: Symbol.for('StockController'),
 	UserController: Symbol.for('UserController'),
+	UserWeaponController: Symbol.for('UserWeaponController'),
+	UserStockController: Symbol.for('UserStockController'),
 	WeaponController: Symbol.for('WeaponController'),
 };
