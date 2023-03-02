@@ -13,12 +13,12 @@ const doc = {
 	schemes: ['http'],
 };
 
-const OUTER_FILE_NAME = './swagger-output.json';
+const OUTER_FILE_NAME = './swagger-api.json';
 const ROUTE_PATH = path.resolve(__dirname, '../routes');
 const routeFiles = fs
 	.readdirSync(ROUTE_PATH)
-	.map(fileName => `${ROUTE_PATH}/${fileName}`);
+	.filter(fileName => fileName.endsWith('index.js') || fileName.endsWith('index.ts'));
 
-const endpointsFiles = [...routeFiles];
+const endpointsFiles = [`${ROUTE_PATH}/${routeFiles[0]}`];
 
 swaggerAutogen(OUTER_FILE_NAME, endpointsFiles, doc);

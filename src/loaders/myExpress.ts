@@ -53,7 +53,7 @@ export default async (app: Express) => {
 	setRouter(app);
 
 	const swaggerFile = await fs.readFile(
-		path.resolve(__dirname, '../express/swagger/swagger-output.json'),
+		path.resolve(__dirname, '../express/swagger/swagger-api.json'),
 		{ encoding: 'utf8' },
 	);
 	app.use('/doc', swaggerUi.serve, swaggerUi.setup(JSON.parse(swaggerFile)));
