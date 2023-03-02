@@ -12,14 +12,14 @@ export interface IFormatter {
 	 * convertSecond(3700) // { type: 'h', value: 1 }
 	 * convertSecond(86400) // Error
 	 */
-	convertSecond(value: number, depth: number): { type: string; value: number };
+	convertSecond(value: number, depth?: number): { type: string; value: number };
 	/**
 	 * min <= x < min + len
 	 * @example
 	 * getRandomNumber(5) // 0 <= x < 5
 	 * getRandomNumber(5, 3) // 3 <= x < 8
 	 */
-	getRandomNumber(len: number, min: number): number;
+	getRandomNumber(len: number, min?: number): number;
 	/**
 	 * @example
 	 * setComma(1000000) // 1,000,000

@@ -3,14 +3,13 @@ import dayjs from 'dayjs';
 import stockController from '../common/controller/stockController';
 import statusController from '../common/controller/statusController';
 import secretKey from '../config/secretKey';
-import { convertSecond } from '../config/util';
 import { container } from '../settings/container';
 import TYPES from '../interfaces/containerType';
-import { ILogger } from '../common/util/logger';
+import { IUtil } from '../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 try {
-	const { type, value } = convertSecond(secretKey.gambleUpdateTime);
+	const { type, value } = util.formatter.convertSecond(secretKey.gambleUpdateTime);
 	const defaultRule = '* * *';
 	let rule: string;
 	switch (type) {
@@ -38,13 +37,15 @@ try {
 			await stockController.updateStockRandom();
 			await stockController.giveDividend();
 
-			logger.info(`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`, ['CRON']);
+			util.logger.info(`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`, [
+				'CRON',
+			]);
 		} catch (err) {
 			let errorMessage = err;
 			if (err instanceof Error) {
 				errorMessage = err.message;
 			}
-			logger.error(
+			util.logger.error(
 				`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update Error: ${errorMessage}`,
 				['CRON'],
 			);
@@ -55,5 +56,5 @@ try {
 	if (err instanceof Error) {
 		errorMessage = err.message;
 	}
-	logger.error(`UpdateStock: ${errorMessage}`, ['CRON']);
+	util.logger.error(`UpdateStock: ${errorMessage}`, ['CRON']);
 }

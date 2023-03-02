@@ -1,11 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { setComma } from '../../../config/util';
 import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
+import { IUtil } from '../../../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 
 export default {
 	data: new SlashCommandBuilder().setName('내돈').setDescription('가지고 있는 돈'),
@@ -16,10 +15,10 @@ export default {
 			const user = await userController.getUser({ discordId });
 
 			await interaction.reply({
-				content: `가지고 있는 돈: ${setComma(user.money, true)}원`,
+				content: `가지고 있는 돈: ${util.formatter.setComma(user.money, true)}원`,
 			});
 		} catch (err) {
-			logger.error(err, ['Command']);
+			util.logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

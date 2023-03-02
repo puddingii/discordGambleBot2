@@ -1,11 +1,10 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { setComma } from '../../../config/util';
 import globalController from '../../../common/controller/statusController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
+import { IUtil } from '../../../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,10 +14,10 @@ export default {
 		try {
 			const money = await globalController.getGrantMoney();
 			await interaction.reply({
-				content: `${setComma(money, true)}원 누적되어 있음.`,
+				content: `${util.formatter.setComma(money, true)}원 누적되어 있음.`,
 			});
 		} catch (err) {
-			logger.error(err, ['Command']);
+			util.logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

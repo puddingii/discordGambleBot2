@@ -6,12 +6,11 @@ import {
 import dayjs from 'dayjs';
 import _ from 'lodash';
 import userController from '../../../common/controller/userController';
-import util from '../../../config/util';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
+import { IUtil } from '../../../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 
 export default {
 	data: new SlashCommandBuilder().setName('내주식').setDescription('내 주식임'),
@@ -36,11 +35,11 @@ export default {
 				embedBox.addFields({
 					name: `${stock.name} ${
 						stock.stockType === 'stock' ? '주식' : '코인'
-					} - ${util.setComma(stock.stockValue, true)}원`,
-					value: `내 포지션: ${util.setComma(
+					} - ${util.formatter.setComma(stock.stockValue, true)}원`,
+					value: `내 포지션: ${util.formatter.setComma(
 						stock.myValue,
 						true,
-					)}원\n손익,수익률: ${util.setComma(stock.profilMargin, true)}원 (${
+					)}원\n손익,수익률: ${util.formatter.setComma(stock.profilMargin, true)}원 (${
 						stock.myRatio
 					}%)\n보유비중: ${stock.cnt}개 | ${_.round(
 						((stock.cnt * stock.myValue) / totalMyValue) * 100,
@@ -52,21 +51,21 @@ export default {
 
 			embedBox.addFields({ name: '\u200B', value: '\u200B' }).addFields({
 				name: '요약',
-				value: `총 투자액: ${util.setComma(
+				value: `총 투자액: ${util.formatter.setComma(
 					totalMyValue,
 					true,
-				)}원\n총 주식평단가: ${util.setComma(
+				)}원\n총 주식평단가: ${util.formatter.setComma(
 					totalStockValue,
 					true,
-				)}원\n총 수익: ${util.setComma(totalCalc, true)}원\n총 수익률: ${_.round(
-					(totalStockValue / totalMyValue - 1) * 100,
-					2,
-				)}%`,
+				)}원\n총 수익: ${util.formatter.setComma(
+					totalCalc,
+					true,
+				)}원\n총 수익률: ${_.round((totalStockValue / totalMyValue - 1) * 100, 2)}%`,
 			});
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {
-			logger.error(err, ['Command']);
+			util.logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

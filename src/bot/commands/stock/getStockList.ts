@@ -5,12 +5,11 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import stockController from '../../../common/controller/stockController';
-import util from '../../../config/util';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
+import { IUtil } from '../../../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -59,7 +58,7 @@ export default {
 				embedBox.addFields({
 					name: `${stock.name} ${
 						stock.type === 'stock' ? '주식' : '코인'
-					} - ${util.setComma(stock.value, true)}원(${upDownEmoji(
+					} - ${util.formatter.setComma(stock.value, true)}원(${upDownEmoji(
 						stock.beforeHistoryRatio * 100,
 					)}%)`,
 					value: stock.comment,
@@ -68,7 +67,7 @@ export default {
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {
-			logger.error(err, ['Command']);
+			util.logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

@@ -3,13 +3,12 @@ import {
 	EmbedBuilder,
 	ChatInputCommandInteraction,
 } from 'discord.js';
-import { setComma } from '../../../config/util';
 import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
+import { IUtil } from '../../../common/util/util';
 
-const logger = container.get<ILogger>(TYPES.Logger);
+const util = container.get<IUtil>(TYPES.Util);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -32,13 +31,13 @@ export default {
 			rankingList.forEach(user => {
 				embedBox.addFields({
 					name: `${user.name}`,
-					value: `총 재산: ${setComma(user.money, true)}원`,
+					value: `총 재산: ${util.formatter.setComma(user.money, true)}원`,
 					inline: true,
 				});
 			});
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {
-			logger.error(err, ['Command']);
+			util.logger.error(err, ['Command']);
 			await interaction.reply({ content: `${err}` });
 		}
 	},

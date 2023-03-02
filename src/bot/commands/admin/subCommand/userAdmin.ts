@@ -1,7 +1,11 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import { setComma } from '../../../../config/util';
 import userController from '../../../../common/controller/userController';
 import { getNewSelectMenu, getModal } from './common';
+import { container } from '../../../../settings/container';
+import TYPES from '../../../../interfaces/containerType';
+import { IFormatter } from '../../../../common/util/formatter';
+
+const formatter = container.get<IFormatter>(TYPES.Formatter);
 
 export default {
 	select: {
@@ -31,7 +35,7 @@ export default {
 			await userController.adjustMoney({ nickname }, cnt);
 
 			await interaction.reply({
-				content: `${nickname}에게 ${setComma(cnt)}원을 줬습니다`,
+				content: `${nickname}에게 ${formatter.setComma(cnt)}원을 줬습니다`,
 				components: [getNewSelectMenu()],
 				ephemeral: true,
 			});
