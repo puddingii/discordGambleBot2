@@ -1,5 +1,4 @@
 import { IStockStatics } from '../../common/model/Stock';
-import { IUserStatics } from '../../common/model/User';
 import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../game/stock';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../game/user';
 
@@ -14,7 +13,6 @@ export type TValidCoinParam = Omit<TCoinInfo, 'beforeHistoryRatio' | 'type'> & {
 };
 
 export interface IStockService {
-	userModel: IUserStatics;
 	stockModel: IStockStatics;
 	/** 새로운 주식 추가 */
 	addStock(stockInfo: TValidStockParam): Promise<IStock2>;

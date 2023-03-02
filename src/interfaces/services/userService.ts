@@ -1,6 +1,4 @@
-import { IStockStatics } from '../../common/model/Stock';
 import { IUserStatics } from '../../common/model/User';
-import { IWeaponStatics } from '../../common/model/Weapon';
 import {
 	IUser,
 	TPopulatedUserStockInfo,
@@ -30,8 +28,6 @@ export type TProcessedStockInfo = {
 };
 export interface IUserService {
 	userModel: IUserStatics;
-	stockModel: IStockStatics;
-	weaponModel: IWeaponStatics;
 	/** 유저 추가 */
 	addUser(userInfo: { id: string; nickname: string }): Promise<void>;
 	/** 유저에게 선물주기 */

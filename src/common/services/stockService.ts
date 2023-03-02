@@ -4,7 +4,6 @@ import TYPES from '../../interfaces/containerType';
 import Stock from '../game/Stock/Stock';
 import Coin from '../game/Stock/Coin';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../../interfaces/game/user';
-import { IUserService } from '../../interfaces/services/userService';
 import {
 	IStockService,
 	TStockType,
@@ -15,14 +14,9 @@ import { ICoin, IStock2 } from '../../interfaces/game/stock';
 
 @injectable()
 class StockService implements IStockService {
-	stockModel: IUserService['stockModel'];
-	userModel: IUserService['userModel'];
+	stockModel: IStockService['stockModel'];
 
-	constructor(
-		@inject(TYPES.UserModel) userModel: IUserService['userModel'],
-		@inject(TYPES.StockModel) stockModel: IUserService['stockModel'],
-	) {
-		this.userModel = userModel;
+	constructor(@inject(TYPES.StockModel) stockModel: IStockService['stockModel']) {
 		this.stockModel = stockModel;
 	}
 

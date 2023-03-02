@@ -23,18 +23,10 @@ import { TEnhanceSimulateResult } from '../../interfaces/services/weaponService'
 
 @injectable()
 class UserService implements IUserService {
-	stockModel: IUserService['stockModel'];
 	userModel: IUserService['userModel'];
-	weaponModel: IUserService['weaponModel'];
 
-	constructor(
-		@inject(TYPES.UserModel) userModel: IUserService['userModel'],
-		@inject(TYPES.StockModel) stockModel: IUserService['stockModel'],
-		@inject(TYPES.WeaponModel) weaponModel: IUserService['weaponModel'],
-	) {
+	constructor(@inject(TYPES.UserModel) userModel: IUserService['userModel']) {
 		this.userModel = userModel;
-		this.stockModel = stockModel;
-		this.weaponModel = weaponModel;
 	}
 
 	private convertDataToClass(userInfo: TUserModelInfo) {
