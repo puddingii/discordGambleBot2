@@ -2,6 +2,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 import swaggerAutogen from 'swagger-autogen';
 import path from 'path';
+import fs from 'fs';
 
 const doc = {
 	info: {
@@ -12,7 +13,12 @@ const doc = {
 	schemes: ['http'],
 };
 
-const outputFile = './swagger-output.json';
-const endpointsFiles = [path.resolve(__dirname, '../../loaders/myExpress.ts')];
+const OUTER_FILE_NAME = './swagger-output.json';
+const ROUTE_PATH = path.resolve(__dirname, '../routes');
+const routeFiles = fs
+	.readdirSync(ROUTE_PATH)
+	.map(fileName => `${ROUTE_PATH}/${fileName}`);
 
-swaggerAutogen(outputFile, endpointsFiles, doc);
+const endpointsFiles = [...routeFiles];
+
+swaggerAutogen(OUTER_FILE_NAME, endpointsFiles, doc);
