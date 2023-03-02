@@ -1,26 +1,28 @@
-import { container } from '../../settings/container';
+import { inject, injectable } from 'inversify';
 import TYPES from '../../interfaces/containerType';
-import { IStatusService } from '../../interfaces/services/statusService';
+import { IStatusController } from '../../interfaces/common/controller/status';
 
-export const getGrantMoney = async () => {
-	const statusService = container.get<IStatusService>(TYPES.StatusService);
-	const { grantMoney } = await statusService.getUserStatus();
-	return grantMoney;
-};
+@injectable()
+export default class StatusController implements IStatusController {
+	statusService: IStatusController['statusService'];
 
-export const updateGrantMoney = async (value?: number) => {
-	const statusService = container.get<IStatusService>(TYPES.StatusService);
-	const { grantMoney } = await statusService.getUserStatus();
-	await statusService.updateGrantMoney(grantMoney, value);
-};
+	constructor(
+		@inject(TYPES.StatusService) statusService: IStatusController['statusService'],
+	) {
+		this.statusService = statusService;
+	}
 
-export const updateCurTime = async (value: number) => {
-	const statusService = container.get<IStatusService>(TYPES.StatusService);
-	await statusService.updateCurTime(value);
-};
+	async getGrantMoney() {
+		const { grantMoney } = await this.statusService.getUserStatus();
+		return grantMoney;
+	}
 
-export default {
-	getGrantMoney,
-	updateGrantMoney,
-	updateCurTime,
-};
+	async updateCurTime(value: number) {
+		await this.statusService.updateCurTime(value);
+	}
+
+	async updateGrantMoney(value?: number | undefined) {
+		const { grantMoney } = await this.statusService.getUserStatus();
+		await this.statusService.updateGrantMoney(grantMoney, value);
+	}
+}

@@ -1,10 +1,13 @@
 import express from 'express';
 import { Types } from 'mongoose';
 import userController from '../../common/controller/userController';
-import statusController from '../../common/controller/statusController';
+import TYPES from '../../interfaces/containerType';
+import { container } from '../../settings/container';
 import { isLoggedIn } from '../middlewares/express';
+import { IStatusController } from '../../interfaces/common/controller/status';
 
 const router = express.Router();
+const statusController = container.get<IStatusController>(TYPES.StatusController);
 
 router.get('/stocklist', isLoggedIn, async (req, res) => {
 	try {

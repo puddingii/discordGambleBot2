@@ -16,6 +16,8 @@ import UserService from '../common/services/userService';
 import StockService from '../common/services/stockService';
 import WeaponService from '../common/services/weaponService';
 import StatusService from '../common/services/statusService';
+import { IStatusController } from '../interfaces/common/controller/status';
+import StatusController from '../common/controller/statusController';
 
 export const container = new Container();
 export const { lazyInject } = getDecorators(container);
@@ -36,5 +38,11 @@ container.bind<IUserService>(TYPES.UserService).to(UserService).inSingletonScope
 container.bind<IStockService>(TYPES.StockService).to(StockService).inSingletonScope();
 container.bind<IWeaponService>(TYPES.WeaponService).to(WeaponService).inSingletonScope();
 container.bind<IStatusService>(TYPES.StatusService).to(StatusService).inSingletonScope();
+
+// Controller
+container
+	.bind<IStatusController>(TYPES.StatusController)
+	.to(StatusController)
+	.inSingletonScope();
 
 export default {};

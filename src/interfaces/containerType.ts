@@ -15,4 +15,10 @@ export default {
 	StockService: Symbol.for('StockService'),
 	WeaponService: Symbol.for('WeaponService'),
 	StatusService: Symbol.for('StatusService'),
+
+	/** Controller */
+	StatusController: Symbol.for('StatusController'),
+	StockController: Symbol.for('StockController'),
+	UserController: Symbol.for('UserController'),
+	WeaponController: Symbol.for('WeaponController'),
 };

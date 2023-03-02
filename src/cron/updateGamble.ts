@@ -1,13 +1,14 @@
 import schedule from 'node-schedule';
 import dayjs from 'dayjs';
 import stockController from '../common/controller/stockController';
-import statusController from '../common/controller/statusController';
 import secretKey from '../config/secretKey';
 import { container } from '../settings/container';
 import TYPES from '../interfaces/containerType';
 import { IUtil } from '../common/util/util';
+import { IStatusController } from '../interfaces/common/controller/status';
 
 const util = container.get<IUtil>(TYPES.Util);
+const statusController = container.get<IStatusController>(TYPES.StatusController);
 try {
 	const { type, value } = util.formatter.convertSecond(secretKey.gambleUpdateTime);
 	const defaultRule = '* * *';
