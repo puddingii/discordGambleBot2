@@ -1,7 +1,7 @@
 import express from 'express';
-import { isLoggedIn } from '../middlewares/express';
-import stockController from '../controller/stockController';
-import Stock from '../game/Stock/Stock';
+import { isLoggedIn } from '../../middlewares/express';
+import stockController from '../../controller/stockController';
+import Stock from '../../game/Stock/Stock';
 
 const router = express.Router();
 

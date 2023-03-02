@@ -13,6 +13,6 @@ const doc = {
 };
 
 const outputFile = './swagger-output.json';
-const endpointsFiles = [path.resolve(__dirname, '../loaders/myExpress.ts')];
+const endpointsFiles = [path.resolve(__dirname, '../../loaders/myExpress.ts')];
 
 swaggerAutogen(outputFile, endpointsFiles, doc);

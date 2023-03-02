@@ -1,10 +1,10 @@
 import express from 'express';
 import passport from 'passport';
-import { isLoggedIn, isNotLoggedIn } from '../middlewares/express';
-import { TUserModelInfo } from '../model/User';
-import { ILogger } from '../util/logger';
-import { container } from '../settings/container';
-import TYPES from '../interfaces/containerType';
+import { isLoggedIn, isNotLoggedIn } from '../../middlewares/express';
+import { TUserModelInfo } from '../../model/User';
+import { ILogger } from '../../util/logger';
+import { container } from '../../settings/container';
+import TYPES from '../../interfaces/containerType';
 
 const router = express.Router();
 const logger = container.get<ILogger>(TYPES.Logger);
