@@ -15,7 +15,7 @@ import secretKey from '../../../config/secretKey';
 import client from '../../../app';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../util/logger';
+import { ILogger } from '../../../common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 

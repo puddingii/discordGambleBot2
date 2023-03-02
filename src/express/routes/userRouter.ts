@@ -1,8 +1,8 @@
 import express from 'express';
 import { Types } from 'mongoose';
-import userController from '../../controller/userController';
-import statusController from '../../controller/statusController';
-import { isLoggedIn } from '../../middlewares/express';
+import userController from '../../common/controller/userController';
+import statusController from '../../common/controller/statusController';
+import { isLoggedIn } from '../middlewares/express';
 
 const router = express.Router();
 

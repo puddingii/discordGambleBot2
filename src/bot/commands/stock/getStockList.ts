@@ -4,11 +4,11 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dayjs from 'dayjs';
-import stockController from '../../../controller/stockController';
+import stockController from '../../../common/controller/stockController';
 import util from '../../../config/util';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../util/logger';
+import { ILogger } from '../../../common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 

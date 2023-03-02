@@ -4,10 +4,10 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import { setComma } from '../../../config/util';
-import userController from '../../../controller/userController';
+import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../util/logger';
+import { ILogger } from '../../../common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 

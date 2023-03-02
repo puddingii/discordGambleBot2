@@ -1,6 +1,6 @@
 import passport from 'passport';
 import passportLocal from 'passport-local';
-import UserModel from '../../model/User';
+import UserModel from '../../common/model/User';
 
 export default () => {
 	const LocalStrategy = passportLocal.Strategy;

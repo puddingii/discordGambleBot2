@@ -1,6 +1,6 @@
 import express from 'express';
-import userController from '../../controller/userController';
-import { isLoggedIn } from '../../middlewares/express';
+import userController from '../../common/controller/userController';
+import { isLoggedIn } from '../middlewares/express';
 
 const router = express.Router();
 

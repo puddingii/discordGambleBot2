@@ -4,10 +4,10 @@ import {
 	SlashCommandBuilder,
 } from 'discord.js';
 import _ from 'lodash';
-import weaponController from '../../../controller/weaponController';
+import weaponController from '../../../common/controller/weaponController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { IUtil } from '../../../util/util';
+import { IUtil } from '../../../common/util/util';
 
 const util = container.get<IUtil>(TYPES.Util);
 

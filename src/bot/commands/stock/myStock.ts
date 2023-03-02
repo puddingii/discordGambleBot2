@@ -5,11 +5,11 @@ import {
 } from 'discord.js';
 import dayjs from 'dayjs';
 import _ from 'lodash';
-import userController from '../../../controller/userController';
+import userController from '../../../common/controller/userController';
 import util from '../../../config/util';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../util/logger';
+import { ILogger } from '../../../common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 

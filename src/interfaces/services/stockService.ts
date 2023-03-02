@@ -1,5 +1,5 @@
-import { IStockStatics } from '../../model/Stock';
-import { IUserStatics } from '../../model/User';
+import { IStockStatics } from '../../common/model/Stock';
+import { IUserStatics } from '../../common/model/User';
 import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../game/stock';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../game/user';
 

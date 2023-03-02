@@ -1,6 +1,6 @@
-import { IStockStatics } from '../../model/Stock';
-import { IUserStatics } from '../../model/User';
-import { IWeaponStatics } from '../../model/Weapon';
+import { IStockStatics } from '../../common/model/Stock';
+import { IUserStatics } from '../../common/model/User';
+import { IWeaponStatics } from '../../common/model/Weapon';
 import {
 	IUser,
 	TPopulatedUserStockInfo,

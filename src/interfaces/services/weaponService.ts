@@ -1,5 +1,5 @@
-import { IWeaponStatics } from '../../model/Weapon';
-import { IFormatter } from '../../util/formatter';
+import { IWeaponStatics } from '../../common/model/Weapon';
+import { IFormatter } from '../../common/util/formatter';
 import { IWeapon, TWeaponConstructor, TWeaponInfo } from '../game/weapon';
 
 /** FIXME */

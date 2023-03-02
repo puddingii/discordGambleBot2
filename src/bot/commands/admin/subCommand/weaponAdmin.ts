@@ -5,7 +5,7 @@ import {
 	SelectMenuInteraction,
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
-import weaponController from '../../../../controller/weaponController';
+import weaponController from '../../../../common/controller/weaponController';
 import { TWeaponConstructor } from '../../../../interfaces/game/weapon';
 
 type InputBoxInfo = {

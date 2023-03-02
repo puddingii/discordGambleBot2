@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
-import stockController from '../../../../controller/stockController';
+import stockController from '../../../../common/controller/stockController';
 
 const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
 	const { curCondition, conditionPeriod, conditionRatioPerList } =

@@ -1,6 +1,6 @@
 import { Collection } from 'discord.js';
 import { Express } from 'express-serve-static-core';
-import { IUserInfo } from '../model/User';
+import { IUserInfo } from '../common/model/User';
 
 // interface DependencyInjection extends DIFB.FilesDI {}
 

@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import { setComma } from '../../../../config/util';
-import userController from '../../../../controller/userController';
+import userController from '../../../../common/controller/userController';
 import { getNewSelectMenu, getModal } from './common';
 
 export default {

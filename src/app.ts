@@ -4,7 +4,7 @@ import express from 'express';
 import secretKey from './config/secretKey';
 import { container } from './settings/container';
 import TYPES from './interfaces/containerType';
-import { ILogger } from './util/logger';
+import { ILogger } from './common/util/logger';
 import loaders from './loaders/index';
 
 const client = new Client({

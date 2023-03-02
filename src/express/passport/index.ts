@@ -1,6 +1,6 @@
 import passport from 'passport';
 import localStrategy from './localStrategy';
-import UserModel, { TUserModelInfo } from '../../model/User';
+import UserModel, { TUserModelInfo } from '../../common/model/User';
 
 export default () => {
 	// 로그인 성공시 세션스토어에 저장
