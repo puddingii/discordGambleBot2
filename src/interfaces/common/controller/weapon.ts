@@ -1,5 +1,5 @@
 import { IWeapon, TWeaponConstructor } from '../../game/weapon';
-import { IWeaponService } from '../../services/weaponService';
+import { IWeaponService } from '../services/weaponService';
 
 type TEnhanceInfo = { success: number; fail: number; destroy: number; cost: number };
 

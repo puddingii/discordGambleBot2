@@ -1,6 +1,6 @@
-import { IStockStatics } from '../../common/model/Stock';
-import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../game/stock';
-import { TPopulatedUserStockInfo, TUserStockInfo } from '../game/user';
+import { IStockStatics } from '../../../common/model/Stock';
+import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../../game/stock';
+import { TPopulatedUserStockInfo, TUserStockInfo } from '../../game/user';
 
 export type TStockName = 'coin' | 'stock';
 

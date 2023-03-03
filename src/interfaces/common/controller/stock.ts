@@ -4,7 +4,7 @@ import {
 	TStockName,
 	TValidCoinParam,
 	TValidStockParam,
-} from '../../services/stockService';
+} from '../services/stockService';
 
 export interface IStockController {
 	stockService: IStockService;

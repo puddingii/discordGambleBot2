@@ -8,7 +8,7 @@ import {
 	TPopulatedList,
 	TProcessedStockInfo,
 	TUserParam,
-} from '../../interfaces/services/userService';
+} from '../../interfaces/common/services/userService';
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
 import Weapon from '../game/weapon/Weapon';
@@ -20,7 +20,7 @@ import {
 import { IStock2 } from '../../interfaces/game/stock';
 import { TUserModelInfo } from '../model/User';
 import { IWeapon } from '../../interfaces/game/weapon';
-import { TEnhanceSimulateResult } from '../../interfaces/services/weaponService';
+import { TEnhanceSimulateResult } from '../../interfaces/common/services/weaponService';
 
 @injectable()
 class UserService implements IUserService {

@@ -1,11 +1,11 @@
 import { ILogger } from '../../../common/util/logger';
-import { IStatusService } from '../../services/statusService';
+import { IStatusService } from '../services/statusService';
 import {
 	IStockService,
 	TValidCoinParam,
 	TValidStockParam,
-} from '../../services/stockService';
-import { IUserService } from '../../services/userService';
+} from '../services/stockService';
+import { IUserService } from '../services/userService';
 
 export interface IUserStockController {
 	userService: IUserService;

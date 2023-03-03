@@ -5,7 +5,7 @@ import {
 	IWeaponService,
 	TEnhanceSimulateResult,
 	ValueOf,
-} from '../../interfaces/services/weaponService';
+} from '../../interfaces/common/services/weaponService';
 import { IWeapon, TWeaponConstructor, TWeaponInfo } from '../../interfaces/game/weapon';
 
 @injectable()

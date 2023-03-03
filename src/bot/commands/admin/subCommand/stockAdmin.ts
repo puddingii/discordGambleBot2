@@ -10,7 +10,7 @@ import secretKey from '../../../../config/secretKey';
 import {
 	TValidCoinParam,
 	TValidStockParam,
-} from '../../../../interfaces/services/stockService';
+} from '../../../../interfaces/common/services/stockService';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
 import { IUserStockController } from '../../../../interfaces/common/controller/userStock';

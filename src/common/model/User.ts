@@ -4,7 +4,7 @@ import StockModel, { IStock } from './Stock';
 import secretKey from '../../config/secretKey';
 import WeaponModel, { IWeapon } from './Weapon';
 import { TPopulatedUserWeaponInfo } from '../../interfaces/game/user';
-import { TPopulatedList, TUserParam } from '../../interfaces/services/userService';
+import { TPopulatedList, TUserParam } from '../../interfaces/common/services/userService';
 
 type UserParam = Partial<{
 	discordId: string;

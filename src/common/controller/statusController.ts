@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import TYPES from '../../interfaces/containerType';
 import { IStatusController } from '../../interfaces/common/controller/status';
-import { TGambleStatus } from '../../interfaces/services/statusService';
+import { TGambleStatus } from '../../interfaces/common/services/statusService';
 
 @injectable()
 export default class StatusController implements IStatusController {

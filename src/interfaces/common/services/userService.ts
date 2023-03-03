@@ -1,11 +1,11 @@
-import { IUserStatics } from '../../common/model/User';
+import { IUserStatics } from '../../../common/model/User';
 import {
 	IUser,
 	TPopulatedUserStockInfo,
 	TPopulatedUserWeaponInfo,
 	TUserGiftInfo,
-} from '../game/user';
-import { IWeapon } from '../game/weapon';
+} from '../../game/user';
+import { IWeapon } from '../../game/weapon';
 import { TEnhanceSimulateResult } from './weaponService';
 
 export type TPopulatedList = Array<'stockList.stock' | 'weaponList.weapon'>;

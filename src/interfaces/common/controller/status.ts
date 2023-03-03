@@ -1,4 +1,4 @@
-import { IStatusService, TGambleStatus } from '../../services/statusService';
+import { IStatusService, TGambleStatus } from '../services/statusService';
 
 export interface IStatusController {
 	statusService: IStatusService;

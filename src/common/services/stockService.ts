@@ -9,7 +9,7 @@ import {
 	TStockName,
 	TValidStockParam,
 	TValidCoinParam,
-} from '../../interfaces/services/stockService';
+} from '../../interfaces/common/services/stockService';
 import { ICoin, IStock2 } from '../../interfaces/game/stock';
 
 @injectable()

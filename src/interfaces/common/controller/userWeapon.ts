@@ -1,6 +1,6 @@
 import { TWeaponConstructor } from '../../game/weapon';
-import { IUserService } from '../../services/userService';
-import { IWeaponService } from '../../services/weaponService';
+import { IUserService } from '../services/userService';
+import { IWeaponService } from '../services/weaponService';
 
 export interface IUserWeaponController {
 	userService: IUserService;

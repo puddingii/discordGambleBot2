@@ -1,11 +1,11 @@
 import { IUser, TPopulatedUserWeaponInfo, TUserWeaponInfo } from '../../game/user';
-import { IStatusService } from '../../services/statusService';
+import { IStatusService } from '../services/statusService';
 import {
 	IUserService,
 	TPopulatedList,
 	TProcessedStockInfo,
 	TUserParam,
-} from '../../services/userService';
+} from '../services/userService';
 
 export interface IUserController {
 	userService: IUserService;

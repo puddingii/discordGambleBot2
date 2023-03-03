@@ -5,7 +5,7 @@ import {
 	TGambleStatus,
 	TTotalStatus,
 	TUserStatus,
-} from '../../interfaces/services/statusService';
+} from '../../interfaces/common/services/statusService';
 
 @injectable()
 class StatusService implements IStatusService {

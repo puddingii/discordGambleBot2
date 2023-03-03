@@ -3,7 +3,7 @@ import { IUserStockController } from '../../interfaces/common/controller/userSto
 import {
 	TValidCoinParam,
 	TValidStockParam,
-} from '../../interfaces/services/stockService';
+} from '../../interfaces/common/services/stockService';
 import TYPES from '../../interfaces/containerType';
 import { TUserGiftInfo } from '../../interfaces/game/user';
 import { IStock2 } from '../../interfaces/game/stock';

@@ -5,7 +5,7 @@ import {
 	TStockName,
 	TValidCoinParam,
 	TValidStockParam,
-} from '../../interfaces/services/stockService';
+} from '../../interfaces/common/services/stockService';
 import { ICoin, IStock2, TStockClassType } from '../../interfaces/game/stock';
 import { IStockController } from '../../interfaces/common/controller/stock';
 

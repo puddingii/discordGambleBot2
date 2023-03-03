@@ -5,9 +5,9 @@ import {
 	IUserService,
 	TPopulatedList,
 	TProcessedStockInfo,
-} from '../../interfaces/services/userService';
+} from '../../interfaces/common/services/userService';
 import { ICoin, IStock2 } from '../../interfaces/game/stock';
-import { IStatusService } from '../../interfaces/services/statusService';
+import { IStatusService } from '../../interfaces/common/services/statusService';
 import { IUserController } from '../../interfaces/common/controller/user';
 import {
 	IUser,
