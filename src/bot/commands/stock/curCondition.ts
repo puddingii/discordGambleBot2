@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import stockController from '../../../common/controller/stockController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
 import { IUserController } from '../../../interfaces/common/controller/user';
+import { IStatusController } from '../../../interfaces/common/controller/status';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const userController = container.get<IUserController>(TYPES.UserController);
+const statusController = container.get<IStatusController>(TYPES.StatusController);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ export default {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const { curCondition: condition } = await stockController.getGambleStatus();
+			const { curCondition: condition } = await statusController.getGambleStatus();
 			let conditionText = '';
 			switch (condition) {
 				case 1:

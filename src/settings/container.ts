@@ -26,6 +26,8 @@ import { IUserController } from '../interfaces/common/controller/user';
 import UserController from '../common/controller/userController';
 import { IUserStockController } from '../interfaces/common/controller/userStock';
 import UserStockController from '../common/controller/userStockController';
+import StockController from '../common/controller/stockController';
+import { IStockController } from '../interfaces/common/controller/stock';
 
 export const container = new Container();
 export const { lazyInject } = getDecorators(container);
@@ -67,6 +69,10 @@ container
 container
 	.bind<IUserController>(TYPES.UserController)
 	.to(UserController)
+	.inSingletonScope();
+container
+	.bind<IStockController>(TYPES.StockController)
+	.to(StockController)
 	.inSingletonScope();
 
 export default {};

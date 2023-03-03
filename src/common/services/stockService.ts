@@ -6,7 +6,7 @@ import Coin from '../game/Stock/Coin';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../../interfaces/game/user';
 import {
 	IStockService,
-	TStockType,
+	TStockName,
 	TValidStockParam,
 	TValidCoinParam,
 } from '../../interfaces/services/stockService';
@@ -147,7 +147,7 @@ class StockService implements IStockService {
 		return stock;
 	}
 
-	async getAllStock(type?: TStockType) {
+	async getAllStock(type?: TStockName) {
 		const stockList = await this.stockModel.findAllList(type || 'all');
 
 		return stockList.map(

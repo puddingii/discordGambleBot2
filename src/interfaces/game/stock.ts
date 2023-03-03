@@ -49,3 +49,5 @@ export interface ICoin extends IStockAbstract {
 	update(curTime: number): { code: number };
 }
 export type TStockConstructor = TStockAbstractConstructor & Partial<TAddedStock2>;
+
+export type TStockClassType = IStock2 | ICoin;

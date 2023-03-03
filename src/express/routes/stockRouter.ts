@@ -1,9 +1,12 @@
 import express from 'express';
 import { isLoggedIn } from '../middlewares/express';
-import stockController from '../../common/controller/stockController';
 import Stock from '../../common/game/Stock/Stock';
+import TYPES from '../../interfaces/containerType';
+import { container } from '../../settings/container';
+import { IStockController } from '../../interfaces/common/controller/stock';
 
 const router = express.Router();
+const stockController = container.get<IStockController>(TYPES.StockController);
 
 router.get('/', isLoggedIn, async (req, res) => {
 	/*

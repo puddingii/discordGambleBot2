@@ -6,12 +6,15 @@ import {
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../../common/game/Stock/Stock';
-import stockController from '../../../../common/controller/stockController';
 import secretKey from '../../../../config/secretKey';
 import {
 	TValidCoinParam,
 	TValidStockParam,
 } from '../../../../interfaces/services/stockService';
+import { container } from '../../../../settings/container';
+import TYPES from '../../../../interfaces/containerType';
+import { IUserStockController } from '../../../../interfaces/common/controller/userStock';
+import { IStockController } from '../../../../interfaces/common/controller/stock';
 
 type InputBoxInfo = {
 	[id: string]: {
@@ -20,6 +23,11 @@ type InputBoxInfo = {
 		value?: string;
 	};
 };
+
+const userStockController = container.get<IUserStockController>(
+	TYPES.UserStockController,
+);
+const stockController = container.get<IStockController>(TYPES.StockController);
 
 const showStockModal = async (interaction: SelectMenuInteraction, stockName?: string) => {
 	const modalInfo = {
@@ -102,11 +110,11 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 	if (type === 'stock' && !isNew) {
 		await stockController.updateStock(stockParam);
 	} else if (type === 'stock' && isNew) {
-		await stockController.addStock(stockParam);
+		await userStockController.addStockAndUpdateUsers(stockParam);
 	} else if (type === 'coin' && !isNew) {
 		await stockController.updateStock(coinParam);
 	} else {
-		await stockController.addCoin(coinParam);
+		await userStockController.addCoinAndUpdateUsers(coinParam);
 	}
 
 	content = isNew ? '주식추가 완료' : '주식 업데이트 완료';

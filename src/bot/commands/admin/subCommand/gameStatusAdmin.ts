@@ -1,10 +1,14 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
-import stockController from '../../../../common/controller/stockController';
+import TYPES from '../../../../interfaces/containerType';
+import { container } from '../../../../settings/container';
+import { IStatusController } from '../../../../interfaces/common/controller/status';
+
+const statusController = container.get<IStatusController>(TYPES.StatusController);
 
 const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
 	const { curCondition, conditionPeriod, conditionRatioPerList } =
-		await stockController.getGambleStatus();
+		await statusController.getGambleStatus();
 	const modalInfo = {
 		id: '어드민-updateStatus',
 		title: '주식상태 업데이트',
@@ -44,7 +48,7 @@ const updateStatus = async (interaction: ModalSubmitInteraction) => {
 		throw Error('제대로 입력해라');
 	}
 
-	await stockController.setGambleStatus({
+	await statusController.setGambleStatus({
 		curCondition,
 		conditionRatioPerList,
 		conditionPeriod,

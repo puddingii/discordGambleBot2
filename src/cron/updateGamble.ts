@@ -1,14 +1,18 @@
 import schedule from 'node-schedule';
 import dayjs from 'dayjs';
-import stockController from '../common/controller/stockController';
 import secretKey from '../config/secretKey';
 import { container } from '../settings/container';
 import TYPES from '../interfaces/containerType';
 import { IUtil } from '../common/util/util';
 import { IStatusController } from '../interfaces/common/controller/status';
+import { IUserStockController } from '../interfaces/common/controller/userStock';
 
 const util = container.get<IUtil>(TYPES.Util);
 const statusController = container.get<IStatusController>(TYPES.StatusController);
+const userStockController = container.get<IUserStockController>(
+	TYPES.UserStockController,
+);
+
 try {
 	const { type, value } = util.formatter.convertSecond(secretKey.gambleUpdateTime);
 	const defaultRule = '* * *';
@@ -31,12 +35,11 @@ try {
 	schedule.scheduleJob(rule, async function (cronTime) {
 		try {
 			/** 12시간마다 컨디션 조정 */
-			await stockController.updateCondition();
+			await statusController.updateCondition();
 			await statusController.updateCurTime(1);
 			await statusController.updateGrantMoney();
 
-			await stockController.updateStockRandom();
-			await stockController.giveDividend();
+			await userStockController.updateStockRandomAndGiveDividend();
 
 			util.logger.info(`${dayjs(cronTime).format('YYYY.MM.DD')} - Stock Update`, [
 				'CRON',

@@ -2,7 +2,7 @@ import { IStockStatics } from '../../common/model/Stock';
 import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../game/stock';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../game/user';
 
-export type TStockType = 'coin' | 'stock';
+export type TStockName = 'coin' | 'stock';
 
 export type TValidStockParam = Omit<TStockInfo2, 'beforeHistoryRatio' | 'type'> & {
 	type: 'stock';
@@ -28,7 +28,7 @@ export interface IStockService {
 		yDataList: Array<Array<number> | number>;
 	};
 	/** 모든 주식 가져오기 */
-	getAllStock(type?: TStockType): Promise<Array<IStock2>>;
+	getAllStock(type?: TStockName): Promise<Array<IStock2 | ICoin>>;
 	/** 주식 가져오기 */
 	getStock(stockName: string): Promise<TPopulatedUserStockInfo['stock']>;
 	/** 주식 등락히스토리 가져오기 */

@@ -4,12 +4,15 @@ import {
 	ChatInputCommandInteraction,
 } from 'discord.js';
 import dayjs from 'dayjs';
-import stockController from '../../../common/controller/stockController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { IUtil } from '../../../common/util/util';
+import { IStatusController } from '../../../interfaces/common/controller/status';
+import { IStockController } from '../../../interfaces/common/controller/stock';
 
 const util = container.get<IUtil>(TYPES.Util);
+const statusController = container.get<IStatusController>(TYPES.StatusController);
+const stockController = container.get<IStockController>(TYPES.StockController);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -36,7 +39,7 @@ export default {
 			/** Discord Info */
 			const stockType =
 				<'coin' | 'stock' | 'all'>interaction.options.getString('종류') || 'all';
-			const condition = await stockController.getNextUpdateTime();
+			const condition = await statusController.getNextUpdateTime();
 
 			const embedBox = new EmbedBuilder();
 			embedBox
