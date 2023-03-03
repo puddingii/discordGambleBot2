@@ -1,11 +1,12 @@
 import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
-import userController from '../../../../common/controller/userController';
 import { getNewSelectMenu, getModal } from './common';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
 import { IFormatter } from '../../../../common/util/formatter';
+import { IUserController } from '../../../../interfaces/common/controller/user';
 
 const formatter = container.get<IFormatter>(TYPES.Formatter);
+const userController = container.get<IUserController>(TYPES.UserController);
 
 export default {
 	select: {
@@ -32,7 +33,7 @@ export default {
 				throw Error('닉네임, 금액을 제대로 적어주세요');
 			}
 
-			await userController.adjustMoney({ nickname }, cnt);
+			await userController.updateMoney({ nickname }, cnt);
 
 			await interaction.reply({
 				content: `${nickname}에게 ${formatter.setComma(cnt)}원을 줬습니다`,

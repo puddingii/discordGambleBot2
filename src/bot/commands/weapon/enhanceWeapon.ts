@@ -1,10 +1,13 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
+import { IUserWeaponController } from '../../../interfaces/common/controller/userWeapon';
 
 const logger = container.get<ILogger>(TYPES.Logger);
+const userWeaponController = container.get<IUserWeaponController>(
+	TYPES.UserWeaponController,
+);
 
 // FIXME 나중에 셀렉터로 바꿔야함
 export default {
@@ -33,7 +36,7 @@ export default {
 			const type = <'sword'>interaction.options.getString('종류') ?? 'sword';
 			// const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const { code, curPower, beforePower } = await userController.enhanceWeapon({
+			const { code, curPower, beforePower } = await userWeaponController.enhanceWeapon({
 				discordId,
 				type,
 				isPreventDestroy: false,

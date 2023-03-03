@@ -22,6 +22,10 @@ import { IWeaponController } from '../interfaces/common/controller/weapon';
 import WeaponController from '../common/controller/weaponController';
 import { IUserWeaponController } from '../interfaces/common/controller/userWeapon';
 import UserWeaponController from '../common/controller/userWeaponController';
+import { IUserController } from '../interfaces/common/controller/user';
+import UserController from '../common/controller/userController';
+import { IUserStockController } from '../interfaces/common/controller/userStock';
+import UserStockController from '../common/controller/userStockController';
 
 export const container = new Container();
 export const { lazyInject } = getDecorators(container);
@@ -55,6 +59,14 @@ container
 container
 	.bind<IUserWeaponController>(TYPES.UserWeaponController)
 	.to(UserWeaponController)
+	.inSingletonScope();
+container
+	.bind<IUserStockController>(TYPES.UserStockController)
+	.to(UserStockController)
+	.inSingletonScope();
+container
+	.bind<IUserController>(TYPES.UserController)
+	.to(UserController)
 	.inSingletonScope();
 
 export default {};

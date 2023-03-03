@@ -7,9 +7,10 @@ import dayjs from 'dayjs';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
-import userController from '../../../common/controller/userController';
+import { IUserController } from '../../../interfaces/common/controller/user';
 
 const logger = container.get<ILogger>(TYPES.Logger);
+const userController = container.get<IUserController>(TYPES.UserController);
 
 // FIXME 여기도 바꿔야함
 export default {

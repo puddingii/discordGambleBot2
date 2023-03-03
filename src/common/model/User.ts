@@ -1,5 +1,4 @@
 import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
-import pwGenerator from 'generate-password';
 import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
 import secretKey from '../../config/secretKey';
@@ -96,7 +95,7 @@ export interface IUserStatics extends Model<IUser> {
 	/** 모든 유저 가져오기 */
 	getAllUserList(populateList?: TPopulatedList): Promise<Array<TUserModelInfo>>;
 	/** 웹 패스워드 발급 */
-	generatePassword(discordId: string): Promise<string>;
+	updatePassword(discordId: string, myPassword: string): Promise<void>;
 	/** 유저 돈 업데이트 */
 	updateMoney(
 		userInfo: UserParam,
@@ -307,12 +306,10 @@ User.statics.getAllUserList = async function (populateList?: TPopulatedList) {
 };
 
 /** 비밀번호 (재)발급 */
-User.statics.generatePassword = async function (discordId: string) {
-	const myPassword = pwGenerator.generate({ length: 12, numbers: true });
+User.statics.updatePassword = async function (discordId: string, myPassword: string) {
 	const encryptedPassword = await bcrypt.hash(myPassword, secretKey.passwordHashRound);
 
 	await this.findOneAndUpdate({ discordId }, { $set: { password: encryptedPassword } });
-	return myPassword;
 };
 
 /** 비밀번호 체크 */

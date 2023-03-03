@@ -60,6 +60,8 @@ export interface IUserService {
 	): Promise<{ cnt: number; value: number }>;
 	/** 가지고 있는 돈 업데이트 */
 	updateMoney(user: IUser, money: number): Promise<void>;
+	/** 랜덤패스워드 생성 및 저장 */
+	generatePassword(discordId: string): Promise<string>;
 }
 
 export default {};

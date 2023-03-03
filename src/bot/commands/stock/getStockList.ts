@@ -59,7 +59,7 @@ export default {
 					name: `${stock.name} ${
 						stock.type === 'stock' ? '주식' : '코인'
 					} - ${util.formatter.setComma(stock.value, true)}원(${upDownEmoji(
-						stock.beforeHistoryRatio * 100,
+						Math.floor(stock.beforeHistoryRatio * 100),
 					)}%)`,
 					value: stock.comment,
 				});

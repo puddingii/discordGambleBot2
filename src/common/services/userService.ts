@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { Types } from 'mongoose';
 import _ from 'lodash';
+import pwGenerator from 'generate-password';
 import TYPES from '../../interfaces/containerType';
 import {
 	IUserService,
@@ -168,6 +169,12 @@ class UserService implements IUserService {
 
 	async addWeapon(weapon: IWeapon) {
 		await this.userModel.addNewWeapon(weapon.type);
+	}
+
+	async generatePassword(discordId: string): Promise<string> {
+		const myPassword = pwGenerator.generate({ length: 12, numbers: true });
+		await this.userModel.updatePassword(discordId, myPassword);
+		return myPassword;
 	}
 
 	async getAllUser(populatedList?: TPopulatedList) {

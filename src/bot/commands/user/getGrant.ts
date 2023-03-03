@@ -1,10 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { IUtil } from '../../../common/util/util';
+import { IUserController } from '../../../interfaces/common/controller/user';
 
 const util = container.get<IUtil>(TYPES.Util);
+const userController = container.get<IUserController>(TYPES.UserController);
 
 export default {
 	data: new SlashCommandBuilder()

@@ -24,7 +24,7 @@ router.get('/', isLoggedIn, async (req, res) => {
 			dividend: stock instanceof Stock ? stock.dividend * 100 : 0,
 			type: stock.type,
 			value: stock.value,
-			diffRatio: stock.beforeHistoryRatio * 100,
+			diffRatio: Math.floor(stock.beforeHistoryRatio * 100),
 		});
 	} catch (err) {
 		let message = err;

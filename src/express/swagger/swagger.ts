@@ -13,7 +13,7 @@ const doc = {
 	schemes: ['http'],
 };
 
-const OUTER_FILE_NAME = './swagger-api.json';
+const OUTER_FILE_NAME = path.resolve(__dirname, './swagger-api.json');
 const ROUTE_PATH = path.resolve(__dirname, '../routes');
 const routeFiles = fs
 	.readdirSync(ROUTE_PATH)

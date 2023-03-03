@@ -1,8 +1,13 @@
 import express from 'express';
-import userController from '../../common/controller/userController';
 import { isLoggedIn } from '../middlewares/express';
+import TYPES from '../../interfaces/containerType';
+import { container } from '../../settings/container';
+import { IUserWeaponController } from '../../interfaces/common/controller/userWeapon';
 
 const router = express.Router();
+const userWeaponController = container.get<IUserWeaponController>(
+	TYPES.UserWeaponController,
+);
 
 router.get('/enhance', isLoggedIn, async (req, res) => {
 	try {
@@ -24,10 +29,8 @@ router.get('/enhance', isLoggedIn, async (req, res) => {
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
-		const { cost, destroy, fail, success } = await userController.getMyWeaponEnhanceInfo(
-			user.discordId,
-			type as string,
-		);
+		const { cost, destroy, fail, success } =
+			await userWeaponController.getMyWeaponEnhanceInfo(user.discordId, type as string);
 
 		return res.status(200).json({
 			cost,

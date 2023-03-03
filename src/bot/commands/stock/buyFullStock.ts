@@ -1,10 +1,13 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import userController from '../../../common/controller/userController';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
+import { IUserStockController } from '../../../interfaces/common/controller/userStock';
 
 const logger = container.get<ILogger>(TYPES.Logger);
+const userStockController = container.get<IUserStockController>(
+	TYPES.UserStockController,
+);
 
 export default {
 	data: new SlashCommandBuilder()
@@ -19,7 +22,7 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름') ?? '';
 
-			await userController.tradeStock({
+			await userStockController.tradeStock({
 				discordId,
 				stockName: name,
 				cnt: 1,

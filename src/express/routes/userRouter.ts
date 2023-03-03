@@ -1,13 +1,18 @@
 import express from 'express';
 import { Types } from 'mongoose';
-import userController from '../../common/controller/userController';
 import TYPES from '../../interfaces/containerType';
 import { container } from '../../settings/container';
 import { isLoggedIn } from '../middlewares/express';
 import { IStatusController } from '../../interfaces/common/controller/status';
+import { IUserController } from '../../interfaces/common/controller/user';
+import { IUserStockController } from '../../interfaces/common/controller/userStock';
 
 const router = express.Router();
 const statusController = container.get<IStatusController>(TYPES.StatusController);
+const userController = container.get<IUserController>(TYPES.UserController);
+const userStockController = container.get<IUserStockController>(
+	TYPES.UserStockController,
+);
 
 router.get('/stocklist', isLoggedIn, async (req, res) => {
 	try {
@@ -125,7 +130,7 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 			throw Error('데이터 오류');
 		}
 
-		const stockResult = await userController.tradeStock({
+		const stockResult = await userStockController.tradeStock({
 			discordId: user.discordId,
 			stockName,
 			cnt: type === 's' ? -1 * cnt : cnt,
