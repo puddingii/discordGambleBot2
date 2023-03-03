@@ -20,7 +20,7 @@ export default {
 			const discordId = interaction.user.id.toString();
 			const nickname = interaction.options.getString('유저닉네임') ?? '';
 
-			userController.addUser({ id: discordId, nickname });
+			await userController.addUser({ id: discordId, nickname });
 			await interaction.reply({
 				content: '유저등록 완료! 이제부터 게임에 참여 가능합니다',
 			});

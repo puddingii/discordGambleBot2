@@ -163,8 +163,16 @@ class UserService implements IUserService {
 		await this.userModel.addNewStock(stock.name);
 	}
 
-	async addUser(userInfo: { id: string; nickname: string }) {
-		await this.userModel.addNewUser(userInfo.id, userInfo.nickname);
+	async addUser({ id, nickname }: { id: string; nickname: string }) {
+		const isExistedId = await this.userModel.exists({ discordId: id });
+		if (isExistedId) {
+			throw Error('이미 등록된 아이디입니다');
+		}
+		const isExistedNickname = await this.userModel.exists({ nickname });
+		if (isExistedNickname) {
+			throw Error('이미 등록된 닉네임입니다');
+		}
+		await this.userModel.addNewUser(id, nickname);
 	}
 
 	async addWeapon(weapon: IWeapon) {
