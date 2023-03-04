@@ -61,10 +61,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Docker Remove Existed Container
+      - name: Docker Check Existed Container # 기존 Container 확인
+        id: docker-container-check-result
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "IS_EXISTED<<$EOF" >> $GITHUB_OUTPUT
+          docker container ls | grep ${{ env.NAME }} >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+      - name: Docker Remove Existed Container # 기존 Container가 있는 경우 제거
+        if: ${{ contains(steps.docker-container-check-result.outputs.IS_EXISTED, env.NAME) == true }}
         run: |
           docker stop ${{ env.NAME }}
           docker rm ${{ env.NAME }}
+
+      - name: Docker Check Existed Image # 기존 Image 확인
+        id: docker-image-check-result
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "IS_EXISTED<<$EOF" >> $GITHUB_OUTPUT
+          docker image ls | grep ${{ env.DOCKER_IMAGE }} >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+      - name: Docker Remove Existed Image # 기존 Image가 있는 경우 제거
+        if: ${{ contains(steps.docker-image-check-result.outputs.IS_EXISTED, env.DOCKER_IMAGE) == true }}
+        run: |
           docker rmi ${{ env.DOCKER_IMAGE }}:latest
 
       - name: Docker Volume Check
@@ -72,7 +93,7 @@ jobs:
         run: |
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "IS_EXISTED<<$EOF" >> $GITHUB_OUTPUT
-          docker volume ls | grep ${{ env.VOLUME_LOG }} >> $GITHUB_ENV
+          docker volume ls | grep ${{ env.VOLUME_LOG }} >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Create Volume
