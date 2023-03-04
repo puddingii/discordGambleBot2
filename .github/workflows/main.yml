@@ -10,6 +10,7 @@ env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/discordgamblebot
   VERSION: ${{ github.sha }}
   NAME: go_cicd
+  VOLUME_LOG: bot-log
 
 jobs:
   # 빌드 Job
@@ -60,8 +61,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Docker Remove Existed Container
+        run: /
+          docker stop ${{ env.NAME }}
+          docker rm ${{ env.NAME }}
+          docker rmi ${{ env.DOCKER_IMAGE }}:latest
+
+      - name: Docker Volume Check
+        id: docker-volume-check-result
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "IS_EXISTED<<$EOF" >> $GITHUB_OUTPUT
+          docker volume ls | grep ${{ env.VOLUME_LOG }}
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Volume
+        if: ${{ contains(steps.docker-volume-check-result.outputs.IS_EXISTED, env.VOLUME_LOG) != true }}
+        run: docker volume create ${{ env.VOLUME_LOG }}
+
       # 3300 -> 80 포트로 수행하도록 지정
       - name: Docker run
         run: |
-          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d --env BOT_TOKEN=${{ secrets.BOT_TOKEN }} --env CLIENT_ID=${{ secrets.CLIENT_ID }} --env GUILD_ID=${{ secrets.GUILD_ID }} --env MONGO_ID=${{ secrets.MONGO_ID }} --env MONGO_PW=${{ secrets.MONGO_PW }} --env ADMIN_ID=${{ secrets.ADMIN_ID }} --env ADMIN_PW=${{ secrets.ADMIN_PW }} --env STOCK_UPDATE_TIME=${{ secrets.STOCK_UPDATE_TIME }} --env GAMBLE_UPDATE_TIME=${{ secrets.GAMBLE_UPDATE_TIME }} --env EXPRESS_PORT=${{ secrets.EXPRESS_PORT }} -p 80:3300 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d \
+          --env BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
+          --env CLIENT_ID=${{ secrets.CLIENT_ID }} \
+          --env GUILD_ID=${{ secrets.GUILD_ID }} \
+          --env MONGO_ID=${{ secrets.MONGO_ID }} \
+          --env MONGO_PW=${{ secrets.MONGO_PW }} \
+          --env ADMIN_ID=${{ secrets.ADMIN_ID }} \
+          --env ADMIN_PW=${{ secrets.ADMIN_PW }} \
+          --env STOCK_UPDATE_TIME=${{ secrets.STOCK_UPDATE_TIME }} \
+          --env GAMBLE_UPDATE_TIME=${{ secrets.GAMBLE_UPDATE_TIME }} \
+          --env EXPRESS_PORT=${{ secrets.EXPRESS_PORT }} \
+          --env SESSION_KEY=${{ secrets.SESSION_KEY }} \
+          --env PASSWORD_HASH_ROUND=${{ secrets.PASSWORD_HASH_ROUND }} \
+          -p 80:3300 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
