@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
-import logger from '../config/logger';
 import secretKey from '../config/secretKey';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { ILogger } from '../common/util/logger';
 
 export default async (): Promise<{ code: number; message?: string }> => {
+	const logger = container.get<ILogger>(TYPES.Logger);
 	try {
 		await mongoose.connect(secretKey.mongoUrl);
-		logger.info('[DB] Connected to MongoDB');
+		logger.info('Connected to MongoDB', ['Loader']);
 		return { code: 1 };
 	} catch (err) {
 		let errorMessage = 'DB Init Error';
@@ -15,7 +18,7 @@ export default async (): Promise<{ code: number; message?: string }> => {
 		if (typeof err === 'string') {
 			errorMessage = err;
 		}
-		logger.error(errorMessage);
+		logger.error(errorMessage, ['Loader']);
 		return { code: 0, message: errorMessage };
 	}
 };

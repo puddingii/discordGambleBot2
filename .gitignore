@@ -10,3 +10,4 @@ imgs/*
 .vscode
 build
 *.code-workspace
+swagger-api.json

@@ -12,7 +12,12 @@
 		"moduleResolution": "Node",
 		"skipLibCheck": true,
 		"typeRoots": ["./src/types", "./node_modules/@types"],
-		"rootDir": "./src"
+		"types": ["reflect-metadata", "mocha"],
+		"rootDir": "./src",
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"noImplicitAny": true
 	},
 	"ts-node": {
 		"transpileOnly": true,

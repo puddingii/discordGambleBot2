@@ -4,18 +4,24 @@ import session from 'express-session';
 import cors from 'cors';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs/promises';
+import path from 'path';
+
 // eslint-disable-next-line import/no-named-default
 import { default as connectMongo } from 'connect-mongodb-session';
-import userRouter from '../routes/userRouter';
-import authRouter from '../routes/authRouter';
-import passportConfig from '../passport';
-import logger from '../config/logger';
+import setRouter from '../express/routes';
+import passportConfig from '../express/passport';
 import secretKey from '../config/secretKey';
+import { container } from '../settings/container';
+import TYPES from '../interfaces/containerType';
+import { ILogger } from '../common/util/logger';
 
-export default (app: Express) => {
+export default async (app: Express) => {
+	const logger = container.get<ILogger>(TYPES.Logger);
 	const stream: StreamOptions = {
 		// Use the http severity
-		write: message => logger.info(message),
+		write: message => logger.info(message, ['Express']),
 	};
 	app.use(
 		morgan(':method :url :status :res[content-length] - :response-time ms', {
@@ -34,7 +40,7 @@ export default (app: Express) => {
 			resave: false, // 세션 데이터가 바뀌기 전까진 저장소에 저장하지 않음.
 			saveUninitialized: true, // 세션이 필요하기전까지는 세션을 구동시키지 않는다.
 			cookie: {
-				maxAge: 60000 * 60 * 24 * 30,
+				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
 		}),
@@ -44,6 +50,11 @@ export default (app: Express) => {
 	app.use(passport.session());
 	passportConfig();
 
-	app.use('/api/user', userRouter);
-	app.use('/api/auth', authRouter);
+	setRouter(app);
+
+	const swaggerFile = await fs.readFile(
+		path.resolve(__dirname, '../express/swagger/swagger-api.json'),
+		{ encoding: 'utf8' },
+	);
+	app.use('/doc', swaggerUi.serve, swaggerUi.setup(JSON.parse(swaggerFile)));
 };
