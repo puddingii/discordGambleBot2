@@ -11,7 +11,7 @@ import {
 } from '../../interfaces/common/services/userService';
 import User from '../game/User/User';
 import Stock from '../game/Stock/Stock';
-import Weapon from '../game/weapon/Weapon';
+import Weapon from '../game/Weapon/Weapon';
 import {
 	IUser,
 	TPopulatedUserWeaponInfo,
