@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "app.ts",
 	"scripts": {
-		"start": "node build/express/swagger/swagger.js && node build/bot/deploy-command.js && node build/app.js",
+		"start": "node build/bot/deploy-command.js && node build/app.js",
 		"start:commandBuild": "node build/bot/deploy-command.js",
 		"build": "tsc",
 		"test": "cross-env NODE_ENV=production mocha",

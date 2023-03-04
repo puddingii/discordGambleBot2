@@ -4,7 +4,6 @@ import session from 'express-session';
 import cors from 'cors';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
-import swaggerUi from 'swagger-ui-express';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -52,9 +51,12 @@ export default async (app: Express) => {
 
 	setRouter(app);
 
-	const swaggerFile = await fs.readFile(
-		path.resolve(__dirname, '../express/swagger/swagger-api.json'),
-		{ encoding: 'utf8' },
-	);
-	app.use('/doc', swaggerUi.serve, swaggerUi.setup(JSON.parse(swaggerFile)));
+	if (secretKey.nodeEnv === 'development') {
+		const swaggerUi = await import('swagger-ui-express');
+		const swaggerFile = await fs.readFile(
+			path.resolve(__dirname, '../express/swagger/swagger-api.json'),
+			{ encoding: 'utf8' },
+		);
+		app.use('/doc', swaggerUi.serve, swaggerUi.setup(JSON.parse(swaggerFile)));
+	}
 };
