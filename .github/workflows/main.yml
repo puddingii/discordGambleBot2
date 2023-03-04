@@ -72,7 +72,7 @@ jobs:
         run: |
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "IS_EXISTED<<$EOF" >> $GITHUB_OUTPUT
-          docker volume ls | grep ${{ env.VOLUME_LOG }}
+          docker volume ls | grep ${{ env.VOLUME_LOG }} >> $GITHUB_ENV
           echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Create Volume
