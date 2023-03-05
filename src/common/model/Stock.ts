@@ -183,7 +183,8 @@ Stock.statics.addStock = async function (stockInfo: TPopulatedUserStockInfo['sto
 	if (isExist) {
 		return { code: 0, message: '같은 이름이 있습니다.' };
 	}
-	const stock = await this.create(stockInfo);
+	const { min, max } = stockInfo.getRatio();
+	const stock = await this.create({ ...stockInfo, minRatio: min, maxRatio: max });
 	await stock.update({
 		$push: { updHistory: { value: stockInfo.value, date: dayjs().toDate().toString() } },
 	});
