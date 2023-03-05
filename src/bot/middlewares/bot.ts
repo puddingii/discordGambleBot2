@@ -1,5 +1,6 @@
 import {
-	CommandInteraction,
+	ButtonInteraction,
+	ChatInputCommandInteraction,
 	ModalSubmitInteraction,
 	SelectMenuInteraction,
 } from 'discord.js';
@@ -12,7 +13,11 @@ const logger = container.get<ILogger>(TYPES.Logger);
 const userController = container.get<IUserController>(TYPES.UserController);
 
 export const isEnrolledUser = async function (
-	interaction: CommandInteraction | ModalSubmitInteraction | SelectMenuInteraction,
+	interaction:
+		| ChatInputCommandInteraction
+		| ModalSubmitInteraction
+		| SelectMenuInteraction
+		| ButtonInteraction,
 ) {
 	try {
 		const discordId = interaction.user.id.toString();

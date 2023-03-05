@@ -1,7 +1,13 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import {
+	ButtonInteraction,
+	ChatInputCommandInteraction,
+	SelectMenuInteraction,
+	SlashCommandBuilder,
+} from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
+import { getEnhanceButton, getSelectMenu } from './subCommand/enhanceWeapon';
 import { IUserWeaponController } from '../../../interfaces/common/controller/userWeapon';
 
 const logger = container.get<ILogger>(TYPES.Logger);
@@ -9,32 +15,48 @@ const userWeaponController = container.get<IUserWeaponController>(
 	TYPES.UserWeaponController,
 );
 
-// FIXME 나중에 셀렉터로 바꿔야함
 export default {
-	data: new SlashCommandBuilder()
-		.setName('무기강화')
-		.setDescription('무기를 강화함')
-		.addStringOption(option =>
-			option.setName('종류').setDescription('강화할 무기').addChoices(
-				{
-					name: '무기',
-					value: 'sword',
-				},
-				// {
-				// 	name: '코인',
-				// 	value: 'coin',
-				// },
-			),
-		),
-	// .addBooleanOption(option =>
-	// 	option.setName('파괴방지').setDescription('강화비용이 20배가 추가로 든다'),
-	// ),
+	data: new SlashCommandBuilder().setName('무기강화').setDescription('무기를 강화함'),
 	async execute(interaction: ChatInputCommandInteraction) {
 		try {
-			/** Discord Info */
+			const menu = await getSelectMenu();
+
+			await interaction.reply({
+				content: '강화할 무기를 먼저 선택해주세요',
+				components: [menu],
+			});
+		} catch (err) {
+			logger.error(err, ['Command']);
+			await interaction.reply({ content: `${err}` });
+		}
+	},
+	async select(interaction: SelectMenuInteraction) {
+		try {
+			await interaction.deferUpdate();
+			const selectedList = interaction.values;
+			const [weaponType, weaponName] = selectedList[0].split('/');
+			await interaction.editReply({
+				content: `버튼을 눌러 강화ㄱㄱ`,
+				components: [getEnhanceButton(weaponType, weaponName)],
+			});
+		} catch (err) {
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage, ['Command']);
+			await interaction.editReply({
+				content: `${errorMessage}`,
+			});
+		}
+	},
+	async buttonClick(interaction: ButtonInteraction) {
+		try {
+			await interaction.deferUpdate();
+			const clickInfo = interaction.customId.split('-')[1].split('/');
+			const type = clickInfo[1];
+			const name = clickInfo[2];
 			const discordId = interaction.user.id.toString();
-			const type = <'sword'>interaction.options.getString('종류') ?? 'sword';
-			// const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
 			const { code, curPower, beforePower } = await userWeaponController.enhanceWeapon({
 				discordId,
@@ -55,10 +77,19 @@ export default {
 					content = `성공! ${content}`;
 			}
 
-			await interaction.reply({ content });
+			await interaction.editReply({
+				content: `${name} ${content}`,
+				components: [getEnhanceButton(type, name)],
+			});
 		} catch (err) {
-			logger.error(err, ['Command']);
-			await interaction.reply({ content: `${err}` });
+			let errorMessage = err;
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			logger.error(errorMessage, ['Command']);
+			await interaction.editReply({
+				content: `${errorMessage}`,
+			});
 		}
 	},
 };

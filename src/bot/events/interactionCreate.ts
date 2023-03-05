@@ -13,9 +13,10 @@ export default {
 			user: { username },
 		} = interaction;
 		if (
-			!interaction.isCommand() &&
+			!interaction.isChatInputCommand() &&
 			!interaction.isSelectMenu() &&
-			!interaction.isModalSubmit()
+			!interaction.isModalSubmit() &&
+			!interaction.isButton()
 		) {
 			return;
 		}
@@ -45,16 +46,14 @@ export default {
 		try {
 			let logMessage = '';
 			if (interaction.isSelectMenu()) {
-				await command.select(interaction, {
-					selectedList: interaction.values,
-					callFuncName: interaction.customId.split('-')[1],
-				});
+				await command.select(interaction);
 				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
 			} else if (interaction.isModalSubmit()) {
-				await command.modalSubmit(interaction, {
-					callFuncName: interaction.customId.split('-')[1],
-				});
-				logMessage = `[interactionCreate-modalSubmit]${username} - ${commandName}[Modal]`;
+				await command.modalSubmit(interaction);
+				logMessage = `[interactionCreate-modalSubmit]${username} - ${commandName}`;
+			} else if (interaction.isButton()) {
+				await command.buttonClick(interaction);
+				logMessage = `[interactionCreate-buttonClick]${username} - ${commandName}`;
 			} else {
 				await command.execute(interaction);
 				logMessage = `[interactionCreate]${username} - ${commandName}`;
