@@ -81,19 +81,18 @@ export default {
 			});
 		}
 	},
-	async select(
-		interaction: SelectMenuInteraction,
-		{ selectedList }: { selectedList: string[] },
-	) {
+	async select(interaction: SelectMenuInteraction) {
 		try {
-			const command = selectedList[0].split('-');
+			const selectedList = interaction.values;
+			const info = selectedList[0].split('-');
+			const callFuncName = info[0];
 
-			switch (command[0]) {
+			switch (callFuncName) {
 				case 'showAddStockModal': // 주식종류 추가하는 모달창 띄우기
 					await showStockModal(interaction);
 					break;
 				case 'updateStock': // 주식 업데이트
-					await showStockModal(interaction, command[1]);
+					await showStockModal(interaction, info[1]);
 					break;
 				case 'selectStock': // 주식 업데이트에서 누른 주식
 					await showStockList(interaction);
@@ -102,7 +101,7 @@ export default {
 					await showWeaponModal(interaction);
 					break;
 				case 'updateWeapon': // 무기 업데이트
-					await showWeaponModal(interaction, command[1]);
+					await showWeaponModal(interaction, info[1]);
 					break;
 				case 'selectWeapon': // 무기 업데이트에서 누른 무기
 					await showWeaponList(interaction);
@@ -144,7 +143,7 @@ export default {
 					});
 					break;
 				case 'updateBotStatus':
-					client.user?.setStatus(<'online' | 'idle' | 'dnd'>command[1]);
+					client.user?.setStatus(<'online' | 'idle' | 'dnd'>info[1]);
 					await interaction.reply({
 						content: '변경 완료',
 						components: [getNewSelectMenu()],
@@ -167,10 +166,8 @@ export default {
 			});
 		}
 	},
-	async modalSubmit(
-		interaction: ModalSubmitInteraction,
-		{ callFuncName }: { callFuncName: string },
-	) {
+	async modalSubmit(interaction: ModalSubmitInteraction) {
+		const callFuncName = interaction.customId.split('-')[1];
 		try {
 			switch (callFuncName) {
 				case 'addStock':
