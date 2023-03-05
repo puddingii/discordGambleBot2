@@ -126,13 +126,23 @@ const Stock = new Schema<IStock, IStockStatics>({
 });
 
 Stock.statics.getUpdateHistory = async function (name: string, limitedCnt: number) {
-	const stock = await this.findOne({ name });
-	const historyList = stock?.updHistory ?? [];
-	let sliceCnt = 0;
-	if (limitedCnt < historyList.length) {
-		sliceCnt = historyList.length - limitedCnt;
-	}
-	return historyList.slice(sliceCnt) ?? [];
+	const historyList = await this.aggregate([
+		{ $project: { name: '$name', updHistory: '$updHistory' } },
+		{ $match: { name } },
+		{
+			$unwind: { path: '$updHistory' },
+		},
+		{ $sort: { updHistory: -1 } },
+		{ $limit: limitedCnt },
+		{ $sort: { updHistory: 1 } },
+		{
+			$project: {
+				value: '$updHistory.value',
+				date: '$updHistory.date',
+			},
+		},
+	]);
+	return historyList;
 };
 
 Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
