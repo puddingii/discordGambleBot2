@@ -86,7 +86,7 @@ class WeaponService implements IWeaponService {
 		const weapon = new Weapon({
 			baseMoney: weaponInfo.baseMoney,
 			enhanceCost: weaponInfo.enhanceCost,
-			maxPower: weaponInfo.enhanceCost,
+			maxPower: weaponInfo.maxPower,
 			name: weaponInfo.name,
 			powerMultiple: weaponInfo.powerMultiple,
 			ratioList: weaponInfo.ratioList,
@@ -105,7 +105,7 @@ class WeaponService implements IWeaponService {
 				new Weapon({
 					baseMoney: weapon.baseMoney,
 					enhanceCost: weapon.enhanceCost,
-					maxPower: weapon.enhanceCost,
+					maxPower: weapon.maxPower,
 					name: weapon.name,
 					powerMultiple: weapon.powerMultiple,
 					ratioList: weapon.ratioList,
@@ -124,7 +124,7 @@ class WeaponService implements IWeaponService {
 		return new Weapon({
 			baseMoney: weapon.baseMoney,
 			enhanceCost: weapon.enhanceCost,
-			maxPower: weapon.enhanceCost,
+			maxPower: weapon.maxPower,
 			name: weapon.name,
 			powerMultiple: weapon.powerMultiple,
 			ratioList: weapon.ratioList,
