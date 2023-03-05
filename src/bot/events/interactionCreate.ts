@@ -30,6 +30,7 @@ export default {
 		if (!command) {
 			return;
 		}
+
 		const notCheckCommandList = ['유저등록', '어드민'];
 		if (!notCheckCommandList.includes(commandName)) {
 			const isExist = await isEnrolledUser(interaction);
@@ -41,6 +42,24 @@ export default {
 		if (commandName !== '어드민' && client.user?.presence.status !== 'online') {
 			await interaction.reply('봇 셋팅중... 잠시후에 시도해주세요');
 			return;
+		}
+
+		/** 만약 Chat 상호작용이 아니면 해당 상호작용이 Owner인지 확인하는 로직추가 */
+		if (
+			!notCheckCommandList.includes(commandName) &&
+			(interaction.isSelectMenu() ||
+				interaction.isModalSubmit() ||
+				interaction.isButton())
+		) {
+			const owner = interaction.customId.split('&')[1];
+			const interactionDiscordId = interaction.user.id.toString();
+			if (owner !== interactionDiscordId) {
+				await interaction.reply({
+					content: '다른 유저의 상호작용 요소입니다.',
+					ephemeral: true,
+				});
+				return;
+			}
 		}
 
 		try {
