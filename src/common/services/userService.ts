@@ -200,6 +200,11 @@ class UserService implements IUserService {
 		return user;
 	}
 
+	async receiveAllGiftMoney(userParam: TUserParam): Promise<number> {
+		const totalMoney = await this.userModel.convertGiftListToMoney(userParam);
+		return totalMoney;
+	}
+
 	async tradeStock(user: IUser, stock: IStock2, cnt: number, isFull: boolean) {
 		const myStock = user.getStock(stock.name);
 		if (isFull) {

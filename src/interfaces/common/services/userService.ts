@@ -62,6 +62,8 @@ export interface IUserService {
 	updateMoney(user: IUser, money: number): Promise<void>;
 	/** 랜덤패스워드 생성 및 저장 */
 	generatePassword(discordId: string): Promise<string>;
+	/** 선물받은 돈 전부 받기 */
+	receiveAllGiftMoney(userParam: TUserParam): Promise<number>;
 }
 
 export default {};

@@ -59,6 +59,7 @@ export default class UserController implements IUserController {
 		return user.weaponList;
 	}
 
+	// FIXME
 	async getRankingList(): Promise<{ name: string; money: number }[]> {
 		const userList = await this.getUserList(['stockList.stock']);
 		const rankingList = userList.map(user => {
@@ -116,6 +117,11 @@ export default class UserController implements IUserController {
 			value: money,
 			comment: `${sender.nickname}이 보냄`,
 		});
+	}
+
+	async receiveAllGiftMoney(discordId: string): Promise<number> {
+		const totalMoney = await this.userService.receiveAllGiftMoney({ discordId });
+		return totalMoney;
 	}
 
 	async updateMoney(

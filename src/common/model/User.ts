@@ -124,6 +124,8 @@ export interface IUserStatics extends Model<IUser> {
 	deleteAllGift(discordId: string, type: string): Promise<void>;
 	/** 유저가 가지고 있는 type과 value가 같은 선물 단일삭제 */
 	deleteGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
+	/** 내 선물리스트에 있는 모든 돈을 정산해서 내 지갑에 넣기 */
+	convertGiftListToMoney(userInfo: UserParam): Promise<number>;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -445,6 +447,23 @@ User.statics.deleteGift = async function (discordId: string, giftInfo: GiftInfo)
 
 User.statics.deleteAllGift = async function (discordId: string, type: string) {
 	await this.findOneAndUpdate({ discordId }, { $pullAll: { giftList: { type } } });
+};
+
+User.statics.convertGiftListToMoney = async function (userParam: UserParam) {
+	const user = await this.findOneAndUpdate(userParam, {
+		$pull: { giftList: { type: 'money' } },
+	});
+	const totalMoney =
+		user?.giftList.reduce((sum, gift) => {
+			if (gift.type === 'money') {
+				return sum + gift.value;
+			}
+			return sum;
+		}, 0) ?? 0;
+
+	await this.findOneAndUpdate(userParam, { $inc: { money: totalMoney } });
+
+	return totalMoney;
 };
 
 export default model<IUser, IUserStatics>('User', User);

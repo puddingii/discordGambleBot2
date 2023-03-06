@@ -35,4 +35,6 @@ export interface IUserController {
 	generatePassword(discordId: string): Promise<string>;
 	/** 보조금 유저에게 지급 */
 	giveGrantMoney(discordId: string): Promise<number>;
+	/** 선물받은 돈 전부 받기 */
+	receiveAllGiftMoney(discordId: string): Promise<number>;
 }
