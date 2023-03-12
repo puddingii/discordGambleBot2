@@ -108,4 +108,4 @@ jobs:
           --env SESSION_KEY=${{ secrets.SESSION_KEY }} \
           --env PASSWORD_HASH_ROUND=${{ secrets.PASSWORD_HASH_ROUND }} \
           -v ${{ env.VOLUME_LOG }}:/usr/app/log \
-          -p 80:3300 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
+          -p ${{ secrets.DOCKER_GAMBLEBOT_PORT }}:${{ secrets.EXPRESS_PORT }} --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
