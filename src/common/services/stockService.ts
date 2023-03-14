@@ -199,6 +199,7 @@ class StockService implements IStockService {
 	}
 
 	async getStockUpdateHistoryList(stockName: string, limitedCnt: number) {
+		await this.getStock(stockName);
 		const historyList = await this.stockModel.getUpdateHistory(stockName, limitedCnt);
 		return historyList;
 	}

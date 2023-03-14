@@ -127,14 +127,12 @@ const Stock = new Schema<IStock, IStockStatics>({
 
 Stock.statics.getUpdateHistory = async function (name: string, limitedCnt: number) {
 	const historyList = await this.aggregate([
-		{ $project: { name: '$name', updHistory: '$updHistory' } },
+		{ $project: { name: '$name', updHistory: { $reverseArray: '$updHistory' } } },
 		{ $match: { name } },
 		{
 			$unwind: { path: '$updHistory' },
 		},
-		{ $sort: { updHistory: -1 } },
 		{ $limit: limitedCnt },
-		{ $sort: { updHistory: 1 } },
 		{
 			$project: {
 				value: '$updHistory.value',
@@ -142,7 +140,8 @@ Stock.statics.getUpdateHistory = async function (name: string, limitedCnt: numbe
 			},
 		},
 	]);
-	return historyList;
+
+	return historyList.reverse();
 };
 
 Stock.statics.findAllList = async function (type: 'stock' | 'coin' | 'all') {
