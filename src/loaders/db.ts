@@ -7,6 +7,7 @@ import { ILogger } from '../common/util/logger';
 export default async (): Promise<{ code: number; message?: string }> => {
 	const logger = container.get<ILogger>(TYPES.Logger);
 	try {
+		mongoose.set('strictQuery', true);
 		await mongoose.connect(secretKey.mongoUrl);
 		logger.info('Connected to MongoDB', ['Loader']);
 		return { code: 1 };
