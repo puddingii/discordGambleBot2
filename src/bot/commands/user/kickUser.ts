@@ -2,10 +2,12 @@ import {
 	SlashCommandBuilder,
 	ChannelType,
 	ChatInputCommandInteraction,
+	TextChannel,
 } from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
+import client from '../../../app';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 
@@ -30,6 +32,9 @@ export default {
 				const kickedUser = interaction.channel?.members.get(user.id);
 			}
 			// kickedUser.voice.disconnect('ㅋㅋ');
+			// const channel = client.channels.cache.get('1061175836599914537');
+			// console.log((channel as TextChannel)?.send({ content: 'asdfasdfasdf' }));
+			// await channel?.client.users.send('370920718302445568', '꺄룰랭');
 
 			await interaction.reply({ content: '테스트' });
 		} catch (err) {
