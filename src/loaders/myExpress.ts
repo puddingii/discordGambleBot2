@@ -42,6 +42,7 @@ export default async (app: Express) => {
 				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
 				sameSite: 'none',
 				httpOnly: true,
+				secure: true,
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
 		}),
