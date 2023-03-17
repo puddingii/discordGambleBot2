@@ -38,10 +38,11 @@ export default async (app: Express) => {
 			secret: secretKey.sessionKey,
 			resave: false, // 세션 데이터가 바뀌기 전까진 저장소에 저장하지 않음.
 			saveUninitialized: true, // 세션이 필요하기전까지는 세션을 구동시키지 않는다.
+			proxy: true,
 			cookie: {
 				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
 				sameSite: 'none',
-				httpOnly: false,
+				httpOnly: true,
 				secure: true,
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
