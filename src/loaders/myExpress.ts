@@ -40,6 +40,8 @@ export default async (app: Express) => {
 			saveUninitialized: true, // 세션이 필요하기전까지는 세션을 구동시키지 않는다.
 			cookie: {
 				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
+				sameSite: 'none',
+				httpOnly: true,
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
 		}),
