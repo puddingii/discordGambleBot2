@@ -20,8 +20,14 @@ export default () => {
 					}
 
 					done(null, userInfo);
-				} catch (e) {
-					done(e);
+				} catch (err) {
+					let errorMessage = '에러발생';
+					if (err instanceof Error) {
+						errorMessage = err.message;
+					} else if (typeof err === 'string') {
+						errorMessage = err;
+					}
+					done(null, false, { message: errorMessage });
 				}
 			},
 		),

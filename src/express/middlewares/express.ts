@@ -12,7 +12,12 @@ export const isNotLoggedIn = (req: Request, res: Response, next: NextFunction) =
 	if (!req.isAuthenticated()) {
 		next();
 	} else {
-		res.status(403).send('이미 로그인 상태입니다.');
+		req.session.destroy(err => {
+			if (err) {
+				next(err);
+			}
+			res.status(403).send('다시 로그인 해주세요');
+		});
 	}
 };
 

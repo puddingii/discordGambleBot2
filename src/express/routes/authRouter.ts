@@ -16,6 +16,16 @@ router.get('/is-login', (req, res) => {
 	});
 });
 router.post('/', isNotLoggedIn, (req, res, next) => {
+	/*
+	#swagger.parameters['userInfo'] = {
+		in: 'body',
+		description: '유저정보(테스트 서버)',
+		schema: {
+			$nickname: '건빵',
+			$password: 'c9hfwulivso1',
+		}
+	}
+	*/
 	passport.authenticate(
 		'local',
 		(
@@ -30,7 +40,7 @@ router.post('/', isNotLoggedIn, (req, res, next) => {
 			}
 			if (!userInfo) {
 				logger.warn(message, ['Controller']);
-				return res.status(403).send('/admin/login');
+				return res.status(403).send(message);
 			}
 
 			return req.login(userInfo, loginError => {
