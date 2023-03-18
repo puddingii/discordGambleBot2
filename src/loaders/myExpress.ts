@@ -28,7 +28,7 @@ export default async (app: Express) => {
 		}),
 	);
 	const allowList = [/localhost/];
-	app.use(cors({ origin: true, credentials: true }));
+	app.use(cors({ origin: allowList, credentials: true }));
 	app.use(cookieParser(secretKey.sessionKey));
 	app.use(urlencoded({ extended: false }));
 	app.use(json());
@@ -41,9 +41,9 @@ export default async (app: Express) => {
 			proxy: true,
 			cookie: {
 				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
-				sameSite: 'none',
+				sameSite: secretKey.nodeEnv === 'production' ? 'none' : undefined,
 				httpOnly: true,
-				secure: true,
+				secure: secretKey.nodeEnv === 'production',
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
 		}),
