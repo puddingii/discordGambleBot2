@@ -6,8 +6,10 @@ import fs from 'fs';
 
 const doc = {
 	info: {
-		title: 'My API',
-		description: 'Discord Gamble Bot API',
+		version: '1.1.0',
+		title: 'Discord Gamble Bot API',
+		description: `HELLO :>
+		Before testing many api, please execute '/auth/' post method`,
 	},
 	host: 'localhost:3300',
 	schemes: ['http'],

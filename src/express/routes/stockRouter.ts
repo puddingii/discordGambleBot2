@@ -10,6 +10,8 @@ const stockController = container.get<IStockController>(TYPES.StockController);
 
 router.get('/', isLoggedIn, async (req, res) => {
 	/*
+	#swagger.tags = ['Stock']
+	#swagger.description = '이름에 해당하는 주식정보 반환'
 	#swagger.parameters['name'] = {
 		in: 'query',
 		description: '주식이름',

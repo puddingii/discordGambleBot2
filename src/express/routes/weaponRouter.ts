@@ -12,6 +12,8 @@ const userWeaponController = container.get<IUserWeaponController>(
 router.get('/enhance-info', isLoggedIn, async (req, res) => {
 	try {
 		/*
+		#swagger.tags = ['Weapon']
+		#swagger.description = '무기강화에 대한 정보'
 		#swagger.parameters['type'] = {
 			in: 'query',
 			description: '무기타입',

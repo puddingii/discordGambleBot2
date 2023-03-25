@@ -13,9 +13,11 @@ router.patch('/enhance', isLoggedIn, async (req, res) => {
 	try {
 		/*
 		#swagger.tags = ['User','Weapon']
+		#swagger.description = '타입에 해당하는 무기 강화하기'
 		#swagger.parameters['weaponInfo'] = {
 			in: 'body',
 			description: '무기강화',
+			required: true,
 			schema: {
 				$type: 'sword',
 			}

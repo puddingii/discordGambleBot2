@@ -16,6 +16,10 @@ const userStockController = container.get<IUserStockController>(
 
 router.get('/stocklist', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User', 'Stock']
+		#swagger.description = '유저가 가지고 있는 모든 주식정보 반환'
+		*/
 		const user = req.user;
 		if (!user) {
 			return res
@@ -35,6 +39,10 @@ router.get('/stocklist', isLoggedIn, async (req, res) => {
 
 router.get('/nicklist', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User']
+		#swagger.description = '게임에 참여하고 있는 모든 유저리스트 반환'
+		*/
 		const userList = await userController.getUserList();
 		return res.status(200).json(userList.map(user => user.nickname));
 	} catch (err) {
@@ -48,6 +56,10 @@ router.get('/nicklist', isLoggedIn, async (req, res) => {
 
 router.get('/weaponList', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User', 'Weapon']
+		#swagger.description = '유저가 가지고 있는 모든 무기 반환'
+		*/
 		const user = req.user;
 		if (!user) {
 			return res
@@ -86,6 +98,20 @@ router.get('/weaponList', isLoggedIn, async (req, res) => {
 
 router.patch('/give-money', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User']
+		#swagger.description = '다른 유저에게 돈 기부하는 기능'
+		#swagger.parameters['giveInfo'] = {
+			in: 'body',
+			description: '건빵이 건빵테스트에게 1000원 주는 기능',
+			required: true,
+			schema: {
+				$myNickname: '건빵',
+				$ptrNickname: '건빵테스트',
+				$money: 1000,
+			}
+		}
+		*/
 		const { user } = req;
 		const { myNickname, ptrNickname, money } = req.body as Partial<{
 			myNickname: string;
@@ -119,6 +145,20 @@ router.patch('/give-money', isLoggedIn, async (req, res) => {
 
 router.patch('/stock', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User','Stock']
+		#swagger.description = '이름에 해당하는 주식 사고팔기'
+		#swagger.parameters['tradeStockInfo'] = {
+			in: 'body',
+			description: 'b=사기, s=팔기',
+			required: true,
+			schema: {
+				$type: 'b',
+				$cnt: 1,
+				$stockName: '응애',
+			}
+		}
+		*/
 		const { user } = req;
 		const { cnt, stockName, type } = req.body as Partial<{
 			type: 'b' | 's';
@@ -153,6 +193,10 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 
 router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User']
+		#swagger.description = '계속 쌓이는 보조금 받기(일정 시간마다 돈이 쌓임)'
+		*/
 		const { user } = req;
 		if (!user) {
 			return res
@@ -174,6 +218,10 @@ router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 
 router.get('/', isLoggedIn, async (req, res) => {
 	try {
+		/*
+		#swagger.tags = ['User']
+		#swagger.description = '유저정보 반환.(가지고 있는 주식, 닉네임, 돈 등등)'
+		*/
 		const { user } = req;
 		if (!user) {
 			return res
