@@ -32,6 +32,7 @@ router.get('/stocklist', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
+
 router.get('/nicklist', isLoggedIn, async (req, res) => {
 	try {
 		const userList = await userController.getUserList();
@@ -44,6 +45,7 @@ router.get('/nicklist', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
+
 router.get('/weaponList', isLoggedIn, async (req, res) => {
 	try {
 		const user = req.user;
@@ -81,7 +83,8 @@ router.get('/weaponList', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
-router.patch('/give/money', isLoggedIn, async (req, res) => {
+
+router.patch('/give-money', isLoggedIn, async (req, res) => {
 	try {
 		const { user } = req;
 		const { myNickname, ptrNickname, money } = req.body as Partial<{
@@ -113,6 +116,7 @@ router.patch('/give/money', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
+
 router.patch('/stock', isLoggedIn, async (req, res) => {
 	try {
 		const { user } = req;
@@ -146,6 +150,7 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
+
 router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 	try {
 		const { user } = req;
@@ -166,6 +171,7 @@ router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 		return res.status(400).json({ message });
 	}
 });
+
 router.get('/', isLoggedIn, async (req, res) => {
 	try {
 		const { user } = req;
