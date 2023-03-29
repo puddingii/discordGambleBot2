@@ -37,4 +37,10 @@ export interface IUserController {
 	giveGrantMoney(discordId: string): Promise<number>;
 	/** 선물받은 돈 전부 받기 */
 	receiveAllGiftMoney(discordId: string): Promise<number>;
+	/** 유저요약 */
+	getUserSummary(discordId: string): Promise<{
+		stockRatioList: Array<{ value: number; name: string }>;
+		money: number;
+		stockProfit: number;
+	}>;
 }

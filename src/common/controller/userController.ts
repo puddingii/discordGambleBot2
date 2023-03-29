@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import _ from 'lodash';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
 import {
@@ -89,6 +90,23 @@ export default class UserController implements IUserController {
 	async getUserList(populatedList?: TPopulatedList | undefined): Promise<IUser[]> {
 		const userList = await this.userService.getAllUser(populatedList);
 		return userList;
+	}
+
+	async getUserSummary(discordId: string) {
+		const user = await this.userService.getUser({ discordId }, ['stockList.stock']);
+		const stockInfoList = this.userService.getProcessedStock(user);
+
+		return {
+			stockRatioList: stockInfoList.stockList.map(stock => ({
+				value: stock.holdingRatio,
+				name: stock.name,
+			})),
+			money: user.money,
+			stockProfit: _.round(
+				(stockInfoList.totalStockValue / stockInfoList.totalMyValue - 1) * 100,
+				2,
+			),
+		};
 	}
 
 	async giveGrantMoney(discordId: string): Promise<number> {

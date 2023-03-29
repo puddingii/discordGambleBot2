@@ -125,6 +125,7 @@ class UserService implements IUserService {
 					stockValue: stock.value,
 					stockType: stock.type,
 					profilMargin: myCnt * (stock.value - myAvgValue),
+					holdingRatio: 0,
 				});
 
 				return acc;

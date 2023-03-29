@@ -20,7 +20,7 @@ export type TProcessedStockInfo = {
 		stockValue: number;
 		stockType: 'stock' | 'coin';
 		profilMargin: number;
-		holdingRatio?: number;
+		holdingRatio: number;
 	}>;
 	totalMyValue: number;
 	totalStockValue: number;

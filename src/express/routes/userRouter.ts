@@ -37,6 +37,29 @@ router.get('/stocklist', isLoggedIn, async (req, res) => {
 	}
 });
 
+router.get('/summary', isLoggedIn, async (req, res) => {
+	try {
+		/*
+		#swagger.tags = ['User', 'Stock', 'Weapon']
+		#swagger.description = '대시보드에 보여줄 종합 내용'
+		*/
+		const user = req.user;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+		const summaryInfo = await userController.getUserSummary(user.discordId);
+		return res.status(200).json(summaryInfo);
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+});
+
 router.get('/nicklist', isLoggedIn, async (req, res) => {
 	try {
 		/*
