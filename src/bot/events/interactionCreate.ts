@@ -14,7 +14,7 @@ export default {
 		} = interaction;
 		if (
 			!interaction.isChatInputCommand() &&
-			!interaction.isSelectMenu() &&
+			!interaction.isStringSelectMenu() &&
 			!interaction.isModalSubmit() &&
 			!interaction.isButton()
 		) {
@@ -47,7 +47,7 @@ export default {
 		/** 만약 Chat 상호작용이 아니면 해당 상호작용이 Owner인지 확인하는 로직추가 */
 		if (
 			!notCheckCommandList.includes(commandName) &&
-			(interaction.isSelectMenu() ||
+			(interaction.isStringSelectMenu() ||
 				interaction.isModalSubmit() ||
 				interaction.isButton())
 		) {
@@ -64,7 +64,7 @@ export default {
 
 		try {
 			let logMessage = '';
-			if (interaction.isSelectMenu()) {
+			if (interaction.isStringSelectMenu()) {
 				await command.select(interaction);
 				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
 			} else if (interaction.isModalSubmit()) {
