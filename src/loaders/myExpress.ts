@@ -27,8 +27,7 @@ export default async (app: Express) => {
 			stream,
 		}),
 	);
-	const allowList = [/localhost/];
-	app.use(cors({ origin: allowList, credentials: true }));
+	app.use(cors({ origin: secretKey.corsOriginList, credentials: true }));
 	app.use(cookieParser(secretKey.sessionKey));
 	app.use(urlencoded({ extended: false }));
 	app.use(json());
