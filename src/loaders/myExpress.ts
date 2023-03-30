@@ -41,9 +41,9 @@ export default async (app: Express) => {
 			proxy: true,
 			cookie: {
 				maxAge: 60000 * 60 * 24 * 30, // 30일 기준
-				sameSite: secretKey.nodeEnv === 'production' ? 'none' : undefined,
+				sameSite: secretKey.nodeEnv !== 'development' ? 'none' : undefined,
 				httpOnly: true,
-				secure: secretKey.nodeEnv === 'production',
+				secure: secretKey.nodeEnv !== 'development',
 			},
 			store: new MongoStore({ uri: secretKey.mongoUrl, collection: 'sessions' }),
 		}),
