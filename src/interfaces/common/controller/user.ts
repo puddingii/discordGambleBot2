@@ -43,4 +43,13 @@ export interface IUserController {
 		money: number;
 		stockProfit: number;
 	}>;
+	/** 유저프로필 정보 가져오기 */
+	getUserProfile(
+		discordId: string,
+	): Promise<{
+		myMoney: number;
+		totalStockValue: number;
+		nickname: string;
+		giftMoney: number;
+	}>;
 }

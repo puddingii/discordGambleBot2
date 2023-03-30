@@ -64,6 +64,8 @@ export interface IUserService {
 	generatePassword(discordId: string): Promise<string>;
 	/** 선물받은 돈 전부 받기 */
 	receiveAllGiftMoney(userParam: TUserParam): Promise<number>;
+	/** 선물받은 돈 */
+	getReceivedAllGiftMoney(user: IUser): Promise<number>;
 }
 
 export default {};

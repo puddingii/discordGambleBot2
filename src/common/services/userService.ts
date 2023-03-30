@@ -194,6 +194,13 @@ class UserService implements IUserService {
 		});
 	}
 
+	async getReceivedAllGiftMoney(user: IUser): Promise<number> {
+		const money = await this.userModel.getReceivedAllGiftMoney({
+			discordId: user.getId(),
+		});
+		return money;
+	}
+
 	async getUser(userParam: TUserParam, populatedList?: TPopulatedList) {
 		const userInfo = await this.userModel.findByUserInfo(userParam, populatedList);
 		const user = this.convertDataToClass(userInfo);

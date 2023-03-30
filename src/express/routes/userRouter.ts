@@ -239,6 +239,31 @@ router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 	}
 });
 
+router.patch('/giftMoney', isLoggedIn, async (req, res) => {
+	try {
+		/*
+		#swagger.tags = ['User']
+		#swagger.description = '선물받은 캐쉬 받기'
+		*/
+		const { user } = req;
+		if (!user) {
+			return res
+				.status(401)
+				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
+		}
+
+		await userController.receiveAllGiftMoney(user.discordId);
+
+		return res.status(200).send();
+	} catch (err) {
+		let message = err;
+		if (err instanceof Error) {
+			message = err.message;
+		}
+		return res.status(400).json({ message });
+	}
+});
+
 router.get('/', isLoggedIn, async (req, res) => {
 	try {
 		/*
@@ -251,32 +276,11 @@ router.get('/', isLoggedIn, async (req, res) => {
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		const userInfo = await userController.getUser({ discordId: user.discordId }, [
-			'stockList.stock',
-		]);
+		const userInfo = await userController.getUserProfile(user.discordId);
 
-		const totalStockValue = userInfo.stockList.reduce((acc, myStock) => {
-			if (myStock.stock instanceof Types.ObjectId) {
-				throw Error('Populated Error. 운영자에게 문의주세요');
-			}
-			const stockInfo = myStock.stock;
-			const { cnt } = myStock;
-
-			if (cnt > 0) {
-				// 내가 가지고 있는 주식 갯수로 평균 매수위치 알기(내 평균값, 주식값)
-				acc += cnt * stockInfo.value;
-			}
-
-			return acc;
-		}, 0);
 		const grantMoney = await statusController.getGrantMoney();
 
-		return res.status(200).json({
-			nickname: user.nickname,
-			totalStockValue,
-			myMoney: user.money,
-			grantMoney,
-		});
+		return res.status(200).json({ ...userInfo, grantMoney });
 	} catch (err) {
 		let message = err;
 		if (err instanceof Error) {

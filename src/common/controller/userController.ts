@@ -92,6 +92,14 @@ export default class UserController implements IUserController {
 		return userList;
 	}
 
+	async getUserProfile(discordId: string) {
+		const user = await this.userService.getUser({ discordId }, ['stockList.stock']);
+		const { totalStockValue } = this.userService.getProcessedStock(user);
+		const giftMoney = await this.userService.getReceivedAllGiftMoney(user);
+
+		return { myMoney: user.money, totalStockValue, nickname: user.nickname, giftMoney };
+	}
+
 	async getUserSummary(discordId: string) {
 		const user = await this.userService.getUser({ discordId }, ['stockList.stock']);
 		const stockInfoList = this.userService.getProcessedStock(user);

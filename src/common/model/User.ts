@@ -126,6 +126,8 @@ export interface IUserStatics extends Model<IUser> {
 	deleteGift(discordId: string, giftInfo: GiftInfo): Promise<void>;
 	/** 내 선물리스트에 있는 모든 돈을 정산해서 내 지갑에 넣기 */
 	convertGiftListToMoney(userInfo: UserParam): Promise<number>;
+	/** 선물받은 돈 계산 */
+	getReceivedAllGiftMoney(userInfo: UserParam): Promise<number>;
 }
 
 const User = new Schema<IUser, IUserStatics>({
@@ -464,6 +466,16 @@ User.statics.convertGiftListToMoney = async function (userParam: UserParam) {
 	await this.findOneAndUpdate(userParam, { $inc: { money: totalMoney } });
 
 	return totalMoney;
+};
+
+User.statics.getReceivedAllGiftMoney = async function (userInfo: UserParam) {
+	const giftList = await this.aggregate([
+		{ $match: userInfo },
+		{ $project: { giftList: '$giftList' } },
+		{ $unwind: { path: '$giftList' } },
+		{ $match: { 'giftList.type': 'money' } },
+	]);
+	return giftList.reduce((acc, giftInfo) => acc + giftInfo.giftList.value, 0);
 };
 
 export default model<IUser, IUserStatics>('User', User);
