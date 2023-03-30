@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import * as echarts from 'echarts';
 import sharp from 'sharp';
+import jsdom from 'jsdom';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
 import { ILogger } from '../../../common/util/logger';
@@ -71,12 +72,17 @@ export default {
 				stickTime,
 			});
 
-			const chart = echarts.init(null, undefined, {
-				renderer: 'svg',
-				ssr: true,
-				width: 1600,
-				height: 800,
-			});
+			const { JSDOM } = jsdom;
+			const chart = echarts.init(
+				new JSDOM().window.document.createElement('div'),
+				undefined,
+				{
+					renderer: 'svg',
+					ssr: true,
+					width: 1600,
+					height: 800,
+				},
+			);
 
 			const chartOptions: ChartOption = {
 				xAxis: {
