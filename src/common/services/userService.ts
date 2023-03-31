@@ -218,7 +218,7 @@ class UserService implements IUserService {
 		if (isFull) {
 			cnt = cnt > 0 ? Math.floor(user.money / stock.value) : (myStock?.cnt ?? 0) * -1;
 		}
-		if (!cnt) {
+		if (!cnt || user.money < stock.value * cnt) {
 			throw Error('돈이 부족하거나 갯수 입력값이 잘못됨.');
 		}
 		// 파는데 숫자가 잘못될 경우
