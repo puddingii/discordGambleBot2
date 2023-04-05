@@ -1,7 +1,7 @@
 import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
-	SelectMenuInteraction,
+	StringSelectMenuInteraction,
 	SlashCommandBuilder,
 } from 'discord.js';
 import { container } from '../../../settings/container';
@@ -30,7 +30,7 @@ export default {
 			await interaction.reply({ content: `${err}` });
 		}
 	},
-	async select(interaction: SelectMenuInteraction) {
+	async select(interaction: StringSelectMenuInteraction) {
 		try {
 			await interaction.deferUpdate();
 			const selectedList = interaction.values;

@@ -2,7 +2,7 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	SelectMenuBuilder,
+	StringSelectMenuBuilder,
 } from 'discord.js';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
@@ -12,8 +12,8 @@ const weaponController = container.get<IWeaponController>(TYPES.WeaponController
 
 export const getSelectMenu = async (owner: string) => {
 	const weaponList = await weaponController.getAllWeapon();
-	return new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-		new SelectMenuBuilder()
+	return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+		new StringSelectMenuBuilder()
 			.setCustomId(`무기강화-main&${owner}`)
 			.setPlaceholder('강화할 무기를 고르세요')
 			.addOptions(

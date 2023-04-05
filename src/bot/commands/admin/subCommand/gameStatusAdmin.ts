@@ -1,4 +1,4 @@
-import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
+import { ModalSubmitInteraction, StringSelectMenuInteraction } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import TYPES from '../../../../interfaces/containerType';
 import { container } from '../../../../settings/container';
@@ -6,7 +6,7 @@ import { IStatusController } from '../../../../interfaces/common/controller/stat
 
 const statusController = container.get<IStatusController>(TYPES.StatusController);
 
-const showGameStatusModal = async (interaction: SelectMenuInteraction) => {
+const showGameStatusModal = async (interaction: StringSelectMenuInteraction) => {
 	const { curCondition, conditionPeriod, conditionRatioPerList } =
 		await statusController.getGambleStatus();
 	const modalInfo = {

@@ -2,8 +2,8 @@ import {
 	ActionRowBuilder,
 	ChatInputCommandInteraction,
 	ModalSubmitInteraction,
-	SelectMenuBuilder,
-	SelectMenuInteraction,
+	StringSelectMenuBuilder,
+	StringSelectMenuInteraction,
 	SlashCommandBuilder,
 } from 'discord.js';
 import stockAdmin from './subCommand/stockAdmin';
@@ -81,7 +81,7 @@ export default {
 			});
 		}
 	},
-	async select(interaction: SelectMenuInteraction) {
+	async select(interaction: StringSelectMenuInteraction) {
 		try {
 			const selectedList = interaction.values;
 			const info = selectedList[0].split('-');
@@ -116,8 +116,8 @@ export default {
 					await interaction.reply({
 						content: '어드민전용-봇상태 업데이트',
 						components: [
-							new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-								new SelectMenuBuilder()
+							new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+								new StringSelectMenuBuilder()
 									.setCustomId('어드민')
 									.setPlaceholder('주식 리스트')
 									.addOptions([

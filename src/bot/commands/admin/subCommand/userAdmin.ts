@@ -1,4 +1,4 @@
-import { ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
+import { ModalSubmitInteraction, StringSelectMenuInteraction } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
@@ -10,7 +10,7 @@ const userController = container.get<IUserController>(TYPES.UserController);
 
 export default {
 	select: {
-		async showGiveMoneyModal(interaction: SelectMenuInteraction) {
+		async showGiveMoneyModal(interaction: StringSelectMenuInteraction) {
 			const modalInfo = {
 				id: '어드민-giveMoney',
 				title: '유저에게 돈주기',

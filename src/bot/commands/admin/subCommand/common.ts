@@ -1,6 +1,6 @@
 import {
 	ActionRowBuilder,
-	SelectMenuBuilder,
+	StringSelectMenuBuilder,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
@@ -17,8 +17,8 @@ type GetModalParam = {
 };
 
 export const getNewSelectMenu = () => {
-	return new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-		new SelectMenuBuilder()
+	return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+		new StringSelectMenuBuilder()
 			.setCustomId('어드민-main')
 			.setPlaceholder('Nothing selected')
 			.addOptions([

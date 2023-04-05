@@ -2,7 +2,7 @@ import {
 	ButtonInteraction,
 	ChatInputCommandInteraction,
 	ModalSubmitInteraction,
-	SelectMenuInteraction,
+	StringSelectMenuInteraction,
 } from 'discord.js';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
@@ -16,7 +16,7 @@ export const isEnrolledUser = async function (
 	interaction:
 		| ChatInputCommandInteraction
 		| ModalSubmitInteraction
-		| SelectMenuInteraction
+		| StringSelectMenuInteraction
 		| ButtonInteraction,
 ) {
 	try {

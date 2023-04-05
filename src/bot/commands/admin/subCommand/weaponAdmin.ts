@@ -1,8 +1,8 @@
 import {
 	ActionRowBuilder,
 	ModalSubmitInteraction,
-	SelectMenuBuilder,
-	SelectMenuInteraction,
+	StringSelectMenuBuilder,
+	StringSelectMenuInteraction,
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import { TWeaponConstructor } from '../../../../interfaces/game/weapon';
@@ -25,7 +25,7 @@ type InputBoxInfo = {
 };
 
 const showWeaponModal = async (
-	interaction: SelectMenuInteraction,
+	interaction: StringSelectMenuInteraction,
 	weaponType?: string,
 ) => {
 	const modalInfo = {
@@ -110,12 +110,12 @@ const updateWeapon = async (interaction: ModalSubmitInteraction, isNew?: boolean
 	});
 };
 
-const showWeaponList = async (interaction: SelectMenuInteraction) => {
+const showWeaponList = async (interaction: StringSelectMenuInteraction) => {
 	await interaction.reply({
 		content: '어드민전용-업데이트할 무기',
 		components: [
-			new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-				new SelectMenuBuilder()
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				new StringSelectMenuBuilder()
 					.setCustomId('어드민')
 					.setPlaceholder('무기 리스트')
 					.addOptions(

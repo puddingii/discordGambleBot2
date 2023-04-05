@@ -1,8 +1,8 @@
 import {
 	ActionRowBuilder,
 	ModalSubmitInteraction,
-	SelectMenuBuilder,
-	SelectMenuInteraction,
+	StringSelectMenuBuilder,
+	StringSelectMenuInteraction,
 } from 'discord.js';
 import { getNewSelectMenu, getModal } from './common';
 import Stock from '../../../../common/game/Stock/Stock';
@@ -29,7 +29,10 @@ const userStockController = container.get<IUserStockController>(
 );
 const stockController = container.get<IStockController>(TYPES.StockController);
 
-const showStockModal = async (interaction: SelectMenuInteraction, stockName?: string) => {
+const showStockModal = async (
+	interaction: StringSelectMenuInteraction,
+	stockName?: string,
+) => {
 	const modalInfo = {
 		id: `어드민-${stockName ? 'updateStock' : 'addStock'}`,
 		title: '주식 추가/업데이트',
@@ -126,12 +129,12 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 	});
 };
 
-const showStockList = async (interaction: SelectMenuInteraction) => {
+const showStockList = async (interaction: StringSelectMenuInteraction) => {
 	await interaction.reply({
 		content: '어드민전용-업데이트할 주식',
 		components: [
-			new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-				new SelectMenuBuilder()
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				new StringSelectMenuBuilder()
 					.setCustomId('어드민')
 					.setPlaceholder('주식 리스트')
 					.addOptions(

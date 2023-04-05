@@ -3,7 +3,7 @@ import {
 	ChatInputCommandInteraction,
 	Collection,
 	ModalSubmitInteraction,
-	SelectMenuInteraction,
+	StringSelectMenuInteraction,
 } from 'discord.js';
 import { Express } from 'express-serve-static-core';
 import { IUserInfo } from '../common/model/User';
@@ -13,7 +13,7 @@ type TCustomName = string;
 type TCustomId = string;
 
 type TCommandEvent = {
-	select(interaction: SelectMenuInteraction): Promise<void>;
+	select(interaction: StringSelectMenuInteraction): Promise<void>;
 	modalSubmit(interaction: ModalSubmitInteraction): Promise<void>;
 	buttonClick(interaction: ButtonInteraction): Promise<void>;
 	execute(interaction: ChatInputCommandInteraction): Promise<void>;
