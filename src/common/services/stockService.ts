@@ -236,7 +236,7 @@ class StockService implements IStockService {
 		}
 		stock.comment = param.comment;
 		stock.value = param.value;
-		stock.setRatio({ min: param.ratio.min, max: param.ratio.min });
+		stock.setRatio({ min: param.ratio.min, max: param.ratio.max });
 		stock.correctionCnt = param.correctionCnt;
 		stock.conditionList = param.conditionList;
 		stock.dividend = param.dividend;

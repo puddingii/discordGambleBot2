@@ -268,7 +268,8 @@ Stock.statics.updateStock = async function (
 	const updateInfo = {
 		comment: updatedStockInfo.comment,
 		correctionCnt: updatedStockInfo.correctionCnt,
-		ratio: { max, min },
+		minRatio: min,
+		maxRatio: max,
 		value: updatedStockInfo.value,
 	};
 
