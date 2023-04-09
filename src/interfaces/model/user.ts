@@ -1,4 +1,4 @@
-import { ClientSession, Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IStock } from './stock';
 import { IWeapon } from './weapon';
 import { TPopulatedList, TUserParam } from '../common/services/userService';
@@ -90,11 +90,7 @@ export interface IUserStatics extends Model<IUser> {
 	/** 웹 패스워드 발급 */
 	updatePassword(discordId: string, myPassword: string): Promise<void>;
 	/** 유저 돈 업데이트 */
-	updateMoney(
-		userInfo: TUserParam,
-		money: number,
-		session?: ClientSession | null,
-	): Promise<boolean>;
+	updateMoney(userInfo: TUserParam, money: number): Promise<boolean>;
 	/** 무기와 돈 같이 업데이트 */
 	updateWeaponAndMoney(
 		discordId: string,

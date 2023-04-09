@@ -214,16 +214,12 @@ User.statics.checkPassword = async function (
 };
 
 /** 유저 머니 업데이트 */
-User.statics.updateMoney = async function (
-	userInfo: TUserParam,
-	money: number,
-	session = null,
-) {
+User.statics.updateMoney = async function (userInfo: TUserParam, money: number) {
 	const isSucceed = await this.findOneAndUpdate(
 		userInfo,
 		{ $set: { money } },
 		{ new: true },
-	).session(session);
+	);
 	return !!isSucceed;
 };
 
