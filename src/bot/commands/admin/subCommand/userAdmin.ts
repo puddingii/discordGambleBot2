@@ -2,8 +2,8 @@ import { ModalSubmitInteraction, StringSelectMenuInteraction } from 'discord.js'
 import { getNewSelectMenu, getModal } from './common';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
-import { IFormatter } from '../../../../common/util/formatter';
 import { IUserController } from '../../../../interfaces/common/controller/user';
+import { IFormatter } from '../../../../interfaces/common/util/formatter';
 
 const formatter = container.get<IFormatter>(TYPES.Formatter);
 const userController = container.get<IUserController>(TYPES.UserController);

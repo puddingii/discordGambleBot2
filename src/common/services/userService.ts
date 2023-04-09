@@ -18,9 +18,9 @@ import {
 	TUserGiftInfo,
 } from '../../interfaces/game/user';
 import { IStock2 } from '../../interfaces/game/stock';
-import { TUserModelInfo } from '../model/User';
 import { IWeapon } from '../../interfaces/game/weapon';
 import { TEnhanceSimulateResult } from '../../interfaces/common/services/weaponService';
+import { TUserModelInfo } from '../../interfaces/model/user';
 
 @injectable()
 class UserService implements IUserService {

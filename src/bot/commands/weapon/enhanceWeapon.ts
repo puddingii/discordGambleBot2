@@ -6,9 +6,9 @@ import {
 } from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
 import { getEnhanceButton, getSelectMenu } from './subCommand/enhanceWeapon';
 import { IUserWeaponController } from '../../../interfaces/common/controller/userWeapon';
+import { ILogger } from '../../../interfaces/common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const userWeaponController = container.get<IUserWeaponController>(

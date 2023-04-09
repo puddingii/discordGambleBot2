@@ -3,12 +3,7 @@ import WinstonDaily from 'winston-daily-rotate-file';
 import path from 'path';
 import { injectable } from 'inversify';
 import envInfo from '../../config/secretKey';
-
-export interface ILogger {
-	error(error: unknown, depthList: Array<string>): void;
-	info(message: string, depthList: Array<string>): void;
-	warn(message: string, depthList: Array<string>): void;
-}
+import { ILogger } from '../../interfaces/common/util/logger';
 
 @injectable()
 class Logger implements ILogger {

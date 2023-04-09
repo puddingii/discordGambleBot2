@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
-import { ILogger } from './logger';
-import { IFormatter } from './formatter';
 import TYPES from '../../interfaces/containerType';
+import { IFormatter } from '../../interfaces/common/util/formatter';
+import { ILogger } from '../../interfaces/common/util/logger';
 
 export interface IUtil {
 	logger: ILogger;

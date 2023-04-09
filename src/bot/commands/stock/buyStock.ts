@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
 import { IUserStockController } from '../../../interfaces/common/controller/userStock';
+import { ILogger } from '../../../interfaces/common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const userStockController = container.get<IUserStockController>(

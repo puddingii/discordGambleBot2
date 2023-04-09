@@ -1,5 +1,5 @@
-import { IStatusModelStatics } from '../../../common/model/Status';
-import { IFormatter } from '../../../common/util/formatter';
+import { IStatusModelStatics } from '../../model/status';
+import { IFormatter } from '../util/formatter';
 
 export type TUserStatus = { grantMoney: number };
 export type TGambleStatus = {

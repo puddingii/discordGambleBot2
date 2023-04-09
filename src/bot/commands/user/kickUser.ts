@@ -6,8 +6,8 @@ import {
 } from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
 import client from '../../../app';
+import { ILogger } from '../../../interfaces/common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 
