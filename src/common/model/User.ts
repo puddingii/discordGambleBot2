@@ -10,7 +10,7 @@ import { IUserModel, IUserStatics, TGiftInfo } from '../../interfaces/model/user
 const User = new Schema<IUserModel, IUserStatics>({
 	discordId: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	password: {
@@ -19,7 +19,6 @@ const User = new Schema<IUserModel, IUserStatics>({
 	},
 	nickname: {
 		type: String,
-		unique: true,
 		required: true,
 	},
 	money: {
@@ -101,6 +100,15 @@ const User = new Schema<IUserModel, IUserStatics>({
 });
 
 User.statics.addNewUser = async function (discordId: string, nickname: string) {
+	const isExistedNickname = await this.exists({ nickname });
+	if (isExistedNickname) {
+		throw Error('중복되는 닉네임입니다.');
+	}
+	const isExistedDiscordId = await this.exists({ discordId });
+	if (isExistedDiscordId) {
+		throw Error('이미 등록된 유저입니다.');
+	}
+
 	const stockList = (await StockModel.findAllList('all')).map(stock => {
 		return { stock: new Types.ObjectId(stock._id), cnt: 0, value: 0 };
 	});

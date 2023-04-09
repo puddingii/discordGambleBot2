@@ -5,7 +5,7 @@ import { IWeaponModel, IWeaponStatics } from '../../interfaces/model/weapon';
 const Weapon = new Schema<IWeaponModel, IWeaponStatics>({
 	type: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	name: {
