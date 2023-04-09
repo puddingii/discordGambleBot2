@@ -7,7 +7,7 @@ import {
 	TPopulatedList,
 	TProcessedStockInfo,
 } from '../../interfaces/common/services/userService';
-import { ICoin, IStock2 } from '../../interfaces/game/stock';
+import { ICoin, IStock } from '../../interfaces/game/stock';
 import { IStatusService } from '../../interfaces/common/services/statusService';
 import { IUserController } from '../../interfaces/common/controller/user';
 import {
@@ -66,7 +66,7 @@ export default class UserController implements IUserController {
 		const rankingList = userList.map(user => {
 			const money =
 				user.stockList.reduce((acc, cur) => {
-					acc += cur.cnt * (<IStock2 | ICoin>cur.stock).value;
+					acc += cur.cnt * (<IStock | ICoin>cur.stock).value;
 					return acc;
 				}, 0) + user.money;
 			return {

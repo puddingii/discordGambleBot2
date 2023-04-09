@@ -4,10 +4,10 @@ import TYPES from '../interfaces/containerType';
 import Formatter from '../common/util/formatter';
 import Logger from '../common/util/logger';
 import Util from '../common/util/util';
-import UserModel, { IUserStatics } from '../common/model/User';
-import StockModel, { IStockStatics } from '../common/model/Stock';
-import WeaponModel, { IWeaponStatics } from '../common/model/Weapon';
-import StatusModel, { IStatusModelStatics } from '../common/model/Status';
+import UserModel from '../common/model/User';
+import StockModel from '../common/model/Stock';
+import WeaponModel from '../common/model/Weapon';
+import StatusModel from '../common/model/Status';
 import { IUserService } from '../interfaces/common/services/userService';
 import { IStockService } from '../interfaces/common/services/stockService';
 import { IWeaponService } from '../interfaces/common/services/weaponService';
@@ -28,6 +28,10 @@ import { IUserStockController } from '../interfaces/common/controller/userStock'
 import UserStockController from '../common/controller/userStockController';
 import StockController from '../common/controller/stockController';
 import { IStockController } from '../interfaces/common/controller/stock';
+import { IStatusModelStatics } from '../interfaces/model/status';
+import { IStockStatics } from '../interfaces/model/stock';
+import { IWeaponStatics } from '../interfaces/model/weapon';
+import { IUserStatics } from '../interfaces/model/user';
 
 export const container = new Container();
 export const { lazyInject } = getDecorators(container);

@@ -4,8 +4,8 @@ import sharp from 'sharp';
 import jsdom from 'jsdom';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { ILogger } from '../../../common/util/logger';
 import { IStockController } from '../../../interfaces/common/controller/stock';
+import { ILogger } from '../../../interfaces/common/util/logger';
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const stockController = container.get<IStockController>(TYPES.StockController);

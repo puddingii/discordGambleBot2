@@ -3,7 +3,7 @@ import client from '../../app';
 import { isEnrolledUser } from '../middlewares/bot';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
-import { ILogger } from '../../common/util/logger';
+import { ILogger } from '../../interfaces/common/util/logger';
 
 export default {
 	name: 'interactionCreate',

@@ -10,7 +10,7 @@ import {
 	TValidStockParam,
 	TValidCoinParam,
 } from '../../interfaces/common/services/stockService';
-import { ICoin, IStock2 } from '../../interfaces/game/stock';
+import { ICoin, IStock } from '../../interfaces/game/stock';
 
 @injectable()
 class StockService implements IStockService {
@@ -229,7 +229,7 @@ class StockService implements IStockService {
 		await this.stockModel.updateStockList(updatedList);
 	}
 
-	async updateStock(stock: IStock2, param: TValidStockParam): Promise<void> {
+	async updateStock(stock: IStock, param: TValidStockParam): Promise<void> {
 		const result = this.isValidStockParam(param);
 		if (result.code === 0) {
 			throw Error(result.message);

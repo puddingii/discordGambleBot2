@@ -1,76 +1,15 @@
-import { Schema, Model, model, Types, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import dayjs from 'dayjs';
 
 import secretKey from '../../config/secretKey';
 import { TPopulatedUserStockInfo } from '../../interfaces/game/user';
-import { IStock2 } from '../../interfaces/game/stock';
+import { IStock } from '../../interfaces/game/stock';
+import { IStockModel, IStockStatics } from '../../interfaces/model/stock';
 
-interface DoucmentResult<T> {
-	_doc: T;
-}
-
-export interface IStock extends Document, DoucmentResult<IStock> {
-	/** 이름 */
-	name: string;
-	/** 타입 (코인 or 주식) */
-	type: string;
-	/** 1개당 가격 */
-	value: number;
-	/** 설명 */
-	comment: string;
-	/** 변동률 최소치 */
-	minRatio: number;
-	/** 변동률 최대치 */
-	maxRatio: number;
-	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
-	updateTime: number;
-	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
-	correctionCnt: number;
-	/** 주식 히스토리 */
-	updHistory: Types.Array<{ value: number; date: string }>;
-	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
-	conditionList: Types.Array<number>;
-	/** 배당 주식에만 해당함 */
-	dividend: number;
-}
-
-export type IStockInfo = IStock & {
-	_id: Types.ObjectId;
-};
-
-export type TAggregatedStockInfo = Omit<IStockInfo, 'updHistory'> & {
-	beforeHistoryRatio: number;
-};
-
-export interface IStockStatics extends Model<IStock> {
-	/** Type에 맞는 주식정보 다 가져오기 */
-	findAllList(type: 'stock' | 'coin' | 'all'): Promise<TAggregatedStockInfo[]>;
-
-	/** 주식이름으로 주식정보 찾아오기 */
-	findByName(name: string): Promise<TAggregatedStockInfo | null>;
-
-	/** 주식추가 */
-	addStock(
-		stockInfo: TPopulatedUserStockInfo['stock'],
-	): Promise<{ code: number; message?: string }>;
-
-	/** 주식제거 */
-	deleteStock(name: string): Promise<{ cnt: number }>;
-
-	/** 업데이트 히스토리 가져오기 */
-	getUpdateHistory(name: string, limitedCnt: number): Promise<IStock['updHistory']>;
-
-	/** 주식 List 업데이트(주식 히스토리 누적) */
-	updateStockList(updateList: TPopulatedUserStockInfo['stock'][]): Promise<void>;
-
-	/** 주식 단일 업데이트(주식 히스토리 미누적) */
-	updateStock(updatedStockInfo: TPopulatedUserStockInfo['stock']): Promise<void>;
-}
-
-const Stock = new Schema<IStock, IStockStatics>({
+const Stock = new Schema<IStockModel, IStockStatics>({
 	name: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	type: {
@@ -201,6 +140,7 @@ Stock.statics.addStock = async function (stockInfo: TPopulatedUserStockInfo['sto
 };
 
 Stock.statics.findByName = async function (name: string) {
+	console.log(Stock.indexes());
 	const stockInfo = await this.aggregate([
 		{ $match: { name } },
 		{
@@ -278,8 +218,8 @@ Stock.statics.updateStock = async function (
 			{ name: updatedStockInfo.name },
 			{
 				...updateInfo,
-				conditionList: (updatedStockInfo as IStock2).conditionList,
-				dividend: (updatedStockInfo as IStock2).dividend,
+				conditionList: (updatedStockInfo as IStock).conditionList,
+				dividend: (updatedStockInfo as IStock).dividend,
 			},
 		);
 		return;
@@ -288,4 +228,4 @@ Stock.statics.updateStock = async function (
 	await this.findOneAndUpdate({ name: updatedStockInfo.name }, updateInfo);
 };
 
-export default model<IStock, IStockStatics>('Stock', Stock);
+export default model<IStockModel, IStockStatics>('Stock', Stock);

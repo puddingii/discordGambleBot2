@@ -1,6 +1,6 @@
-import { IWeaponStatics } from '../../../common/model/Weapon';
-import { IFormatter } from '../../../common/util/formatter';
 import { IWeapon, TWeaponConstructor, TWeaponInfo } from '../../game/weapon';
+import { IWeaponStatics } from '../../model/weapon';
+import { IFormatter } from '../util/formatter';
 
 /** FIXME */
 export type ValueOf<T> = T[keyof T];

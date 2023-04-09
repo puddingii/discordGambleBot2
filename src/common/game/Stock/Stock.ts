@@ -1,8 +1,8 @@
-import { IStock2, TStockConstructor, TStockInfo2 } from '../../../interfaces/game/stock';
+import { IStock, TStockConstructor, TStockInfo2 } from '../../../interfaces/game/stock';
 import Condition from './ExternalOption/Condition';
 import StockAbstract from './StockAbstract';
 
-export default class Stock extends StockAbstract implements IStock2 {
+export default class Stock extends StockAbstract implements IStock {
 	conditionList: TStockInfo2['conditionList'];
 	dividend: TStockInfo2['dividend'];
 	readonly MAX_RATIO = 0.2;

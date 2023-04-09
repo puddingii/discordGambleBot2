@@ -8,7 +8,7 @@ import fs from 'fs';
 import secretKey from '../config/secretKey';
 import { container } from '../settings/container';
 import TYPES from '../interfaces/containerType';
-import { ILogger } from '../common/util/logger';
+import { ILogger } from '../interfaces/common/util/logger';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
