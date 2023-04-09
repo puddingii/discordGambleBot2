@@ -3,7 +3,7 @@ import passport from 'passport';
 import { isLoggedIn, isNotLoggedIn } from '../middlewares/express';
 import { container } from '../../settings/container';
 import TYPES from '../../interfaces/containerType';
-import { TUserModelInfo } from '../../interfaces/model/user';
+import { TUserModelResult } from '../../interfaces/model/user';
 import { ILogger } from '../../interfaces/common/util/logger';
 
 const router = express.Router();
@@ -16,7 +16,7 @@ router.get('/is-login', (req, res) => {
 	*/
 	return res.status(200).json({
 		isLoggedIn: req.isAuthenticated(),
-		nickname: (req.user as TUserModelInfo)?.nickname,
+		nickname: (req.user as TUserModelResult)?.nickname,
 	});
 });
 router.post('/', isNotLoggedIn, (req, res, next) => {
@@ -36,7 +36,7 @@ router.post('/', isNotLoggedIn, (req, res, next) => {
 		'local',
 		(
 			authError: unknown,
-			userInfo: false | TUserModelInfo,
+			userInfo: false | TUserModelResult,
 			obj: { message: string } | undefined,
 		) => {
 			const message = obj?.message ?? '';

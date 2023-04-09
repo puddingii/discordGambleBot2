@@ -3,10 +3,10 @@ import dayjs from 'dayjs';
 
 import secretKey from '../../config/secretKey';
 import { TPopulatedUserStockInfo } from '../../interfaces/game/user';
-import { IStock2 } from '../../interfaces/game/stock';
-import { IStock, IStockStatics } from '../../interfaces/model/stock';
+import { IStock } from '../../interfaces/game/stock';
+import { IStockModel, IStockStatics } from '../../interfaces/model/stock';
 
-const Stock = new Schema<IStock, IStockStatics>({
+const Stock = new Schema<IStockModel, IStockStatics>({
 	name: {
 		type: String,
 		unique: true,
@@ -217,8 +217,8 @@ Stock.statics.updateStock = async function (
 			{ name: updatedStockInfo.name },
 			{
 				...updateInfo,
-				conditionList: (updatedStockInfo as IStock2).conditionList,
-				dividend: (updatedStockInfo as IStock2).dividend,
+				conditionList: (updatedStockInfo as IStock).conditionList,
+				dividend: (updatedStockInfo as IStock).dividend,
 			},
 		);
 		return;
@@ -227,4 +227,4 @@ Stock.statics.updateStock = async function (
 	await this.findOneAndUpdate({ name: updatedStockInfo.name }, updateInfo);
 };
 
-export default model<IStock, IStockStatics>('Stock', Stock);
+export default model<IStockModel, IStockStatics>('Stock', Stock);

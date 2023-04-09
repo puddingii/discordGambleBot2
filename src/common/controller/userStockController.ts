@@ -6,7 +6,7 @@ import {
 } from '../../interfaces/common/services/stockService';
 import TYPES from '../../interfaces/containerType';
 import { TUserGiftInfo } from '../../interfaces/game/user';
-import { IStock2 } from '../../interfaces/game/stock';
+import { IStock } from '../../interfaces/game/stock';
 
 @injectable()
 export default class UserStockController implements IUserStockController {
@@ -73,7 +73,7 @@ export default class UserStockController implements IUserStockController {
 					giftList.push({
 						type: 'money',
 						value: money,
-						comment: `${(<IStock2>stock.stock).name}의 배당금`,
+						comment: `${(<IStock>stock.stock).name}의 배당금`,
 					});
 				}
 			});

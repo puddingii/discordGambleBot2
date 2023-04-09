@@ -1,11 +1,11 @@
 import { Model, Types } from 'mongoose';
-import { IStock } from './stock';
-import { IWeapon } from './weapon';
+import { IStockModelResult } from './stock';
+import { IWeaponModelResult } from './weapon';
 import { TPopulatedList, TUserParam } from '../common/services/userService';
 import { TPopulatedUserWeaponInfo } from '../game/user';
 
-type WeaponInfo = {
-	weapon: Types.ObjectId | IWeapon;
+type TWeaponInfo = {
+	weapon: IWeaponModelResult;
 	/** 터진수 */
 	destroyCnt: number;
 	/** 실패수 */
@@ -22,8 +22,8 @@ type WeaponInfo = {
 	missRatio: number;
 };
 
-type StockInfo = {
-	stock: Types.ObjectId | IStock;
+type TStockInfo = {
+	stock: IStockModelResult;
 	/** 가지고 있는 갯수 */
 	cnt: number;
 	/** 내 평균 포지션 */
@@ -43,7 +43,7 @@ interface DoucmentResult<T> {
 	_doc: T;
 }
 
-export interface IUser extends Document, DoucmentResult<IUser> {
+export interface IUserModel extends Document, DoucmentResult<IUserModel> {
 	/** 디스코드 아이디 */
 	discordId: string;
 	/** 웹 접속용 패스워드 */
@@ -53,18 +53,18 @@ export interface IUser extends Document, DoucmentResult<IUser> {
 	/** 가지고 있는 돈 */
 	money: number;
 	/** 가지고 있는 주식 리스트 */
-	stockList: Types.Array<StockInfo>;
+	stockList: Types.Array<TStockInfo>;
 	/** 가지고 있는 무기 리스트 */
-	weaponList: Types.Array<WeaponInfo>;
+	weaponList: Types.Array<TWeaponInfo>;
 	/** 선물 받은 리스트 */
 	giftList: Types.Array<TGiftInfo>;
 }
 
-export type TUserModelInfo = IUser & {
+export type TUserModelResult = IUserModel & {
 	_id: Types.ObjectId;
 };
 
-export interface IUserStatics extends Model<IUser> {
+export interface IUserStatics extends Model<IUserModel> {
 	/** 새로운 유저 추가 */
 	addNewUser(discordId: string, nickname: string): Promise<void>;
 	/** 새로운 주식 추가 */
@@ -84,9 +84,9 @@ export interface IUserStatics extends Model<IUser> {
 	findByUserInfo(
 		userParam: TUserParam,
 		populateList?: TPopulatedList,
-	): Promise<TUserModelInfo>;
+	): Promise<TUserModelResult>;
 	/** 모든 유저 가져오기 */
-	getAllUserList(populateList?: TPopulatedList): Promise<Array<TUserModelInfo>>;
+	getAllUserList(populateList?: TPopulatedList): Promise<Array<TUserModelResult>>;
 	/** 웹 패스워드 발급 */
 	updatePassword(discordId: string, myPassword: string): Promise<void>;
 	/** 유저 돈 업데이트 */

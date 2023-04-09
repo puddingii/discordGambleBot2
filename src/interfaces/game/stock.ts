@@ -42,7 +42,7 @@ type TAddedStock2 = {
 export type TStockInfo2 = TStockInfo & TAddedStock2;
 export type TCoinInfo = TStockInfo;
 
-export interface IStock2 extends IStockAbstract, TAddedStock2 {
+export interface IStock extends IStockAbstract, TAddedStock2 {
 	update(curTime: number, curCondition: number): { code: number };
 }
 export interface ICoin extends IStockAbstract {
@@ -50,4 +50,4 @@ export interface ICoin extends IStockAbstract {
 }
 export type TStockConstructor = TStockAbstractConstructor & Partial<TAddedStock2>;
 
-export type TStockClassType = IStock2 | ICoin;
+export type TStockClassType = IStock | ICoin;

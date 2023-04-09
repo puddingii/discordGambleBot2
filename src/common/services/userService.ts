@@ -17,10 +17,10 @@ import {
 	TPopulatedUserWeaponInfo,
 	TUserGiftInfo,
 } from '../../interfaces/game/user';
-import { IStock2 } from '../../interfaces/game/stock';
+import { IStock } from '../../interfaces/game/stock';
 import { IWeapon } from '../../interfaces/game/weapon';
 import { TEnhanceSimulateResult } from '../../interfaces/common/services/weaponService';
-import { TUserModelInfo } from '../../interfaces/model/user';
+import { TUserModelResult } from '../../interfaces/model/user';
 
 @injectable()
 class UserService implements IUserService {
@@ -30,7 +30,7 @@ class UserService implements IUserService {
 		this.userModel = userModel;
 	}
 
-	private convertDataToClass(userInfo: TUserModelInfo) {
+	private convertDataToClass(userInfo: TUserModelResult) {
 		const stockList = userInfo.stockList.map(stockInfo => {
 			const { cnt, value } = stockInfo;
 			const { stock } = stockInfo;
@@ -160,7 +160,7 @@ class UserService implements IUserService {
 		await this.userModel.addGiftList({ discordId: user.getId() }, giftList);
 	}
 
-	async addStock(stock: IStock2) {
+	async addStock(stock: IStock) {
 		await this.userModel.addNewStock(stock.name);
 	}
 
@@ -213,7 +213,7 @@ class UserService implements IUserService {
 		return totalMoney;
 	}
 
-	async tradeStock(user: IUser, stock: IStock2, cnt: number, isFull: boolean) {
+	async tradeStock(user: IUser, stock: IStock, cnt: number, isFull: boolean) {
 		const myStock = user.getStock(stock.name);
 		if (isFull) {
 			cnt = cnt > 0 ? Math.floor(user.money / stock.value) : (myStock?.cnt ?? 0) * -1;

@@ -5,7 +5,7 @@ interface DoucmentResult<T> {
 	_doc: T;
 }
 
-export interface IWeapon extends Document, DoucmentResult<IWeapon> {
+export interface IWeaponModel extends Document, DoucmentResult<IWeaponModel> {
 	/** sword, pickaxe */
 	type: string;
 	/** name */
@@ -24,15 +24,15 @@ export interface IWeapon extends Document, DoucmentResult<IWeapon> {
 	maxPower: number;
 }
 
-export type IWeaponInfo = IWeapon & {
+export type IWeaponModelResult = IWeaponModel & {
 	_id: Types.ObjectId;
 };
 
-export interface IWeaponStatics extends Model<IWeapon> {
+export interface IWeaponStatics extends Model<IWeaponModel> {
 	/** 모든 무기정보 가져오기 */
-	findAllList(): Promise<Array<IWeaponInfo>>;
+	findAllList(): Promise<Array<IWeaponModelResult>>;
 	/** 무기추가 */
-	addWeapon(weaponInfo: TWeaponConstructor): Promise<IWeaponInfo>;
+	addWeapon(weaponInfo: TWeaponConstructor): Promise<IWeaponModelResult>;
 	/** 무기 단일 업데이트(주식 히스토리 미누적) */
 	updateWeapon(updatedWeaponInfo: TWeaponConstructor): Promise<void>;
 }

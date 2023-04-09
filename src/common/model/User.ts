@@ -5,9 +5,9 @@ import secretKey from '../../config/secretKey';
 import WeaponModel from './Weapon';
 import { TPopulatedUserWeaponInfo } from '../../interfaces/game/user';
 import { TPopulatedList, TUserParam } from '../../interfaces/common/services/userService';
-import { IUser, IUserStatics, TGiftInfo } from '../../interfaces/model/user';
+import { IUserModel, IUserStatics, TGiftInfo } from '../../interfaces/model/user';
 
-const User = new Schema<IUser, IUserStatics>({
+const User = new Schema<IUserModel, IUserStatics>({
 	discordId: {
 		type: String,
 		unique: true,
@@ -351,4 +351,4 @@ User.statics.getReceivedAllGiftMoney = async function (userInfo: TUserParam) {
 	return giftList.reduce((acc, giftInfo) => acc + giftInfo.giftList.value, 0);
 };
 
-export default model<IUser, IUserStatics>('User', User);
+export default model<IUserModel, IUserStatics>('User', User);

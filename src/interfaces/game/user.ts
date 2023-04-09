@@ -1,16 +1,16 @@
 import { Types } from 'mongoose';
-import { ICoin, IStock2 } from './stock';
+import { ICoin, IStock } from './stock';
 import { IWeapon } from './weapon';
 
 /** 유저가 가지고 있는 주식정보 타입 */
 export type TUserStockInfo = {
-	stock: IStock2 | ICoin | Types.ObjectId;
+	stock: IStock | ICoin | Types.ObjectId;
 	cnt: number;
 	value: number;
 };
 
 export type TPopulatedUserStockInfo = Omit<TUserStockInfo, 'stock'> & {
-	stock: IStock2 | ICoin;
+	stock: IStock | ICoin;
 };
 
 /** 유저가 가지고 있는 무기정보 */

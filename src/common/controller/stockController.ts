@@ -6,7 +6,7 @@ import {
 	TValidCoinParam,
 	TValidStockParam,
 } from '../../interfaces/common/services/stockService';
-import { ICoin, IStock2, TStockClassType } from '../../interfaces/game/stock';
+import { ICoin, IStock, TStockClassType } from '../../interfaces/game/stock';
 import { IStockController } from '../../interfaces/common/controller/stock';
 
 @injectable()
@@ -55,7 +55,7 @@ export default class StockController implements IStockController {
 	async updateStock(param: TValidStockParam | TValidCoinParam): Promise<void> {
 		const stock = await this.stockService.getStock(param.name);
 		if (stock.type === 'stock') {
-			await this.stockService.updateStock(stock as IStock2, param as TValidStockParam);
+			await this.stockService.updateStock(stock as IStock, param as TValidStockParam);
 		} else {
 			await this.stockService.updateCoin(stock as ICoin, param as TValidCoinParam);
 		}

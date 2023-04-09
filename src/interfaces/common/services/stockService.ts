@@ -1,4 +1,4 @@
-import { ICoin, IStock2, TCoinInfo, TStockInfo2 } from '../../game/stock';
+import { ICoin, IStock, TCoinInfo, TStockInfo2 } from '../../game/stock';
 import { TPopulatedUserStockInfo, TUserStockInfo } from '../../game/user';
 import { IStockStatics } from '../../model/stock';
 
@@ -15,7 +15,7 @@ export type TValidCoinParam = Omit<TCoinInfo, 'beforeHistoryRatio' | 'type'> & {
 export interface IStockService {
 	stockModel: IStockStatics;
 	/** 새로운 주식 추가 */
-	addStock(stockInfo: TValidStockParam): Promise<IStock2>;
+	addStock(stockInfo: TValidStockParam): Promise<IStock>;
 	/** 새로운 코인 추가 */
 	addCoin(stockInfo: TValidCoinParam): Promise<ICoin>;
 	/** 데이터를 차트레이블 데이터로 변환(xlabel, ylabel 등..) */
@@ -28,7 +28,7 @@ export interface IStockService {
 		yDataList: Array<Array<number> | number>;
 	};
 	/** 모든 주식 가져오기 */
-	getAllStock(type?: TStockName): Promise<Array<IStock2 | ICoin>>;
+	getAllStock(type?: TStockName): Promise<Array<IStock | ICoin>>;
 	/** 주식 가져오기 */
 	getStock(stockName: string): Promise<TPopulatedUserStockInfo['stock']>;
 	/** 주식 등락히스토리 가져오기 */
@@ -39,7 +39,7 @@ export interface IStockService {
 	/** 주식 배당금 계산 */
 	getStockDividend(stock: TUserStockInfo['stock'], cnt: number): number;
 	/** 주식정보 업데이트 */
-	updateStock(stock: IStock2, param: TValidStockParam): Promise<void>;
+	updateStock(stock: IStock, param: TValidStockParam): Promise<void>;
 	/** 주식정보 업데이트 */
 	updateCoin(stock: ICoin, param: TValidCoinParam): Promise<void>;
 	/** 주식 랜덤 업데이트 */

@@ -5,7 +5,7 @@ interface DoucmentResult<T> {
 	_doc: T;
 }
 
-export interface IStock extends Document, DoucmentResult<IStock> {
+export interface IStockModel extends Document, DoucmentResult<IStockModel> {
 	/** 이름 */
 	name: string;
 	/** 타입 (코인 or 주식) */
@@ -30,15 +30,15 @@ export interface IStock extends Document, DoucmentResult<IStock> {
 	dividend: number;
 }
 
-export type IStockInfo = IStock & {
+export type IStockModelResult = IStockModel & {
 	_id: Types.ObjectId;
 };
 
-export type TAggregatedStockInfo = Omit<IStockInfo, 'updHistory'> & {
+export type TAggregatedStockInfo = Omit<IStockModelResult, 'updHistory'> & {
 	beforeHistoryRatio: number;
 };
 
-export interface IStockStatics extends Model<IStock> {
+export interface IStockStatics extends Model<IStockModel> {
 	/** Type에 맞는 주식정보 다 가져오기 */
 	findAllList(type: 'stock' | 'coin' | 'all'): Promise<TAggregatedStockInfo[]>;
 
@@ -54,7 +54,7 @@ export interface IStockStatics extends Model<IStock> {
 	deleteStock(name: string): Promise<{ cnt: number }>;
 
 	/** 업데이트 히스토리 가져오기 */
-	getUpdateHistory(name: string, limitedCnt: number): Promise<IStock['updHistory']>;
+	getUpdateHistory(name: string, limitedCnt: number): Promise<IStockModel['updHistory']>;
 
 	/** 주식 List 업데이트(주식 히스토리 누적) */
 	updateStockList(updateList: TPopulatedUserStockInfo['stock'][]): Promise<void>;

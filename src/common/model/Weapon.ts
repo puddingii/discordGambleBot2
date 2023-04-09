@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
 import { TWeaponConstructor } from '../../interfaces/game/weapon';
-import { IWeapon, IWeaponStatics } from '../../interfaces/model/weapon';
+import { IWeaponModel, IWeaponStatics } from '../../interfaces/model/weapon';
 
-const Weapon = new Schema<IWeapon, IWeaponStatics>({
+const Weapon = new Schema<IWeaponModel, IWeaponStatics>({
 	type: {
 		type: String,
 		unique: true,
@@ -83,4 +83,4 @@ Weapon.statics.updateWeapon = async function (updatedWeaponInfo: TWeaponConstruc
 	);
 };
 
-export default model<IWeapon, IWeaponStatics>('Weapon', Weapon);
+export default model<IWeaponModel, IWeaponStatics>('Weapon', Weapon);
