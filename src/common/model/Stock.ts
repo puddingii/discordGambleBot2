@@ -70,7 +70,7 @@ export interface IStockStatics extends Model<IStock> {
 const Stock = new Schema<IStock, IStockStatics>({
 	name: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	type: {
@@ -201,6 +201,7 @@ Stock.statics.addStock = async function (stockInfo: TPopulatedUserStockInfo['sto
 };
 
 Stock.statics.findByName = async function (name: string) {
+	console.log(Stock.indexes());
 	const stockInfo = await this.aggregate([
 		{ $match: { name } },
 		{

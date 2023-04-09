@@ -40,7 +40,7 @@ export interface IWeaponStatics extends Model<IWeapon> {
 const Weapon = new Schema<IWeapon, IWeaponStatics>({
 	type: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	name: {

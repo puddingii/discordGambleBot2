@@ -1,4 +1,4 @@
-import { Schema, Model, model, Types, Document, ClientSession } from 'mongoose';
+import { Schema, Model, model, Types, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import StockModel, { IStock } from './Stock';
 import secretKey from '../../config/secretKey';
@@ -97,11 +97,7 @@ export interface IUserStatics extends Model<IUser> {
 	/** 웹 패스워드 발급 */
 	updatePassword(discordId: string, myPassword: string): Promise<void>;
 	/** 유저 돈 업데이트 */
-	updateMoney(
-		userInfo: UserParam,
-		money: number,
-		session?: ClientSession | null,
-	): Promise<boolean>;
+	updateMoney(userInfo: UserParam, money: number): Promise<boolean>;
 	/** 무기와 돈 같이 업데이트 */
 	updateWeaponAndMoney(
 		discordId: string,
@@ -133,7 +129,7 @@ export interface IUserStatics extends Model<IUser> {
 const User = new Schema<IUser, IUserStatics>({
 	discordId: {
 		type: String,
-		unique: true,
+		index: { unique: true, sparse: false },
 		required: true,
 	},
 	password: {
@@ -142,7 +138,6 @@ const User = new Schema<IUser, IUserStatics>({
 	},
 	nickname: {
 		type: String,
-		unique: true,
 		required: true,
 	},
 	money: {
@@ -224,6 +219,15 @@ const User = new Schema<IUser, IUserStatics>({
 });
 
 User.statics.addNewUser = async function (discordId: string, nickname: string) {
+	const isExistedNickname = await this.exists({ nickname });
+	if (isExistedNickname) {
+		throw Error('중복되는 닉네임입니다.');
+	}
+	const isExistedDiscordId = await this.exists({ discordId });
+	if (isExistedDiscordId) {
+		throw Error('이미 등록된 유저입니다.');
+	}
+
 	const stockList = (await StockModel.findAllList('all')).map(stock => {
 		return { stock: new Types.ObjectId(stock._id), cnt: 0, value: 0 };
 	});
@@ -337,16 +341,12 @@ User.statics.checkPassword = async function (
 };
 
 /** 유저 머니 업데이트 */
-User.statics.updateMoney = async function (
-	userInfo: UserParam,
-	money: number,
-	session = null,
-) {
+User.statics.updateMoney = async function (userInfo: UserParam, money: number) {
 	const isSucceed = await this.findOneAndUpdate(
 		userInfo,
 		{ $set: { money } },
 		{ new: true },
-	).session(session);
+	);
 	return !!isSucceed;
 };
 
