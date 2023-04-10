@@ -37,6 +37,6 @@ declare module 'discord.js' {
 // }
 declare module 'express-serve-static-core' {
 	interface Request {
-		user?: IUserInfo;
+		user?: string;
 	}
 }

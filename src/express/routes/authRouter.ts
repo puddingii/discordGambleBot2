@@ -16,7 +16,6 @@ router.get('/is-login', (req, res) => {
 	*/
 	return res.status(200).json({
 		isLoggedIn: req.isAuthenticated(),
-		nickname: (req.user as TUserModelResult)?.nickname,
 	});
 });
 router.post('/', isNotLoggedIn, (req, res, next) => {
