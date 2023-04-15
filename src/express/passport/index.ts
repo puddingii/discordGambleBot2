@@ -8,7 +8,7 @@ export default () => {
 		done(null, (user as TUserModelResult).discordId);
 	});
 
-	// 페이지 방문할때마다 발동a
+	// 페이지 방문할때마다 발동
 	passport.deserializeUser((id, done) => {
 		try {
 			done(null, id as string);
