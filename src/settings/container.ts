@@ -3,7 +3,7 @@ import getDecorators from 'inversify-inject-decorators';
 import TYPES from '../interfaces/containerType';
 import Formatter from '../common/util/formatter';
 import Logger from '../common/util/logger';
-import Util from '../common/util/util';
+import Util from '../common/util';
 import UserModel from '../common/model/User';
 import StockModel from '../common/model/Stock';
 import WeaponModel from '../common/model/Weapon';
