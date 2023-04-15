@@ -5,7 +5,7 @@ import {
 } from 'discord.js';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { IUtil } from '../../../common/util/util';
+import { IUtil } from '../../../common/util';
 import { IUserController } from '../../../interfaces/common/controller/user';
 
 const util = container.get<IUtil>(TYPES.Util);
