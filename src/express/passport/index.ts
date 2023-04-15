@@ -1,6 +1,5 @@
 import passport from 'passport';
 import localStrategy from './localStrategy';
-import UserModel from '../../common/model/User';
 import { TUserModelResult } from '../../interfaces/model/user';
 
 export default () => {
@@ -10,10 +9,9 @@ export default () => {
 	});
 
 	// 페이지 방문할때마다 발동
-	passport.deserializeUser(async (id, done) => {
+	passport.deserializeUser((id, done) => {
 		try {
-			const userInfo = await UserModel.findByUserInfo({ discordId: id as string });
-			done(null, userInfo);
+			done(null, id as string);
 		} catch (e) {
 			done(e);
 		}

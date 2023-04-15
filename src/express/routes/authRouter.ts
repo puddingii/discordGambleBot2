@@ -16,13 +16,12 @@ router.get('/is-login', (req, res) => {
 	*/
 	return res.status(200).json({
 		isLoggedIn: req.isAuthenticated(),
-		nickname: (req.user as TUserModelResult)?.nickname,
 	});
 });
 router.post('/', isNotLoggedIn, (req, res, next) => {
 	/*
 	#swagger.tags = ['User']
-	#swagger.description = '로그인 시도'
+	#swagger.description = '로그인 시도 및 닉네임 반환'
 	#swagger.parameters['userInfo'] = {
 		in: 'body',
 		description: '유저정보(테스트 서버)',
@@ -54,7 +53,7 @@ router.post('/', isNotLoggedIn, (req, res, next) => {
 					logger.error(loginError, ['Controller']);
 					return next(loginError);
 				}
-				return res.status(200).json({ user: userInfo });
+				return res.status(200).send(userInfo.nickname);
 			});
 		},
 	)(req, res, next);

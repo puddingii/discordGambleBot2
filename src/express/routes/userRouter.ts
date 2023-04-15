@@ -20,13 +20,13 @@ router.get('/stocklist', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User', 'Stock']
 		#swagger.description = '유저가 가지고 있는 모든 주식정보 반환'
 		*/
-		const user = req.user;
-		if (!user) {
+		const discordId = req.user;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		const myStockList = await userController.getMyStockList(user.discordId);
+		const myStockList = await userController.getMyStockList(discordId);
 		return res.status(200).json(myStockList);
 	} catch (err) {
 		let message = err;
@@ -43,13 +43,13 @@ router.get('/summary', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User', 'Stock', 'Weapon']
 		#swagger.description = '대시보드에 보여줄 종합 내용'
 		*/
-		const user = req.user;
-		if (!user) {
+		const discordId = req.user;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		const summaryInfo = await userController.getUserSummary(user.discordId);
+		const summaryInfo = await userController.getUserSummary(discordId);
 		return res.status(200).json(summaryInfo);
 	} catch (err) {
 		let message = err;
@@ -83,13 +83,13 @@ router.get('/weaponList', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User', 'Weapon']
 		#swagger.description = '유저가 가지고 있는 모든 무기 반환'
 		*/
-		const user = req.user;
-		if (!user) {
+		const discordId = req.user;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		const weaponList = await userController.getMyWeaponList(user.discordId);
+		const weaponList = await userController.getMyWeaponList(discordId);
 
 		const myWeaponList = weaponList.map(myWeapon => {
 			if (myWeapon.weapon instanceof Types.ObjectId) {
@@ -182,13 +182,13 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 			}
 		}
 		*/
-		const { user } = req;
+		const { user: discordId } = req;
 		const { cnt, stockName, type } = req.body as Partial<{
 			type: 'b' | 's';
 			cnt: number;
 			stockName: string;
 		}>;
-		if (!user) {
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
@@ -198,7 +198,7 @@ router.patch('/stock', isLoggedIn, async (req, res) => {
 		}
 
 		const stockResult = await userStockController.tradeStock({
-			discordId: user.discordId,
+			discordId,
 			stockName,
 			cnt: type === 's' ? -1 * cnt : cnt,
 			isFull: false,
@@ -220,14 +220,14 @@ router.patch('/grantmoney', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User']
 		#swagger.description = '계속 쌓이는 보조금 받기(일정 시간마다 돈이 쌓임)'
 		*/
-		const { user } = req;
-		if (!user) {
+		const { user: discordId } = req;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
-		const money = await userController.giveGrantMoney(user.discordId);
+		const money = await userController.giveGrantMoney(discordId);
 
 		return res.status(200).json({ value: money });
 	} catch (err) {
@@ -245,14 +245,14 @@ router.patch('/giftMoney', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User']
 		#swagger.description = '선물받은 캐쉬 받기'
 		*/
-		const { user } = req;
-		if (!user) {
+		const { user: discordId } = req;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
-		await userController.receiveAllGiftMoney(user.discordId);
+		await userController.receiveAllGiftMoney(discordId);
 
 		return res.status(200).send();
 	} catch (err) {
@@ -270,13 +270,13 @@ router.get('/', isLoggedIn, async (req, res) => {
 		#swagger.tags = ['User']
 		#swagger.description = '유저정보 반환.(가지고 있는 주식, 닉네임, 돈 등등)'
 		*/
-		const { user } = req;
-		if (!user) {
+		const { user: discordId } = req;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
-		const userInfo = await userController.getUserProfile(user.discordId);
+		const userInfo = await userController.getUserProfile(discordId);
 
 		const grantMoney = await statusController.getGrantMoney();
 

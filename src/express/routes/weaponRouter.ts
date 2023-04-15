@@ -24,15 +24,15 @@ router.get('/enhance-info', isLoggedIn, async (req, res) => {
 		const {
 			query: { type },
 		} = req;
-		const { user } = req;
-		if (!user) {
+		const { user: discordId } = req;
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
 		}
 
 		const { cost, destroy, fail, success } =
-			await userWeaponController.getMyWeaponEnhanceInfo(user.discordId, type as string);
+			await userWeaponController.getMyWeaponEnhanceInfo(discordId, type as string);
 
 		return res.status(200).json({
 			cost,

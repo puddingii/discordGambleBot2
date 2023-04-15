@@ -23,11 +23,11 @@ router.patch('/enhance', isLoggedIn, async (req, res) => {
 			}
 		}
 		*/
-		const { user } = req;
+		const { user: discordId } = req;
 		const { type } = req.body as Partial<{
 			type: string;
 		}>;
-		if (!user) {
+		if (!discordId) {
 			return res
 				.status(401)
 				.json({ message: '유저정보가 없습니다. 다시 로그인 해주세요.' });
@@ -37,14 +37,14 @@ router.patch('/enhance', isLoggedIn, async (req, res) => {
 		}
 
 		const enhanceResult = await userWeaponController.enhanceWeapon({
-			discordId: user.discordId,
+			discordId,
 			isPreventDestroy: false,
 			isPreventDown: false,
 			type,
 		});
 
 		const { cost, destroy, fail, success } =
-			await userWeaponController.getMyWeaponEnhanceInfo(user.discordId, type as string);
+			await userWeaponController.getMyWeaponEnhanceInfo(discordId, type as string);
 
 		return res.status(200).json({
 			enhanceResult,
