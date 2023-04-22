@@ -11,7 +11,6 @@ env:
   VERSION: ${{ github.sha }}
   NAME: go_cicd
   VOLUME_LOG: bot-log
-  VOLUME_LOGG: ttest
 
 jobs:
   # 빌드 Job
@@ -100,20 +99,9 @@ jobs:
       # 기존 Volume이 없는 경우 생성
       - name: Create Volume
         if: ${{ contains(steps.docker-volume-check-result.outputs.IS_EXISTED, env.VOLUME_LOG) != true }}
-        run: docker volume create ${{ env.VOLUME_LOG }}
-
-      # 기존 로그관련 Volume 확인
-      - name: Docker Volume Check
-        id: docker-volume-check-resultt
         run: |
-          echo "IS_EXISTED=$(docker volume ls | grep ${{ env.VOLUME_LOGG }})" >> $GITHUB_OUTPUT
-
-      # 기존 Volume이 없는 경우 생성 후 권한 변경
-      - name: Create Volume
-        if: ${{ contains(steps.docker-volume-check-resultt.outputs.IS_EXISTED, env.VOLUME_LOGG) != true }}
-        run: |
-          docker volume create ${{ env.VOLUME_LOGG }}
-          sudo chown ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} /var/lib/docker/volumes/${{ env.VOLUME_LOGG }}/_data
+          docker volume create ${{ env.VOLUME_LOG }}
+          sudo chown ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} /var/lib/docker/volumes/${{ env.VOLUME_LOG }}/_data
 
       # Docker 환경변수 셋팅 및 Volume, Port 설정 값으로 Run
       - name: Docker run
