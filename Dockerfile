@@ -1,7 +1,6 @@
 FROM node:18-alpine as ts-compiler
 WORKDIR /usr/app
 COPY package*.json tsconfig*.json yarn.lock ./
-RUN npm install -g yarn
 RUN yarn install --pure-lockfile
 COPY . ./
 RUN yarn build
@@ -10,7 +9,6 @@ FROM node:18-alpine as ts-remover
 WORKDIR /usr/app
 COPY --from=ts-compiler /usr/app/package*.json /usr/app/yarn.lock ./
 COPY --from=ts-compiler /usr/app/build ./build
-RUN npm install -g yarn
 RUN yarn install --only=production --pure-lockfile
 
 FROM node:18-alpine
