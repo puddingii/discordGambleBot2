@@ -33,4 +33,5 @@ export default {
 	sessionKey: process.env.SESSION_KEY ?? '',
 	passwordHashRound: parseInt(process.env.PASSWORD_HASH_ROUND ?? '', 10),
 	corsOriginList: process.env.CORS_LIST?.split(',').map(origin => new RegExp(origin)),
+	isTestRun: process.env.IS_TEST ?? 'false',
 };

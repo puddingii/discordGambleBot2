@@ -59,6 +59,9 @@ class Logger implements ILogger {
 	}
 
 	error(error: unknown, depthList: Array<string>) {
+		if (this.isTestRun()) {
+			return;
+		}
 		const depthStr = this.combineDepth(depthList);
 		let message = error;
 		if (error instanceof Error) {
@@ -75,11 +78,21 @@ class Logger implements ILogger {
 	}
 
 	info(message: string, depthList: Array<string>) {
+		if (this.isTestRun()) {
+			return;
+		}
 		const depthStr = this.combineDepth(depthList);
 		this.logger.info(`${depthStr} ${message}`);
 	}
 
+	private isTestRun() {
+		return envInfo.isTestRun === 'true';
+	}
+
 	warn(message: string, depthList: Array<string>) {
+		if (this.isTestRun()) {
+			return;
+		}
 		const depthStr = this.combineDepth(depthList);
 		this.logger.warn(`${depthStr} ${message}`);
 	}

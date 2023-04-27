@@ -2,6 +2,12 @@
 	"extension": [
 		"ts"
 	],
-	"spec": "src/**/*.spec.ts",
-	"require": "ts-node/register"
+	"spec": "src/test/**/*.spec.ts",
+	"require": [
+		"ts-node/register",
+		"reflect-metadata/Reflect",
+		"src/test"
+	],
+	"exit": true,
+	"parallel": true
 }
