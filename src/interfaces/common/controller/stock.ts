@@ -2,8 +2,8 @@ import { TStockClassType } from '../../game/stock';
 import {
 	IStockService,
 	TStockName,
-	TValidCoinParam,
-	TIsValidStockParam,
+	TInvalidatedCoinData,
+	TInvalidatedStockData,
 } from '../services/stockService';
 
 export interface IStockController {
@@ -26,5 +26,5 @@ export interface IStockController {
 		yDataList: Array<Array<number> | number>;
 	}>;
 	/** 주식 업데이트 */
-	updateStock(param: TIsValidStockParam | TValidCoinParam): Promise<void>;
+	updateStock(param: TInvalidatedStockData | TInvalidatedCoinData): Promise<void>;
 }

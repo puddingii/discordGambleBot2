@@ -1,5 +1,5 @@
 export type TRatioType = { min: number; max: number };
-export type TStockInfo = {
+export type TStockData = {
 	ratio: TRatioType;
 	name: string;
 	value: number;
@@ -9,8 +9,8 @@ export type TStockInfo = {
 	comment: string;
 	beforeHistoryRatio: number;
 };
-export interface IStockAbstract<T extends TStockInfo['type']>
-	extends Omit<TStockInfo, 'ratio'> {
+export interface IStockAbstract<T extends TStockData['type']>
+	extends Omit<TStockData, 'ratio'> {
 	type: T;
 	/** 조정을 위한 히스토리 쌓기	*/
 	addCorrectionHistory(value: number, ratio: number): void;
@@ -32,10 +32,10 @@ export interface IStockAbstract<T extends TStockInfo['type']>
 }
 
 export type TStockAbstractConstructor = Omit<
-	TStockInfo,
+	TStockData,
 	'correctionCnt' | 'comment' | 'beforeHistoryRatio'
 > &
-	Pick<Partial<TStockInfo>, 'correctionCnt' | 'comment' | 'beforeHistoryRatio'>;
+	Pick<Partial<TStockData>, 'correctionCnt' | 'comment' | 'beforeHistoryRatio'>;
 
 type TAddedStock2 = {
 	conditionList: [number, number, number, number, number];
@@ -45,8 +45,8 @@ type TAddedStock2 = {
 type TAddedCoin = {
 	type: 'coin';
 };
-export type TStockInfo2 = Omit<TStockInfo, 'type'> & TAddedStock2;
-export type TCoinInfo = Omit<TStockInfo, 'type'> & TAddedCoin;
+export type TStockInfo = Omit<TStockData, 'type'> & TAddedStock2;
+export type TCoinInfo = Omit<TStockData, 'type'> & TAddedCoin;
 
 export interface IStock extends IStockAbstract<'stock'>, TAddedStock2 {
 	update(curTime: number, curCondition: number): { code: number };

@@ -3,8 +3,8 @@ import TYPES from '../../interfaces/containerType';
 import {
 	IStockService,
 	TStockName,
-	TValidCoinParam,
-	TIsValidStockParam,
+	TInvalidatedCoinData,
+	TInvalidatedStockData,
 } from '../../interfaces/common/services/stockService';
 import { ICoin, IStock, TStockClassType } from '../../interfaces/game/stock';
 import { IStockController } from '../../interfaces/common/controller/stock';
@@ -52,12 +52,15 @@ export default class StockController implements IStockController {
 		return stock;
 	}
 
-	async updateStock(param: TIsValidStockParam | TValidCoinParam): Promise<void> {
+	async updateStock(param: TInvalidatedStockData | TInvalidatedCoinData): Promise<void> {
 		const stock = await this.stockService.getStock(param.name);
 		if (stock.type === 'stock') {
-			await this.stockService.updateStock(stock as IStock, param as TIsValidStockParam);
+			await this.stockService.updateStock(
+				stock as IStock,
+				param as TInvalidatedStockData,
+			);
 		} else {
-			await this.stockService.updateCoin(stock as ICoin, param as TValidCoinParam);
+			await this.stockService.updateCoin(stock as ICoin, param as TInvalidatedCoinData);
 		}
 	}
 }

@@ -7,10 +7,10 @@ import { TPopulatedUserStockInfo, TUserStockInfo } from '../../interfaces/game/u
 import {
 	IStockService,
 	TStockName,
-	TIsValidStockParam,
-	TValidCoinParam,
+	TInvalidatedStockData,
+	TInvalidatedCoinData,
 } from '../../interfaces/common/services/stockService';
-import { ICoin, IStock, TStockInfo2 } from '../../interfaces/game/stock';
+import { ICoin, IStock, TStockInfo } from '../../interfaces/game/stock';
 
 @injectable()
 class StockService implements IStockService {
@@ -62,7 +62,10 @@ class StockService implements IStockService {
 	}
 
 	/** 코인 값 유효성 검사 */
-	private isValidCoinParam(param: TValidCoinParam): { code: number; message?: string } {
+	private isValidCoinParam(param: TInvalidatedCoinData): {
+		code: number;
+		message?: string;
+	} {
 		const MAX_RATIO = 0.2;
 
 		/** 비율이 일정 수준이 넘었는지 */
@@ -78,7 +81,7 @@ class StockService implements IStockService {
 	}
 
 	/** 주식 값 유효성 검사 */
-	private isValidStockParam(param: TIsValidStockParam): {
+	private isValidStockParam(param: TInvalidatedStockData): {
 		code: number;
 		message?: string;
 	} {
@@ -107,7 +110,7 @@ class StockService implements IStockService {
 		return { code: 1 };
 	}
 
-	async addCoin(stockInfo: TValidCoinParam) {
+	async addCoin(stockInfo: TInvalidatedCoinData) {
 		const result = this.isValidCoinParam(stockInfo);
 		if (result.code === 0) {
 			throw Error(result.message);
@@ -126,7 +129,7 @@ class StockService implements IStockService {
 		return coin;
 	}
 
-	async addStock(stockInfo: TIsValidStockParam | TStockInfo2) {
+	async addStock(stockInfo: TInvalidatedStockData | TStockInfo) {
 		const result = this.isValidStockParam(stockInfo);
 		if (result.code === 0) {
 			throw Error(result.message);
@@ -138,7 +141,7 @@ class StockService implements IStockService {
 			updateTime: stockInfo.updateTime,
 			value: stockInfo.value,
 			comment: stockInfo.comment,
-			conditionList: (<TStockInfo2>stockInfo).conditionList,
+			conditionList: (<TStockInfo>stockInfo).conditionList,
 			correctionCnt: stockInfo.correctionCnt,
 			dividend: stockInfo.dividend,
 		});
@@ -204,7 +207,7 @@ class StockService implements IStockService {
 		return historyList;
 	}
 
-	async updateCoin(stock: ICoin, param: TValidCoinParam) {
+	async updateCoin(stock: ICoin, param: TInvalidatedCoinData) {
 		const result = this.isValidCoinParam(param);
 		if (result.code === 0) {
 			throw Error(result.message);
@@ -231,7 +234,7 @@ class StockService implements IStockService {
 
 	async updateStock(
 		stock: IStock,
-		param: TIsValidStockParam | TStockInfo2,
+		param: TInvalidatedStockData | TStockInfo,
 	): Promise<void> {
 		const result = this.isValidStockParam(param);
 		if (result.code === 0) {
@@ -241,7 +244,7 @@ class StockService implements IStockService {
 		stock.value = param.value;
 		stock.setRatio({ min: param.ratio.min, max: param.ratio.max });
 		stock.correctionCnt = param.correctionCnt;
-		stock.conditionList = (<TStockInfo2>param).conditionList;
+		stock.conditionList = (<TStockInfo>param).conditionList;
 		stock.dividend = param.dividend;
 
 		await this.stockModel.updateStock(stock);
