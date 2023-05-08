@@ -4,18 +4,19 @@ import { IStockStatics } from '../../model/stock';
 
 export type TStockName = 'coin' | 'stock';
 
-export type TValidStockParam = Omit<TStockInfo2, 'beforeHistoryRatio' | 'type'> & {
-	type: 'stock';
+export type TIsValidStockParam = Omit<
+	TStockInfo2,
+	'beforeHistoryRatio' | 'conditionList'
+> & {
+	conditionList: Array<number> | TStockInfo2['conditionList'];
 };
 
-export type TValidCoinParam = Omit<TCoinInfo, 'beforeHistoryRatio' | 'type'> & {
-	type: 'coin';
-};
+export type TValidCoinParam = Omit<TCoinInfo, 'beforeHistoryRatio'>;
 
 export interface IStockService {
 	stockModel: IStockStatics;
 	/** 새로운 주식 추가 */
-	addStock(stockInfo: TValidStockParam): Promise<IStock>;
+	addStock(stockInfo: TIsValidStockParam | TStockInfo2): Promise<IStock>;
 	/** 새로운 코인 추가 */
 	addCoin(stockInfo: TValidCoinParam): Promise<ICoin>;
 	/** 데이터를 차트레이블 데이터로 변환(xlabel, ylabel 등..) */
@@ -39,7 +40,7 @@ export interface IStockService {
 	/** 주식 배당금 계산 */
 	getStockDividend(stock: TUserStockInfo['stock'], cnt: number): number;
 	/** 주식정보 업데이트 */
-	updateStock(stock: IStock, param: TValidStockParam): Promise<void>;
+	updateStock(stock: IStock, param: TIsValidStockParam): Promise<void>;
 	/** 주식정보 업데이트 */
 	updateCoin(stock: ICoin, param: TValidCoinParam): Promise<void>;
 	/** 주식 랜덤 업데이트 */

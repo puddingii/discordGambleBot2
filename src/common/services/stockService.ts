@@ -7,10 +7,10 @@ import { TPopulatedUserStockInfo, TUserStockInfo } from '../../interfaces/game/u
 import {
 	IStockService,
 	TStockName,
-	TValidStockParam,
+	TIsValidStockParam,
 	TValidCoinParam,
 } from '../../interfaces/common/services/stockService';
-import { ICoin, IStock } from '../../interfaces/game/stock';
+import { ICoin, IStock, TStockInfo2 } from '../../interfaces/game/stock';
 
 @injectable()
 class StockService implements IStockService {
@@ -78,7 +78,7 @@ class StockService implements IStockService {
 	}
 
 	/** 주식 값 유효성 검사 */
-	private isValidStockParam(param: TValidStockParam): {
+	private isValidStockParam(param: TIsValidStockParam): {
 		code: number;
 		message?: string;
 	} {
@@ -126,7 +126,7 @@ class StockService implements IStockService {
 		return coin;
 	}
 
-	async addStock(stockInfo: TValidStockParam) {
+	async addStock(stockInfo: TIsValidStockParam | TStockInfo2) {
 		const result = this.isValidStockParam(stockInfo);
 		if (result.code === 0) {
 			throw Error(result.message);
@@ -138,7 +138,7 @@ class StockService implements IStockService {
 			updateTime: stockInfo.updateTime,
 			value: stockInfo.value,
 			comment: stockInfo.comment,
-			conditionList: stockInfo.conditionList,
+			conditionList: (<TStockInfo2>stockInfo).conditionList,
 			correctionCnt: stockInfo.correctionCnt,
 			dividend: stockInfo.dividend,
 		});
@@ -229,7 +229,10 @@ class StockService implements IStockService {
 		await this.stockModel.updateStockList(updatedList);
 	}
 
-	async updateStock(stock: IStock, param: TValidStockParam): Promise<void> {
+	async updateStock(
+		stock: IStock,
+		param: TIsValidStockParam | TStockInfo2,
+	): Promise<void> {
 		const result = this.isValidStockParam(param);
 		if (result.code === 0) {
 			throw Error(result.message);
@@ -238,7 +241,7 @@ class StockService implements IStockService {
 		stock.value = param.value;
 		stock.setRatio({ min: param.ratio.min, max: param.ratio.max });
 		stock.correctionCnt = param.correctionCnt;
-		stock.conditionList = param.conditionList;
+		stock.conditionList = (<TStockInfo2>param).conditionList;
 		stock.dividend = param.dividend;
 
 		await this.stockModel.updateStock(stock);

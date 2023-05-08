@@ -3,7 +3,7 @@ import {
 	IStockService,
 	TStockName,
 	TValidCoinParam,
-	TValidStockParam,
+	TIsValidStockParam,
 } from '../services/stockService';
 
 export interface IStockController {
@@ -26,5 +26,5 @@ export interface IStockController {
 		yDataList: Array<Array<number> | number>;
 	}>;
 	/** 주식 업데이트 */
-	updateStock(param: TValidStockParam | TValidCoinParam): Promise<void>;
+	updateStock(param: TIsValidStockParam | TValidCoinParam): Promise<void>;
 }

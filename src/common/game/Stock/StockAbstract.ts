@@ -5,14 +5,16 @@ import {
 	TStockInfo,
 } from '../../../interfaces/game/stock';
 
-export default abstract class StockAbstract implements IStockAbstract {
+export default abstract class StockAbstract<T extends TStockInfo['type']>
+	implements IStockAbstract<T>
+{
 	private _ratio: TStockInfo['ratio'];
 	beforeHistoryRatio: TStockInfo['beforeHistoryRatio'];
 	comment: TStockInfo['comment'];
 	correctionCnt: TStockInfo['correctionCnt'];
 	correctionHistory: { value: number; ratio: number }[];
 	name: TStockInfo['name'];
-	type: TStockInfo['type'];
+	type: T;
 	updateTime: TStockInfo['updateTime'];
 	value: TStockInfo['value'];
 
@@ -29,7 +31,7 @@ export default abstract class StockAbstract implements IStockAbstract {
 		this._ratio = ratio;
 		this.name = name;
 		this.value = value;
-		this.type = type;
+		this.type = <T>type;
 		this.updateTime = updateTime;
 		this.correctionCnt = correctionCnt ?? 4;
 		this.comment = comment ?? '';

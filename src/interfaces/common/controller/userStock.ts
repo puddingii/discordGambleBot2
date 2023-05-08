@@ -2,7 +2,7 @@ import { IStatusService } from '../services/statusService';
 import {
 	IStockService,
 	TValidCoinParam,
-	TValidStockParam,
+	TIsValidStockParam,
 } from '../services/stockService';
 import { IUserService } from '../services/userService';
 import { ILogger } from '../util/logger';
@@ -13,7 +13,7 @@ export interface IUserStockController {
 	statusService: IStatusService;
 	logger: ILogger;
 	/** 주식추가 */
-	addStockAndUpdateUsers(param: TValidStockParam): Promise<void>;
+	addStockAndUpdateUsers(param: TIsValidStockParam): Promise<void>;
 	/** 코인추가 */
 	addCoinAndUpdateUsers(param: TValidCoinParam): Promise<void>;
 	/** 주식거래 */

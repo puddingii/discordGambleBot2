@@ -9,7 +9,7 @@ import Stock from '../../../../common/game/Stock/Stock';
 import secretKey from '../../../../config/secretKey';
 import {
 	TValidCoinParam,
-	TValidStockParam,
+	TIsValidStockParam,
 } from '../../../../interfaces/common/services/stockService';
 import { container } from '../../../../settings/container';
 import TYPES from '../../../../interfaces/containerType';
@@ -99,7 +99,7 @@ const updateStock = async (interaction: ModalSubmitInteraction, isNew?: boolean)
 		correctionCnt: param.correctionCnt,
 		updateTime: secretKey.stockUpdateTime,
 	};
-	const stockParam: TValidStockParam = {
+	const stockParam: TIsValidStockParam = {
 		conditionList: param.conditionList,
 		dividend: param.dividend,
 		...defaultClassParam,
