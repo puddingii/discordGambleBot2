@@ -1,7 +1,7 @@
 import { ICoin } from '../../../interfaces/game/stock';
 import StockAbstract from './StockAbstract';
 
-export default class Coin extends StockAbstract implements ICoin {
+export default class Coin extends StockAbstract<'coin'> implements ICoin {
 	update(curTime: number): { code: number } {
 		const ratio = this.getRandomRatio();
 		if (this.isUpdateTime(curTime)) {

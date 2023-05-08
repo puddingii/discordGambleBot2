@@ -23,7 +23,7 @@ router.get('/', isLoggedIn, async (req, res) => {
 		query: { name },
 	} = req;
 	try {
-		const stock = await stockController.getStock(name as string);
+		const stock = await stockController.getStock(<string>name);
 		return res.status(200).json({
 			comment: stock.comment,
 			dividend: stock instanceof Stock ? stock.dividend * 100 : 0,

@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 
 import secretKey from '../../config/secretKey';
 import { TPopulatedUserStockInfo } from '../../interfaces/game/user';
-import { IStock } from '../../interfaces/game/stock';
 import { IStockModel, IStockStatics } from '../../interfaces/model/stock';
 
 const Stock = new Schema<IStockModel, IStockStatics>({
@@ -218,8 +217,8 @@ Stock.statics.updateStock = async function (
 			{ name: updatedStockInfo.name },
 			{
 				...updateInfo,
-				conditionList: (updatedStockInfo as IStock).conditionList,
-				dividend: (updatedStockInfo as IStock).dividend,
+				conditionList: updatedStockInfo.conditionList,
+				dividend: updatedStockInfo.dividend,
 			},
 		);
 		return;

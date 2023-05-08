@@ -1,8 +1,8 @@
 import { IStatusService } from '../services/statusService';
 import {
 	IStockService,
-	TValidCoinParam,
-	TValidStockParam,
+	TInvalidatedCoinData,
+	TInvalidatedStockData,
 } from '../services/stockService';
 import { IUserService } from '../services/userService';
 import { ILogger } from '../util/logger';
@@ -13,9 +13,9 @@ export interface IUserStockController {
 	statusService: IStatusService;
 	logger: ILogger;
 	/** 주식추가 */
-	addStockAndUpdateUsers(param: TValidStockParam): Promise<void>;
+	addStockAndUpdateUsers(param: TInvalidatedStockData): Promise<void>;
 	/** 코인추가 */
-	addCoinAndUpdateUsers(param: TValidCoinParam): Promise<void>;
+	addCoinAndUpdateUsers(param: TInvalidatedCoinData): Promise<void>;
 	/** 주식거래 */
 	tradeStock({
 		discordId,

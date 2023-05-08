@@ -63,7 +63,7 @@ export default class User implements IUser {
 				!(stockInfo.stock instanceof Types.ObjectId) && stockInfo.stock.name === name,
 		);
 
-		return myStock as TPopulatedUserStockInfo;
+		return <TPopulatedUserStockInfo>myStock;
 	}
 
 	getWeapon(type: string) {
@@ -76,6 +76,6 @@ export default class User implements IUser {
 				!(weaponInfo.weapon instanceof Types.ObjectId) && weaponInfo.weapon.type === type,
 		);
 
-		return myWeapon as TPopulatedUserWeaponInfo;
+		return <TPopulatedUserWeaponInfo>myWeapon;
 	}
 }

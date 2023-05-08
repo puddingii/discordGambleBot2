@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { IUserStockController } from '../../interfaces/common/controller/userStock';
 import {
-	TValidCoinParam,
-	TValidStockParam,
+	TInvalidatedCoinData,
+	TInvalidatedStockData,
 } from '../../interfaces/common/services/stockService';
 import TYPES from '../../interfaces/containerType';
 import { TUserGiftInfo } from '../../interfaces/game/user';
@@ -27,12 +27,12 @@ export default class UserStockController implements IUserStockController {
 		this.logger = logger;
 	}
 
-	async addCoinAndUpdateUsers(param: TValidCoinParam): Promise<void> {
+	async addCoinAndUpdateUsers(param: TInvalidatedCoinData): Promise<void> {
 		const stock = await this.stockService.addCoin(param);
 		await this.userService.addStock(stock);
 	}
 
-	async addStockAndUpdateUsers(param: TValidStockParam): Promise<void> {
+	async addStockAndUpdateUsers(param: TInvalidatedStockData): Promise<void> {
 		const stock = await this.stockService.addStock(param);
 		await this.userService.addStock(stock);
 	}

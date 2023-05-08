@@ -2,19 +2,21 @@ import _ from 'lodash';
 import {
 	IStockAbstract,
 	TStockAbstractConstructor,
-	TStockInfo,
+	TStockData,
 } from '../../../interfaces/game/stock';
 
-export default abstract class StockAbstract implements IStockAbstract {
-	private _ratio: TStockInfo['ratio'];
-	beforeHistoryRatio: TStockInfo['beforeHistoryRatio'];
-	comment: TStockInfo['comment'];
-	correctionCnt: TStockInfo['correctionCnt'];
+export default abstract class StockAbstract<T extends TStockData['type']>
+	implements IStockAbstract<T>
+{
+	private _ratio: TStockData['ratio'];
+	beforeHistoryRatio: TStockData['beforeHistoryRatio'];
+	comment: TStockData['comment'];
+	correctionCnt: TStockData['correctionCnt'];
 	correctionHistory: { value: number; ratio: number }[];
-	name: TStockInfo['name'];
-	type: TStockInfo['type'];
-	updateTime: TStockInfo['updateTime'];
-	value: TStockInfo['value'];
+	name: TStockData['name'];
+	type: T;
+	updateTime: TStockData['updateTime'];
+	value: TStockData['value'];
 
 	constructor({
 		ratio,
@@ -29,7 +31,7 @@ export default abstract class StockAbstract implements IStockAbstract {
 		this._ratio = ratio;
 		this.name = name;
 		this.value = value;
-		this.type = type;
+		this.type = <T>type;
 		this.updateTime = updateTime;
 		this.correctionCnt = correctionCnt ?? 4;
 		this.comment = comment ?? '';
@@ -77,7 +79,7 @@ export default abstract class StockAbstract implements IStockAbstract {
 		this.correctionHistory = [];
 	}
 
-	setRatio(ratio: TStockInfo['ratio']) {
+	setRatio(ratio: TStockData['ratio']) {
 		// if (Math.abs(ratio.min) > 0.02 || Math.abs(ratio.max) > 0.02) {
 		// 	throw new Error('Set Ratio Error. Minimum/Maximum size is too big.');
 		// }

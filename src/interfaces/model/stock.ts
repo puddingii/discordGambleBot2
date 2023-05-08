@@ -25,7 +25,7 @@ export interface IStockModel extends Document, DoucmentResult<IStockModel> {
 	/** 주식 히스토리 */
 	updHistory: Types.Array<{ value: number; date: string }>;
 	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
-	conditionList: Types.Array<number>;
+	conditionList: [number, number, number, number, number];
 	/** 배당 주식에만 해당함 */
 	dividend: number;
 }

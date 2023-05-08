@@ -32,7 +32,7 @@ router.get('/enhance-info', isLoggedIn, async (req, res) => {
 		}
 
 		const { cost, destroy, fail, success } =
-			await userWeaponController.getMyWeaponEnhanceInfo(discordId, type as string);
+			await userWeaponController.getMyWeaponEnhanceInfo(discordId, <string>type);
 
 		return res.status(200).json({
 			cost,
