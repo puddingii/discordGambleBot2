@@ -3,9 +3,9 @@ import dayjs from 'dayjs';
 import secretKey from '../config/secretKey';
 import { container } from '../settings/container';
 import TYPES from '../interfaces/containerType';
-import { IUtil } from '../common/util';
 import { IStatusController } from '../interfaces/common/controller/status';
 import { IUserStockController } from '../interfaces/common/controller/userStock';
+import { IUtil } from '../interfaces/common/util';
 
 const util = container.get<IUtil>(TYPES.Util);
 const statusController = container.get<IStatusController>(TYPES.StatusController);

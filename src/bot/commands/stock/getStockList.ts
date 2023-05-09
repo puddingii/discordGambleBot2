@@ -6,9 +6,9 @@ import {
 import dayjs from 'dayjs';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { IUtil } from '../../../common/util';
 import { IStatusController } from '../../../interfaces/common/controller/status';
 import { IStockController } from '../../../interfaces/common/controller/stock';
+import { IUtil } from '../../../interfaces/common/util';
 
 const util = container.get<IUtil>(TYPES.Util);
 const statusController = container.get<IStatusController>(TYPES.StatusController);

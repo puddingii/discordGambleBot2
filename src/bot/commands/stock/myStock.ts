@@ -7,8 +7,8 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { IUtil } from '../../../common/util';
 import { IUserController } from '../../../interfaces/common/controller/user';
+import { IUtil } from '../../../interfaces/common/util';
 
 const util = container.get<IUtil>(TYPES.Util);
 const userController = container.get<IUserController>(TYPES.UserController);

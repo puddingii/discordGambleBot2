@@ -1,12 +1,7 @@
 import { inject, injectable } from 'inversify';
+import mongoose from 'mongoose';
 import TYPES from '../../interfaces/containerType';
-import { IFormatter } from '../../interfaces/common/util/formatter';
-import { ILogger } from '../../interfaces/common/util/logger';
-
-export interface IUtil {
-	logger: ILogger;
-	formatter: IFormatter;
-}
+import { IUtil } from '../../interfaces/common/util';
 
 @injectable()
 class Util implements IUtil {
@@ -19,6 +14,20 @@ class Util implements IUtil {
 	) {
 		this.logger = logger;
 		this.formatter = formatter;
+	}
+
+	getErrorMessage(err: unknown, defaultMessage?: string) {
+		let message = defaultMessage || 'Unrecognized Error';
+
+		if (typeof err === 'string') {
+			message = err;
+		}
+
+		if (err instanceof Error || err instanceof mongoose.Error) {
+			message = err.message;
+		}
+
+		return message;
 	}
 }
 

@@ -6,8 +6,8 @@ import {
 import _ from 'lodash';
 import { container } from '../../../settings/container';
 import TYPES from '../../../interfaces/containerType';
-import { IUtil } from '../../../common/util';
 import { IWeaponController } from '../../../interfaces/common/controller/weapon';
+import { IUtil } from '../../../interfaces/common/util';
 
 const util = container.get<IUtil>(TYPES.Util);
 const weaponController = container.get<IWeaponController>(TYPES.WeaponController);
