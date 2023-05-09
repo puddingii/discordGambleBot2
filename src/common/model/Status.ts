@@ -9,6 +9,7 @@ const Status = new Schema<IStatusModel, IStatusModelStatics>({
 	isTest: {
 		type: Boolean,
 		default: false,
+		unique: true,
 	},
 	user: {
 		grantMoney: {
